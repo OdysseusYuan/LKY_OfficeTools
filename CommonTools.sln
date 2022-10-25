@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LKY_ScanFiles", "LKY_ScanFiles\LKY_ScanFiles.csproj", "{C6093017-A8EB-4ADA-AF15-DF2AD2738712}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LKY_OfficeTools", "LKY_OfficeTools\LKY_OfficeTools.csproj", "{6D00F508-106A-42D1-BE0F-048762434E69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C6093017-A8EB-4ADA-AF15-DF2AD2738712}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6093017-A8EB-4ADA-AF15-DF2AD2738712}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6093017-A8EB-4ADA-AF15-DF2AD2738712}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D00F508-106A-42D1-BE0F-048762434E69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D00F508-106A-42D1-BE0F-048762434E69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D00F508-106A-42D1-BE0F-048762434E69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D00F508-106A-42D1-BE0F-048762434E69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
