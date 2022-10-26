@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 SJTU Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Lib_OfficeInfo.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -18,19 +19,11 @@ namespace LKY_OfficeTools.Lib
         /// <summary>
         /// 最新版 Office 版本信息
         /// </summary>
-        internal Version latest_version = null;
+        internal static Version latest_version = null;
 
         private const string office_info_url = "https://config.office.com/api/filelist/channels";
 
-        private static string office_file_root_url;
-
-        /// <summary>
-        /// 重载实现获取 Office 信息
-        /// </summary>
-        internal Lib_OfficeInfo()
-        {
-            Get_OfficeFileList();
-        }
+        public static string office_file_root_url;
 
         /// <summary>
         /// 获取最新版本的 Office 函数
@@ -40,6 +33,9 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Write("\n\n------> 正在获取最新 Microsoft Office 版本 ...\n");
+
                 //获取频道信息
                 WebClient MyWebClient = new WebClient();
                 MyWebClient.Credentials = CredentialCache.DefaultCredentials;       //获取或设置用于向Internet资源的请求进行身份验证的网络凭据
@@ -51,14 +47,14 @@ namespace LKY_OfficeTools.Lib
                 {
                     //获取版本信息
                     string latest_info = Com_TextOS.GetCenterText(office_info, "\"Current Channel\",", "name");     //获取当前频道（每月）信息
-                    string result = Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\"},");              //获取版本号
+                    latest_version = new Version(Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\"},"));              //获取版本号
 
                     //赋值对应的下载地址
                     office_file_root_url = Com_TextOS.GetCenterText(latest_info, "baseUrl\":\"", "\"");              //获取url
 
                     //Console.WriteLine(office_file_root_url);
 
-                    return new Version(result);
+                    return latest_version;
                 }
                 else
                 { return null; }
@@ -95,6 +91,9 @@ namespace LKY_OfficeTools.Lib
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine($"     √ 获取完成，最新版本：{ver}。");
 
+                //延迟，让用户看清版本号
+                Thread.Sleep(500);
+
                 //获取文件列表
                 List<string> file_list = new List<string>();
                 office_file_root_url += "/office/data";
@@ -107,12 +106,14 @@ namespace LKY_OfficeTools.Lib
                 file_list.Add($"{office_file_root_url}/{ver}/stream.x64.x-none.dat");
                 file_list.Add($"{office_file_root_url}/{ver}/stream.x64.zh-cn.dat");
 
+                /*
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine($"\n------> 预计下载文件：");
                 foreach (var a in file_list)
                 {
                     Console.WriteLine($"      > {a}");
                 }
+                */
 
                 return file_list;
             }

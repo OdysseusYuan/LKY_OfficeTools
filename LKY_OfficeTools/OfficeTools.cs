@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 SJTU Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : OfficeTools.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -9,6 +9,7 @@ using LKY_OfficeTools.Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -20,14 +21,17 @@ namespace LKY_OfficeTools
         static void Main(string[] args)
         {
             //欢迎话术
-            Console.Write("******* 欢迎使用 LKY Office Tools，请按 回车键 继续 ...");
+            Version version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            Console.WriteLine($"******* Welcome to using LKY Office Tools v{version} *******");
+            Console.WriteLine("******* Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc. *******");
+
+            Console.Write("\n请按 回车键 继续 ...");
 
             if (Console.ReadKey().Key == ConsoleKey.Enter)
             {
                 //继续
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write("\n\n------> 正在获取最新版 Microsoft Office 版本 ...\n");
-                new Lib_OfficeInfo();
+                new Lib_OfficeDownload();
 
                 Console.ReadKey();
             }
