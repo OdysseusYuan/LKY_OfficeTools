@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 SJTU Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : ScanFiles.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
