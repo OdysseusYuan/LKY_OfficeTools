@@ -34,7 +34,7 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Write("\n\n------> 正在获取最新 Microsoft Office 版本 ...\n");
+                Console.WriteLine("\n\n------> 正在获取最新 Microsoft Office 版本 ...");
 
                 //获取频道信息
                 WebClient MyWebClient = new WebClient();
@@ -46,7 +46,7 @@ namespace LKY_OfficeTools.Lib
                 if (!string.IsNullOrEmpty(office_info))
                 {
                     //获取版本信息
-                    string latest_info = Com_TextOS.GetCenterText(office_info, "\"Current Channel\",", "name");     //获取当前频道（每月）信息
+                    string latest_info = Com_TextOS.GetCenterText(office_info, "\"PerpetualVL2021\",", "name");     //获取 2021 LTSC
                     latest_version = new Version(Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\"},"));              //获取版本号
 
                     //赋值对应的下载地址
@@ -82,7 +82,7 @@ namespace LKY_OfficeTools.Lib
                 if (version_info == null || string.IsNullOrEmpty(office_file_root_url))     //下载根地址为空时，视为失败
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine("------× 最新版本获取失败，请稍后重试！");
+                    Console.WriteLine("     × 最新版本获取失败，请稍后重试！");
                     return null;
                 }
 

@@ -5,6 +5,7 @@
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
  */
 
+using LKY_OfficeTools.Common;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -34,7 +35,7 @@ namespace LKY_OfficeTools.SDK.Aria2c
                 string aria2c_params = $"{uri} --dir=\"{file_path}\" --out={filename} --continue=true --max-connection-per-server=5 --check-integrity=true --file-allocation=none";
                 //Console.WriteLine(aria2c_params);
 
-                StartProcess(aria2c_path, aria2c_params);
+                Com_ExeOS.RunExe(aria2c_path, aria2c_params);
 
                 return true;
             }
@@ -49,38 +50,6 @@ namespace LKY_OfficeTools.SDK.Aria2c
         }
 
 
-        /// <summary>
-        /// 启动一个外部exe
-        /// </summary>
-        /// <param name="runFilePath"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        internal static string StartProcess(string runFilePath, string args)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-
-            Process p = new Process();
-            p.StartInfo.FileName = runFilePath;             //需要启动的程序名       
-            p.StartInfo.Arguments = args;                   //启动参数
-
-            //是否使用操作系统shell启动
-            p.StartInfo.UseShellExecute = false;
-
-            //启动
-            p.Start();
-
-            //接收返回值
-            //p.StandardInput.AutoFlush = true;
-
-            //获取输出信息
-            //string strOuput = p.StandardOutput.ReadToEnd();
-
-            //等待程序执行完退出进程
-            p.WaitForExit();
-
-            p.Close();
-
-            return null;
-        }
+        
     }
 }

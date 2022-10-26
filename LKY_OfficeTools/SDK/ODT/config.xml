@@ -1,0 +1,15 @@
+﻿<Configuration>
+	<Add OfficeClientEdition="64" Channel="PerpetualVL2021" SourcePath="XXX" AllowCdnFallback="true" Version="XXX">
+		<Product ID="ProPlus2021Volume">
+			<Language ID="zh-cn" />
+			<ExcludeApp ID="Access" />
+			<ExcludeApp ID="Lync" />
+			<ExcludeApp ID="OneDrive" />
+			<ExcludeApp ID="OneNote" />
+			<ExcludeApp ID="Outlook" />
+			<ExcludeApp ID="Publisher" />
+			<ExcludeApp ID="Teams" />
+		</Product>
+	</Add>
+	<Extend CreateShortcuts="true" />
+</Configuration>

@@ -31,7 +31,7 @@ namespace LKY_OfficeTools
             if (Console.ReadKey().Key == ConsoleKey.Enter)
             {
                 //继续
-                new Lib_OfficeDownload();
+                new Lib_OfficeInstall();
 
                 Console.ReadKey();
             }

@@ -6,9 +6,11 @@
  */
 
 using LKY_OfficeTools.SDK.Aria2c;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 
 namespace LKY_OfficeTools.Lib
@@ -28,66 +30,103 @@ namespace LKY_OfficeTools.Lib
         /// </summary>
         internal Lib_OfficeDownload()
         {
-            FilesDownload();
+            //FilesDownload();
         }
 
         /// <summary>
         /// 下载所有文件（Aria2c）
+        /// 返回值：-1【无需下载】，0【下载失败】，1【下载成功】
         /// </summary>
-        internal static void FilesDownload()
+        internal static int FilesDownload()
         {
-            //获取下载列表
-            down_list = Lib_OfficeInfo.Get_OfficeFileList();
-
-            //定义下载目标地
-            string save_to = Environment.CurrentDirectory + @"\Office\";
-
-            //计划保存的地址
-            List<string> save_files = new List<string>();
-
-            //下载开始
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine($"\n------> 开始下载 Microsoft Office v{Lib_OfficeInfo.latest_version} 文件 ...");
-            //延迟，让用户看到开始下载
-            Thread.Sleep(1000);
-
-            //轮询下载所有文件
-            foreach (var a in down_list)
+            try
             {
-                //根据官方目录，来调整下载保存位置
-                string save_path = save_to + a.Substring(Lib_OfficeInfo.office_file_root_url.Length).Replace("/", "\\");
+                //获取下载列表
+                down_list = Lib_OfficeInfo.Get_OfficeFileList();
 
-                //保存到List里面，用于后续检查
-                save_files.Add(save_path);
+                //判断是否已经安装了当前版本
+                RegistryKey HKLM = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, 
+                    Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32);      //判断操作系统版本（64位\32位）打开注册表项，不然 x86编译的本程序 读取 x64的程序会出现无法读取 已经存在于注册表 中的数据
+                
+                RegistryKey office_reg = HKLM.OpenSubKey(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration");
 
-                //遇到重复的文件可以断点续传
-                Aria2c.DownFile(a, save_path);
-            }
-
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine($"\n------> 正在检查 Microsoft Office v{Lib_OfficeInfo.latest_version} 文件 ...");
-
-            foreach (var b in save_files)
-            {
-                string aria_tmp_file = b + ".aria2c";
-
-                //下载完成的标志：文件存在，且不存在临时文件
-                if (File.Exists(b) && !File.Exists(aria_tmp_file))
+                //判断是否存在值
+                if (office_reg != null)
                 {
+                    object office_InstallVer = office_reg.GetValue("VersionToReport");
+                    if (office_InstallVer != null && office_InstallVer.ToString() == Lib_OfficeInfo.latest_version.ToString())      //必须先判断不为null，否则会抛出异常
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.WriteLine($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！");
+                        return -1;
+                    }
+                }
+                ///当不存在 \Configuration\ 项 or 不存在 VersionToReport or 其版本与最新版不一致时，需要下载新文件。
+
+                //定义下载目标地
+                string save_to = Environment.CurrentDirectory + @"\Office\Data\";       //文件必须位于 \Office\Data\ 下，
+                                                                                        //ODT安装必须在 Office 上一级目录上执行。
+
+                //计划保存的地址
+                List<string> save_files = new List<string>();
+
+                //下载开始
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine($"\n------> 开始下载 Microsoft Office v{Lib_OfficeInfo.latest_version} 文件 ...");
+                //延迟，让用户看到开始下载
+                Thread.Sleep(1000);
+
+                //轮询下载所有文件
+                foreach (var a in down_list)
+                {
+                    //根据官方目录，来调整下载保存位置
+                    string save_path = save_to + a.Substring(Lib_OfficeInfo.office_file_root_url.Length).Replace("/", "\\");
+
+                    //保存到List里面，用于后续检查
+                    save_files.Add(save_path);
+
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine($"      > 正在检查 {new FileInfo(b).Name} ...");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine($"      > 文件 {new FileInfo(b).Name} 存在异常，重试中 ...");
-                    FilesDownload();
-                    return;
-                }
-            }
+                    Console.WriteLine($"\n     >> 下载 {new FileInfo(save_path).Name} 文件 ...");
 
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine($"-----√ Microsoft Office v{Lib_OfficeInfo.latest_version} 下载完成。\n");
+                    //遇到重复的文件可以断点续传
+                    Aria2c.DownFile(a, save_path);
+
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine($"     √ {new FileInfo(save_path).Name} 已下载。\n");
+                }
+
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine($"\n------> 正在检查 Microsoft Office v{Lib_OfficeInfo.latest_version} 文件 ...");
+
+                foreach (var b in save_files)
+                {
+                    string aria_tmp_file = b + ".aria2c";
+
+                    //下载完成的标志：文件存在，且不存在临时文件
+                    if (File.Exists(b) && !File.Exists(aria_tmp_file))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.WriteLine($"     >> 检查 {new FileInfo(b).Name} ...");
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine($"     >> 文件 {new FileInfo(b).Name} 存在异常，重试中 ...");
+                        FilesDownload();
+                    }
+                }
+
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine($"     √ Microsoft Office v{Lib_OfficeInfo.latest_version} 下载完成。\n");
+
+                return 1;
+            }
+            catch (Exception Ex)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine(Ex.Message.ToString());
+                return 0;
+            }
         }
 
         ///迅雷下载方法存在BUG，暂停
