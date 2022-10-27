@@ -118,51 +118,5 @@ namespace LKY_OfficeTools.Lib
                 return 0;
             }
         }
-
-        ///迅雷下载方法存在BUG，暂停
-        /*
-        /// <summary>
-        /// 下载单个文件（Thunder）
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="save_to"></param>
-        internal static void DownFileByThunder(string url, string save_to)
-        {
-            if (down_list.Count > 0)
-            {
-                //Console.WriteLine(save_to);
-
-                string file_path = new FileInfo(save_to).DirectoryName;     //保存的文件路径，不含文件名
-                string filename = new FileInfo(save_to).Name;               //保存的文件名
-
-                var manager = new DownloadManager(1, file_path);
-
-                manager.CreateNewTask(url, new FileInfo(save_to).Name);
-
-                Console.WriteLine($"下载至：{new FileInfo(save_to).DirectoryName}，文件名{filename}");
-
-                manager.TaskDownload += (s, e) =>
-                {
-                    if (!(s is DownFileInfo info))
-                    {
-                        return;
-                    }
-                    Console.Write($"{filename} 已完成 {info.TaskInfo.Percent:0.0%}，速度：{info.TaskInfo.Speed / 1024 / 1024:0.0MB/S}\r");
-                };
-
-                manager.TaskCompleted += (s, e) =>
-                {
-                    if (!(s is DownFileInfo info))
-                    {
-                        return;
-                    }
-                    Console.WriteLine($"{info.FileName} 下载完成");
-                };
-
-                manager.StartAllTask();
-            }
-        }
-
-        */
     }
 }

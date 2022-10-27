@@ -75,52 +75,11 @@
     <Compile Include="OfficeTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SDK\Aria2c\Aria2c.cs" />
-    <Compile Include="SDK\ThunderSdk\DownFileInfo.cs" />
-    <Compile Include="SDK\ThunderSdk\DownloadManager.cs" />
-    <Compile Include="SDK\ThunderSdk\ThunderSdk.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Example\office_channels.json" />
     <None Include="Properties\app.manifest" />
-    <None Include="SDK\ThunderSdk\download\id.dat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SDK\ThunderSdk\download\atl71.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\dl_peer_id.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\download_engine.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\MiniThunderPlatform.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\minizip.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\msvcp71.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\msvcr71.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\XLBugHandler.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\XLBugReport.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\download\zlib1.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="SDK\ThunderSdk\xldl.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDK\Aria2c\aria2c.exe">
