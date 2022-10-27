@@ -15,6 +15,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -35,14 +36,24 @@ namespace LKY_OfficeTools.Lib
             switch (DownCode)
             {
                 case 1:
-                    StartInstall();
+                    if (StartInstall())
+                    {
+                        //安装成功，进入激活程序
+                        new Lib_OfficeActivate();
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine($"     × 因 Office 安装失败，自动跳过激活流程！");
+                    }
                     return;
                 case 0:
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine($"     × 未能找到可用的 Office 安装文件！");
                     return;
                 case -1:
-                    //无需下载安装，自动退出
+                    //无需下载安装，直接进入激活模块
+                    new Lib_OfficeActivate();
                     return;
             }
         }
@@ -53,7 +64,7 @@ namespace LKY_OfficeTools.Lib
         internal static bool StartInstall()
         {
             //定义ODT文件位置
-            string ODT_path_root = Environment.CurrentDirectory + @"SDK\ODT\";
+            string ODT_path_root = Environment.CurrentDirectory + @"\SDK\ODT\";
             string ODT_path_exe = ODT_path_root + @"ODT.exe";
             string ODT_path_xml = ODT_path_root + @"config.xml";
 
@@ -78,7 +89,7 @@ namespace LKY_OfficeTools.Lib
             }
 
             ///修改为新版本号
-            bool isNewVersion = Com_FileOS.XML.SetValue(ODT_path_xml, "Version", Lib_OfficeInfo.latest_version.ToString());
+            bool isNewVersion = Com_FileOS.XML.SetValue(ODT_path_xml, "Version", OfficeNetVersion.latest_version.ToString());
 
             //检查是否修改成功（版本号）
             if (!isNewVersion)
@@ -92,7 +103,7 @@ namespace LKY_OfficeTools.Lib
             string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
 
             Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine($"\n------> 开始安装 Microsoft Office v{Lib_OfficeInfo.latest_version} ...");
+            Console.WriteLine($"\n------> 开始安装 Microsoft Office v{OfficeNetVersion.latest_version} ...");
 
             bool isInstallFinish = Com_ExeOS.RunExe(ODT_path_exe, install_args);
 
@@ -100,38 +111,38 @@ namespace LKY_OfficeTools.Lib
             if (!isInstallFinish)
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × Microsoft Office v{Lib_OfficeInfo.latest_version} 安装意外结束！");
+                Console.WriteLine($"     × Microsoft Office v{OfficeNetVersion.latest_version} 安装意外结束！");
                 return false;
             }
 
-            //检查注册表，判断安装是否成功
-            RegistryKey HKLM = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine,
-                    Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32);      //判断操作系统版本（64位\32位）打开注册表项，不然 x86编译的本程序 读取 x64的程序会出现无法读取 已经存在于注册表 中的数据
-
-            RegistryKey office_reg = HKLM.OpenSubKey(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration");
-
-            if (office_reg == null)
+            //检查安装是否成功
+            OfficeLocalInstall.State install_state = OfficeLocalInstall.GetState();
+            if (install_state == OfficeLocalInstall.State.Nothing)
             {
                 //找不到 ClickToRun 注册表
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × Microsoft Office v{Lib_OfficeInfo.latest_version} 安装失败！");
+                Console.WriteLine($"     × Microsoft Office v{OfficeNetVersion.latest_version} 安装失败！");
                 return false;
             }
             else
             {
-                object office_InstallVer = office_reg.GetValue("VersionToReport");
-                if (office_InstallVer != null && office_InstallVer.ToString() == Lib_OfficeInfo.latest_version.ToString())      //必须先判断不为null，否则会抛出异常
+                if (install_state == OfficeLocalInstall.State.Installed)
                 {
                     //一切正常
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"     √ Microsoft Office v{Lib_OfficeInfo.latest_version} 已安装完成。");
+                    Console.WriteLine($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 已安装完成。");
                     return true;
                 }
-                else
+                else if (install_state == OfficeLocalInstall.State.VersionDiff)
                 {
                     //版本号和一开始下载的版本号不一致
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"     × 未能正确安装 Microsoft Office v{Lib_OfficeInfo.latest_version} 版本！");
+                    Console.WriteLine($"     × 未能正确安装 Microsoft Office v{OfficeNetVersion.latest_version} 版本！");
+                    return false;
+                }
+                else
+                {
+                    //未在预期内的结果都返回false
                     return false;
                 }
             } 

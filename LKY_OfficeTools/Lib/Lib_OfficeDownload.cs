@@ -6,12 +6,11 @@
  */
 
 using LKY_OfficeTools.SDK.Aria2c;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Threading;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -42,24 +41,15 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //获取下载列表
-                down_list = Lib_OfficeInfo.Get_OfficeFileList();
+                down_list = OfficeNetVersion.Get_OfficeFileList();
 
                 //判断是否已经安装了当前版本
-                RegistryKey HKLM = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, 
-                    Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32);      //判断操作系统版本（64位\32位）打开注册表项，不然 x86编译的本程序 读取 x64的程序会出现无法读取 已经存在于注册表 中的数据
-                
-                RegistryKey office_reg = HKLM.OpenSubKey(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration");
-
-                //判断是否存在值
-                if (office_reg != null)
+                OfficeLocalInstall.State install_state = OfficeLocalInstall.GetState();
+                if (install_state == OfficeLocalInstall.State.Installed)
                 {
-                    object office_InstallVer = office_reg.GetValue("VersionToReport");
-                    if (office_InstallVer != null && office_InstallVer.ToString() == Lib_OfficeInfo.latest_version.ToString())      //必须先判断不为null，否则会抛出异常
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                        Console.WriteLine($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！");
-                        return -1;
-                    }
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！");
+                    return -1;
                 }
                 ///当不存在 \Configuration\ 项 or 不存在 VersionToReport or 其版本与最新版不一致时，需要下载新文件。
 
@@ -72,7 +62,7 @@ namespace LKY_OfficeTools.Lib
 
                 //下载开始
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine($"\n------> 开始下载 Microsoft Office v{Lib_OfficeInfo.latest_version} 文件 ...");
+                Console.WriteLine($"\n------> 开始下载 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...");
                 //延迟，让用户看到开始下载
                 Thread.Sleep(1000);
 
@@ -80,7 +70,7 @@ namespace LKY_OfficeTools.Lib
                 foreach (var a in down_list)
                 {
                     //根据官方目录，来调整下载保存位置
-                    string save_path = save_to + a.Substring(Lib_OfficeInfo.office_file_root_url.Length).Replace("/", "\\");
+                    string save_path = save_to + a.Substring(OfficeNetVersion.office_file_root_url.Length).Replace("/", "\\");
 
                     //保存到List里面，用于后续检查
                     save_files.Add(save_path);
@@ -96,7 +86,7 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine($"\n------> 正在检查 Microsoft Office v{Lib_OfficeInfo.latest_version} 文件 ...");
+                Console.WriteLine($"\n------> 正在检查 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...");
 
                 foreach (var b in save_files)
                 {
@@ -117,7 +107,7 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"     √ Microsoft Office v{Lib_OfficeInfo.latest_version} 下载完成。\n");
+                Console.WriteLine($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 下载完成。\n");
 
                 return 1;
             }
