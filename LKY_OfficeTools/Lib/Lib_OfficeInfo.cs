@@ -40,7 +40,7 @@ namespace LKY_OfficeTools.Lib
                 try
                 {
                     Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine("\n\n------> 正在获取最新 Microsoft Office 版本 ...");
+                    Console.WriteLine("\n------> 正在获取最新 Microsoft Office 版本 ...");
 
                     //获取频道信息
                     WebClient MyWebClient = new WebClient();
@@ -100,17 +100,44 @@ namespace LKY_OfficeTools.Lib
                     //延迟，让用户看清版本号
                     Thread.Sleep(500);
 
+
                     //获取文件列表
                     List<string> file_list = new List<string>();
                     office_file_root_url += "/office/data";
-                    file_list.Add($"{office_file_root_url}/v64.cab");
-                    file_list.Add($"{office_file_root_url}/v64_{ver}.cab");
+                    ///获取当前系统位数
+                    int sys_bit;
+                    if (Environment.Is64BitOperatingSystem)
+                    {
+                        sys_bit = 64;
+                    }
+                    else
+                    {
+                        sys_bit = 32;
+                    }
+
+                    //x32系统也需要下载 64 的 i64****.cab文件，但必须放在 {ver} 目录下。
                     file_list.Add($"{office_file_root_url}/{ver}/i640.cab");
                     file_list.Add($"{office_file_root_url}/{ver}/i642052.cab");
-                    file_list.Add($"{office_file_root_url}/{ver}/s640.cab");
-                    file_list.Add($"{office_file_root_url}/{ver}/s642052.cab");
-                    file_list.Add($"{office_file_root_url}/{ver}/stream.x64.x-none.dat");
-                    file_list.Add($"{office_file_root_url}/{ver}/stream.x64.zh-cn.dat");
+
+                    switch (sys_bit)
+                    {
+                        case 64:
+                            file_list.Add($"{office_file_root_url}/{ver}/stream.x{sys_bit}.x-none.dat");
+                            file_list.Add($"{office_file_root_url}/{ver}/stream.x{sys_bit}.zh-cn.dat");
+                            break;
+                        case 32:
+                            file_list.Add($"{office_file_root_url}/{ver}/stream.x86.x-none.dat");
+                            file_list.Add($"{office_file_root_url}/{ver}/stream.x86.zh-cn.dat");
+                            file_list.Add($"{office_file_root_url}/{ver}/i{sys_bit}0.cab");
+                            file_list.Add($"{office_file_root_url}/{ver}/i{sys_bit}2052.cab");
+                            break;
+                    }
+
+                    //按版本下载其余文件
+                    file_list.Add($"{office_file_root_url}/v{sys_bit}.cab");
+                    file_list.Add($"{office_file_root_url}/v{sys_bit}_{ver}.cab");
+                    file_list.Add($"{office_file_root_url}/{ver}/s{sys_bit}0.cab");
+                    file_list.Add($"{office_file_root_url}/{ver}/s{sys_bit}2052.cab");
 
                     /*
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -119,6 +146,7 @@ namespace LKY_OfficeTools.Lib
                     {
                         Console.WriteLine($"      > {a}");
                     }
+                    Console.Read();
                     */
 
                     return file_list;

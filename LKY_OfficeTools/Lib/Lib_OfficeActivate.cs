@@ -37,7 +37,7 @@ namespace LKY_OfficeTools.Lib
                 //只要安装了 Office 相对新一点的版本，就用KMS开始激活
                 string cmd_switch_cd = $"pushd \"{Environment.CurrentDirectory + @"\SDK\Activate"}\"";      //切换至OSPP文件目录
                 string cmd_install_key = "cscript ospp.vbs /inpkey:FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH";          //安装序列号，默认是 ProPlus2021VL 的
-                string cmd_kms_url = "cscript ospp.vbs /sethst:kms.03k.org";                                //设置激活KMS地址
+                string cmd_kms_url = "cscript ospp.vbs /sethst:kms.chinancce.com";                          //设置激活KMS地址
                 string cmd_activate = "cscript ospp.vbs /act";                                              //开始激活
 
                 Console.ForegroundColor = ConsoleColor.DarkCyan;

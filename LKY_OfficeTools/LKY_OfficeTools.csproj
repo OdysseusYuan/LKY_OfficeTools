@@ -8,10 +8,11 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>LKY_OfficeTools</RootNamespace>
     <AssemblyName>LKY_OfficeTools</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -67,6 +68,7 @@
     <Compile Include="Common\Com_ExeOS.cs" />
     <Compile Include="Common\Com_FileOS.cs" />
     <Compile Include="Common\Com_PrivilegeOS.cs" />
+    <Compile Include="Common\Com_ProcessOS.cs" />
     <Compile Include="Common\Com_TextOS.cs" />
     <Compile Include="Lib\Lib_OfficeActivate.cs" />
     <Compile Include="Lib\Lib_OfficeDownload.cs" />
@@ -82,12 +84,10 @@
     <None Include="Properties\app.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="logo.ico" />
     <None Include="SDK\Aria2c\aria2c.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="logo.ico" />
     <None Include="SDK\Activate\OSPP.VBS">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

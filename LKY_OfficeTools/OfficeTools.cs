@@ -42,12 +42,11 @@ namespace LKY_OfficeTools
             //等待用户
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write("\n请按 回车键 继续部署 ...");
-
-            //权限检查
-            Com_PrivilegeOS.PrivilegeAttention();
-
             if (Console.ReadKey().Key == ConsoleKey.Enter)
             {
+                //权限检查
+                Com_PrivilegeOS.PrivilegeAttention();
+
                 //继续
                 new Lib_OfficeInstall();
 

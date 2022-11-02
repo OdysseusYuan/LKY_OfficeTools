@@ -99,6 +99,27 @@ namespace LKY_OfficeTools.Lib
                 return false;
             }
 
+            ///修改安装的位数
+            //获取系统位数
+            int sys_bit;
+            if (Environment.Is64BitOperatingSystem)
+            {
+                sys_bit = 64;
+            }
+            else
+            {
+                sys_bit = 32;
+            }
+            bool isNewBit = Com_FileOS.XML.SetValue(ODT_path_xml, "OfficeClientEdition", sys_bit.ToString());
+
+            //检查是否修改成功（位数）
+            if (!isNewBit)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine($"     × 配置 Edition 信息错误！");
+                return false;
+            }
+
             //开始安装
             string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
 
@@ -129,6 +150,8 @@ namespace LKY_OfficeTools.Lib
                 if (install_state == OfficeLocalInstall.State.Installed)
                 {
                     //一切正常
+                    Com_ProcessOS.KillProcess("OfficeClickToRun");      //结束无关进程
+                    Com_ProcessOS.KillProcess("OfficeC2RClient");       //结束无关进程
                     Console.ForegroundColor = ConsoleColor.DarkGreen;
                     Console.WriteLine($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 已安装完成。");
                     return true;

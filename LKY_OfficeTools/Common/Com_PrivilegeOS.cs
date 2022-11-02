@@ -32,13 +32,16 @@ namespace LKY_OfficeTools.Common
         internal static void PrivilegeAttention()
         {
             Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine($"\n------> 正在进行 权限检查 ...");
+            Console.WriteLine($"\n\n------> 正在进行 权限检查 ...");
 
             //提权检验，非提权，激活会出问题
             if (!IsRunByAdmin())
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine($"     × 权限错误，请以管理员身份运行此文件！");
+
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write("\n请按任意键退出 ...");
                 Console.Read();
                 Environment.Exit(-1);
             }

@@ -42,6 +42,11 @@ namespace LKY_OfficeTools.Lib
             {
                 //获取下载列表
                 down_list = OfficeNetVersion.Get_OfficeFileList();
+                if (down_list == null)
+                {
+                    //中断安装
+                    return 0;
+                }
 
                 //判断是否已经安装了当前版本
                 OfficeLocalInstall.State install_state = OfficeLocalInstall.GetState();
