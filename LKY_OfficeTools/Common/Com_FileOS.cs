@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -38,7 +39,7 @@ namespace LKY_OfficeTools.Common
                     string current_value = Com_TextOS.GetCenterText(xml_content, $"{Key_str}=\"", "\"");
 
                     //替换值
-                    string xml_new_content = Com_TextOS.ReplaceText(xml_content, current_value, new_Value);
+                    string xml_new_content = xml_content.Replace(current_value, new_Value);
 
                     //判断是否替换成功
                     if (string.IsNullOrEmpty(xml_new_content))
@@ -60,5 +61,76 @@ namespace LKY_OfficeTools.Common
                 }
             }
         }
+
+        /// <summary>
+        /// 搜索文件的类库
+        /// </summary>
+        internal class ScanFiles
+        {
+            /// <summary>
+            /// 检索最终的文件路径列表
+            /// </summary>
+            internal List<string> FilesList = new List<string>();
+
+            /// <summary>
+            /// 通过文件后缀扩展类型，递归查找满足条件的文件路径
+            /// </summary>
+            /// <param name="dirPath"></param>
+            /// <param name="isRoot"></param>
+            public void GetFilesByExtension(string dirPath, string fileType = "*", bool isRoot = false)
+            {
+                if (Directory.Exists(dirPath))     //目录存在
+                {
+                    DirectoryInfo folder = new DirectoryInfo(dirPath);
+
+                    //Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    //Console.Write("\r正在检索: " + folder.FullName);
+
+                    //获取当前目录下的文件名
+                    foreach (FileInfo file in folder.GetFiles())
+                    {
+                        //如果没有限制文件后缀名，或者满足了特定后缀名，开始写入List
+                        if (fileType == "*" || file.Extension == (fileType))
+                        {
+                            //扫描到的文件添加到列表中
+                            FilesList.Add(file.FullName);
+                        }
+                    }
+
+                    //如果是根目录先排除掉 回收站目录
+                    if (isRoot)
+                    {
+                        foreach (DirectoryInfo dir in folder.GetDirectories())
+                        {
+                            if (dir.FullName.Contains("$RECYCLE.BIN") || dir.FullName.Contains("System Volume Information"))
+                            {
+                                //Console.ForegroundColor = ConsoleColor.DarkGray;
+                                //Console.WriteLine("跳过: " + dir.FullName);
+                            }
+                            else
+                            {
+                                //Console.WriteLine("----->: " + dir.FullName);
+                                GetFilesByExtension(dir.FullName, fileType);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //遍历下一个子目录
+                        foreach (DirectoryInfo subFolders in folder.GetDirectories())
+                        {
+                            //Console.WriteLine(subFolders.FullName);
+                            GetFilesByExtension(subFolders.FullName, fileType);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("不存在: " + dirPath);
+                }
+            }
+        }
+
     }
 }

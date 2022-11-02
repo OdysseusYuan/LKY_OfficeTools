@@ -24,7 +24,7 @@ namespace LKY_OfficeTools.SDK.Aria2c
                 if (!File.Exists(aria2c_path))
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine("------× aria2c.exe 文件丢失！");
+                    Console.WriteLine("     × aria2c.exe 文件丢失！");
                     return false;
                 }
 
@@ -32,7 +32,7 @@ namespace LKY_OfficeTools.SDK.Aria2c
                 string filename = new FileInfo(save_to).Name;               //保存的文件名
 
                 //设置命令行
-                string aria2c_params = $"{uri} --dir=\"{file_path}\" --out={filename} --continue=true --max-connection-per-server=5 --check-integrity=true --file-allocation=none";
+                string aria2c_params = $"{uri} --dir=\"{file_path}\" --out=\"{filename}\" --continue=true --max-connection-per-server=5 --check-integrity=true --file-allocation=none";
                 //Console.WriteLine(aria2c_params);
 
                 Com_ExeOS.RunExe(aria2c_path, aria2c_params);

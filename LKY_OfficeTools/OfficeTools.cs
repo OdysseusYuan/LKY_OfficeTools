@@ -47,6 +47,9 @@ namespace LKY_OfficeTools
                 //权限检查
                 Com_PrivilegeOS.PrivilegeAttention();
 
+                //更新检查
+                Lib_SelfUpdate.Check_Latest_Version();
+
                 //继续
                 new Lib_OfficeInstall();
 

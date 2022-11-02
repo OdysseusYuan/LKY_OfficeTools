@@ -56,6 +56,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -74,12 +76,14 @@
     <Compile Include="Lib\Lib_OfficeDownload.cs" />
     <Compile Include="Lib\Lib_OfficeInfo.cs" />
     <Compile Include="Lib\Lib_OfficeInstall.cs" />
+    <Compile Include="Lib\Lib_SelfUpdate.cs" />
     <Compile Include="OfficeTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SDK\Aria2c\Aria2c.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Example\LKY_OfficeTools_AppInfo.json" />
     <None Include="Example\office_channels.json" />
     <None Include="Properties\app.manifest" />
   </ItemGroup>
