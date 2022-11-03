@@ -42,12 +42,8 @@ namespace LKY_OfficeTools.Lib
                     Console.ForegroundColor = ConsoleColor.DarkCyan;
                     Console.WriteLine("\n------> 正在获取最新 Microsoft Office 版本 ...");
 
-                    //获取频道信息
-                    WebClient MyWebClient = new WebClient();
-                    MyWebClient.Credentials = CredentialCache.DefaultCredentials;       //获取或设置用于向Internet资源的请求进行身份验证的网络凭据
-                    Byte[] pageData = MyWebClient.DownloadData(office_info_url);        //从指定网站下载数据
-                                                                                        //string pageHtml = Encoding.Default.GetString(pageData);             //如果获取网站页面采用的是GB2312，则使用这句            
-                    string office_info = Encoding.UTF8.GetString(pageData);              //如果获取网站页面采用的是UTF-8，则使用这句
+                    //获取频道信息       
+                    string office_info = Com_WebOS.Visit_WebRequest(office_info_url);
 
                     if (!string.IsNullOrEmpty(office_info))
                     {

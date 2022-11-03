@@ -25,6 +25,16 @@ namespace LKY_OfficeTools.Lib
     internal class Lib_SelfUpdate
     {
         /// <summary>
+        /// 获取更新info时的访问地址
+        /// </summary>
+        internal const string update_json_url = "https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/download/AppInfo/LKY_OfficeTools_AppInfo.json";
+
+        /// <summary>
+        /// 获取到的最新信息
+        /// </summary>
+        internal static string latest_info;
+
+        /// <summary>
         /// 检查自身最新版本
         /// </summary>
         /// <returns></returns>
@@ -47,18 +57,25 @@ namespace LKY_OfficeTools.Lib
                     }
                 }
 
-                string check_url = "https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/download/AppInfo/LKY_OfficeTools_AppInfo.json";
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"     >> 初始化完成 {new Random().Next(10, 30)}% ...");
 
-                //获取 github 版本信息
-                WebClient MyWebClient = new WebClient();
-                MyWebClient.Credentials = CredentialCache.DefaultCredentials;       //获取或设置用于向Internet资源的请求进行身份验证的网络凭据
-                Byte[] pageData = MyWebClient.DownloadData(check_url);        //从指定网站下载数据
-                                                                              //string pageHtml = Encoding.Default.GetString(pageData);             //如果获取网站页面采用的是GB2312，则使用这句            
-                string latest_info = Encoding.UTF8.GetString(pageData);             //如果获取网站页面采用的是UTF-8，则使用这句
+                //获取版本信息
+                latest_info = Com_WebOS.Visit_WebRequest(update_json_url);
 
                 //截取获得最新版本和下载地址
                 string latest_ver = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version\": \"", "\"");
                 string latest_down_url = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version_Update_Url\": \"", "\"");
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"     >> 初始化完成 {new Random().Next(31, 50)}% ...");
+
+                //执行运行统计
+                new Lib_SelfCount();
+                Console.ReadKey();
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"     >> 初始化完成 {new Random().Next(71, 90)}% ...");
 
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine($"     √ 已完成 {Console.Title} v{latest_ver} 初始化检查。");
