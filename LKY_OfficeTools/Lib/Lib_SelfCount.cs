@@ -39,18 +39,20 @@ namespace LKY_OfficeTools.Lib
                 try
                 {
                     //获取系统版本
+                    ///先获取位数
+                    int sys_bit = Environment.Is64BitOperatingSystem ? 64 : 32;
                     string system_ver = null;
                     if (OS.WindowsVersion() == OS.OSType.Win10)
                     {
-                        system_ver = $"{OS.OSType.Win10} ({OS.Win10Version(false)}) v{OS.Win10Version()}";
+                        system_ver = $"{OS.OSType.Win10} ({OS.Win10Version(false)}) x{sys_bit} v{OS.Win10Version()}";
                     }
                     else if (OS.WindowsVersion() == OS.OSType.Win11)
                     {
-                        system_ver = $"{OS.OSType.Win11} ({OS.Win11Version(false)}) v{OS.Win10Version()}";
+                        system_ver = $"{OS.OSType.Win11} ({OS.Win11Version(false)}) x{sys_bit} v{OS.Win10Version()}";
                     }
                     else
                     {
-                        system_ver = OS.WindowsVersion().ToString();
+                        system_ver = OS.WindowsVersion().ToString() + $" x{sys_bit}";
                     }
 
                     //访问统计网址，并获取返回值

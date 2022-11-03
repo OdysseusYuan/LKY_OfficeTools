@@ -18,6 +18,7 @@ namespace LKY_OfficeTools.Common
     /// </summary>
     internal class Com_EmailOS
     {
+        /*
         /// <summary>
         /// 通过本机无密码发送邮件
         /// </summary>
@@ -68,6 +69,7 @@ namespace LKY_OfficeTools.Common
                 return false;
             }
         }
+        */
 
         /// <summary>
         /// 通过账号方式发送

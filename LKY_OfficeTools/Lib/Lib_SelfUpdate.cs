@@ -72,7 +72,6 @@ namespace LKY_OfficeTools.Lib
 
                 //执行运行统计
                 new Lib_SelfCount();
-                Console.ReadKey();
 
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
                 Console.WriteLine($"     >> 初始化完成 {new Random().Next(71, 90)}% ...");
