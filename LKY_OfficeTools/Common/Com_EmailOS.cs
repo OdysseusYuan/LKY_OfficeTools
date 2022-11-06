@@ -135,10 +135,10 @@ namespace LKY_OfficeTools.Common
 
                 return true;
             }
-            catch (Exception err)
+            catch /*(Exception err)*/
             {
-                //此处直接报错，不再new bug，因为此模块直接被new Bug调用
-                Console.WriteLine(err);
+                //Console.WriteLine(err);
+                //Console.ReadKey();
                 return false;
             }
             finally

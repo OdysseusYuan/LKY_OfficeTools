@@ -3,10 +3,11 @@
   "Latest_Version_Update_Url": "https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/download/AppInfo/LKY_OfficeTools_v1.0.2.21103.zip",
 
   "Count_Url": "https://odysseusyuan.gitee.io/lky_officetools/running_count.html",
-
   "Count_Feedback_To": "liukaiyuan@sjtu.edu.cn",
   "Count_Feedback_From": "3612196934@qq.com",
   "Count_Feedback_Pwd": "vecxfbuynacedaag",
 
-  "KMS_List": "kms.03k.org, kms.chinancce.com, zh.us.to, kms.shuax.com, kms.dwhd.org, kms.luody.info, kms.digiboy.ir, kms.lotro.cc, www.zgbs.cc, cy2617.jios.org"
+  "KMS_List": "kms.03k.org, kms.chinancce.com, zh.us.to, kms.shuax.com, kms.dwhd.org, kms.luody.info, kms.digiboy.ir, kms.lotro.cc, www.zgbs.cc, cy2617.jios.org",
+
+  "IP_Check_Url_List": "http://www.net.cn/static/customercare/yourip.asp; https://ip.tool.chinaz.com; https://tool.lu/ip; https://www.ip123.in; https://www.ip123.in"
 }

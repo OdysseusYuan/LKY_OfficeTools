@@ -7,6 +7,7 @@
 
 using LKY_OfficeTools.Common;
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using static LKY_OfficeTools.Common.Com_SystemOS;
 
@@ -42,28 +43,39 @@ namespace LKY_OfficeTools.Lib
                     ///先获取位数
                     int sys_bit = Environment.Is64BitOperatingSystem ? 64 : 32;
                     string system_ver = null;
-                    if (OS.WindowsVersion() == OS.OSType.Win10)
+                    if (OS.GetPublishType() == OS.OSType.Win10)
                     {
-                        system_ver = $"{OS.OSType.Win10} ({OS.Win10Version(false)}) x{sys_bit} v{OS.Win10Version()}";
+                        system_ver = $"{OS.OSType.Win10} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
                     }
-                    else if (OS.WindowsVersion() == OS.OSType.Win11)
+                    else if (OS.GetPublishType() == OS.OSType.Win11)
                     {
-                        system_ver = $"{OS.OSType.Win11} ({OS.Win11Version(false)}) x{sys_bit} v{OS.Win10Version()}";
+                        system_ver = $"{OS.OSType.Win11} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
                     }
                     else
                     {
-                        system_ver = OS.WindowsVersion().ToString() + $" x{sys_bit}";
+                        system_ver = OS.GetPublishType().ToString() + $" x{sys_bit}";
                     }
 
+                    //运行模式
+                    string run_mode;
+#if (DEBUG)
+                    run_mode = "Debug";
+#else
+                    run_mode = "Release";
+#endif
+
                     //访问统计网址，并获取返回值
-                    string title = $"[LKY OfficeTools 启动信息]";
+                    string title = $"[LKY OfficeTools 启动通知]";
 
                     string content =
                         $"<font color=green><b>*************** 【运行信息】 ***************</b></font><br /><br />" +
                          $"<font color = red>【发送时间】：</font>{DateTime.Now}<br /><br />" +
                          $"<font color = red>【反馈类型】：</font>软件例行启动<br /><br />" +
-                         $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version}<br /><br />" +
                          $"<font color = red>【系统环境】：</font>{system_ver}<br /><br />" +
+                         $"<font color = red>【机器名称】：</font>{Environment.MachineName} ({Environment.UserName})<br /><br />" +
+                         $"<font color = red>【网络地址】：</font>{Com_NetworkOS.IP.GetMyIP_Info()}<br /><br />" +
+                         $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
+                         $"<font color = red>【启动路径】：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
                          /*$"<font color = red>【关联类库】：</font>{bug_class}<br /><br />" +
                          $"<font color = red>【错误提示】：</font>{bug_msg}<br /><br />" +
                          $"<font color = red>【代码位置】：</font>{bug_code}<br /><br />" +*/
@@ -73,7 +85,7 @@ namespace LKY_OfficeTools.Lib
                     string info = Lib_SelfUpdate.latest_info;
                     if (string.IsNullOrEmpty(info))
                     {
-                        info = Com_WebOS.Visit_WebRequest(Lib_SelfUpdate.update_json_url);
+                        info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
                     }
 
                     string PostTo = Com_TextOS.GetCenterText(info, "\"Count_Feedback_To\": \"", "\"");
@@ -108,6 +120,8 @@ namespace LKY_OfficeTools.Lib
                 {
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
                     Console.WriteLine($"     >> 已跳过非必要流程 ...");
+                    //Console.WriteLine(Ex);
+                    //Console.ReadKey();
                     return false;
                 }
             }

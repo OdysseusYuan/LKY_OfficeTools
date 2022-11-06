@@ -9,7 +9,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Windows.Forms;
 
 namespace LKY_OfficeTools.Common
 {
@@ -24,25 +23,27 @@ namespace LKY_OfficeTools.Common
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        internal static string Visit_WebRequest(string url)
+        internal static string Visit_WebClient(string url, Encoding encoding = null)
         {
             try
             {
-                Uri uri = new Uri(url);
-                WebRequest myReq = WebRequest.Create(uri);
-                WebResponse result = myReq.GetResponse();
-                Stream receviceStream = result.GetResponseStream();
-                StreamReader readerOfStream = new StreamReader(receviceStream, Encoding.UTF8);
-                string strHTML = readerOfStream.ReadToEnd();
-                readerOfStream.Close();
-                receviceStream.Close();
-                result.Close();
-                return strHTML;
+                if (encoding == null)
+                {
+                    encoding = Encoding.UTF8;
+                }
+
+                using (WebClient WC = new WebClient())
+                {
+                    WC.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36");
+                    WC.Credentials = CredentialCache.DefaultCredentials;//获取或设置用于向Internet资源的请求进行身份验证的网络凭据
+                    Byte[] pageData = WC.DownloadData(url); //从指定网站下载数据
+                    return encoding.GetString(pageData);
+                }
             }
             catch /*(Exception Ex)*/
             {
                 //Console.ForegroundColor = ConsoleColor.DarkYellow;
-                //Console.WriteLine($"      * 运行统计异常！");
+                //Console.WriteLine(Ex);
                 return null;
             }
         }

@@ -7,7 +7,6 @@
 
 using LKY_OfficeTools.Common;
 using System;
-using System.Diagnostics;
 using System.IO;
 
 namespace LKY_OfficeTools.SDK.Aria2c
@@ -39,17 +38,17 @@ namespace LKY_OfficeTools.SDK.Aria2c
 
                 return true;
             }
-            catch (Exception Ex)
+            catch /*(Exception Ex)*/
             {
-                string error = Ex.Message.ToString();
-               
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine(error);
+                //string error = Ex.Message.ToString();
+
+                //Console.ForegroundColor = ConsoleColor.DarkRed;
+                //Console.WriteLine(error);
                 return false;
             }
         }
 
 
-        
+
     }
 }

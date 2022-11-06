@@ -116,10 +116,10 @@ namespace LKY_OfficeTools.Lib
 
                 return 1;
             }
-            catch (Exception Ex)
+            catch /*(Exception Ex)*/
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine(Ex.Message.ToString());
+                //Console.ForegroundColor = ConsoleColor.DarkRed;
+                //Console.WriteLine(Ex.Message.ToString());
                 return 0;
             }
         }

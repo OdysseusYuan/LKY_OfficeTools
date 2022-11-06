@@ -55,10 +55,10 @@ namespace LKY_OfficeTools.Common
 
                 return true;
             }
-            catch (Exception Ex)
+            catch /*(Exception Ex)*/
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine(Ex.Message.ToString());
+                //Console.ForegroundColor = ConsoleColor.DarkRed;
+                //Console.WriteLine(Ex.Message.ToString());
                 return false;
             }
         }
@@ -110,10 +110,10 @@ namespace LKY_OfficeTools.Common
 
                 return strOuput;
             }
-            catch (Exception Ex)
+            catch /*(Exception Ex)*/
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine(Ex.Message.ToString());
+                //Console.ForegroundColor = ConsoleColor.DarkRed;
+                //Console.WriteLine(Ex.Message.ToString());
                 return null;
             }
         }

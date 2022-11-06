@@ -39,7 +39,7 @@ namespace LKY_OfficeTools.Lib
             string info = Lib_SelfUpdate.latest_info;
             if (string.IsNullOrEmpty(info))
             {
-                info = Com_WebOS.Visit_WebRequest(Lib_SelfUpdate.update_json_url);
+                info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
             }
 
             string KMS_info = Com_TextOS.GetCenterText(info, "\"KMS_List\": \"", "\"");

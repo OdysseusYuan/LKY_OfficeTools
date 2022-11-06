@@ -43,7 +43,7 @@ namespace LKY_OfficeTools.Lib
                     Console.WriteLine("\n------> 正在获取最新 Microsoft Office 版本 ...");
 
                     //获取频道信息       
-                    string office_info = Com_WebOS.Visit_WebRequest(office_info_url);
+                    string office_info = Com_WebOS.Visit_WebClient(office_info_url);
 
                     if (!string.IsNullOrEmpty(office_info))
                     {
@@ -62,10 +62,10 @@ namespace LKY_OfficeTools.Lib
                     { return null; }
                 }
 
-                catch (WebException webEx)
+                catch /*(WebException webEx)*/
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine(webEx.Message.ToString());
+                    //Console.ForegroundColor = ConsoleColor.DarkRed;
+                    //Console.WriteLine(webEx.Message.ToString());
                     return null;
                 }
 
@@ -148,10 +148,10 @@ namespace LKY_OfficeTools.Lib
                     return file_list;
                 }
 
-                catch (WebException webEx)
+                catch /*(WebException webEx)*/
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine(webEx.Message.ToString());
+                    //Console.ForegroundColor = ConsoleColor.DarkRed;
+                    //Console.WriteLine(webEx.Message.ToString());
                     return null;
                 }
 

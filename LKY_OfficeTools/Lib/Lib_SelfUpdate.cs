@@ -61,7 +61,7 @@ namespace LKY_OfficeTools.Lib
                 Console.WriteLine($"     >> 初始化完成 {new Random().Next(10, 30)}% ...");
 
                 //获取版本信息
-                latest_info = Com_WebOS.Visit_WebRequest(update_json_url);
+                latest_info = Com_WebOS.Visit_WebClient(update_json_url);
 
                 //截取获得最新版本和下载地址
                 string latest_ver = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version\": \"", "\"");
