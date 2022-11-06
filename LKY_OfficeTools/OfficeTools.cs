@@ -36,15 +36,25 @@ namespace LKY_OfficeTools
                 $"版权所有（C）LiuKaiyuan (Odysseus.Yuan)。保留所有权利。\n\n" +
                 $"探讨 {Console.Title} 相关内容，可发送邮件至：liukaiyuan@sjtu.edu.cn", ConsoleColor.Gray);
 
+            //确认系统情况
+            if (int.Parse(Com_SystemOS.OS.GetBuildNumber()) < 15063)
+            {
+                //小于 Win10 1703 的操作系统，激活存在失败问题
+                new Log($"\n     × 请将当前操作系统升级至 Windows 10 (1703) 或其以上版本，否则 Office 无法进行正版激活！", ConsoleColor.DarkRed);
+
+                //退出机制
+                QuitMsg();
+
+                return;
+            }
+
             //确认联网情况
             if (!Com_NetworkOS.Check.IsConnected)
             {
                 new Log($"\n     × 请确保当前电脑可正常访问互联网！", ConsoleColor.DarkRed);
 
                 //退出机制
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("\n请按任意键退出 ...");
-                Console.ReadKey();
+                QuitMsg();
 
                 return;
             }
@@ -67,9 +77,7 @@ namespace LKY_OfficeTools
                 Lib_SelfCount.PostInfo.Finish();
 
                 //退出机制
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("\n请按任意键退出 ...");
-                Console.ReadKey();
+                QuitMsg();
             }
             else
             {
@@ -78,6 +86,14 @@ namespace LKY_OfficeTools
 
                 return;
             }
+        }
+
+        private static void QuitMsg()
+        {
+            //退出机制
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write("\n请按任意键退出 ...");
+            Console.ReadKey();
         }
     }
 }

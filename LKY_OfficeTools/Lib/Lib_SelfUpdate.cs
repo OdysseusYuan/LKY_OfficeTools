@@ -129,7 +129,7 @@ namespace LKY_OfficeTools.Lib
                     //重启自身完成更新
                     new Log($"\n     √ 已更新至 {Console.Title} v{latest_ver} 版本，程序即将自动重启，请稍候。", ConsoleColor.DarkGreen);
 
-                    Thread.Sleep(3000);
+                    Thread.Sleep(5000);
 
                     //启动实例
                     Process.Start(Process.GetCurrentProcess().MainModule.FileName);
