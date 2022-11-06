@@ -11,11 +11,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_FileOS;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -42,8 +41,7 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine($"\n------> 正在进行 {Console.Title} 初始化检查 ...");
+                new Log($"\n------> 正在进行 {Console.Title} 初始化检查 ...", ConsoleColor.DarkCyan);
 
                 //当更新完成自重启时，自动删除 .old 的文件
                 ScanFiles oldFiles = new ScanFiles();
@@ -57,8 +55,7 @@ namespace LKY_OfficeTools.Lib
                     }
                 }
 
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"     >> 初始化完成 {new Random().Next(10, 30)}% ...");
+                new Log($"     >> 初始化完成 {new Random().Next(10, 30)}% ...", ConsoleColor.DarkYellow);
 
                 //获取版本信息
                 latest_info = Com_WebOS.Visit_WebClient(update_json_url);
@@ -67,24 +64,20 @@ namespace LKY_OfficeTools.Lib
                 string latest_ver = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version\": \"", "\"");
                 string latest_down_url = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version_Update_Url\": \"", "\"");
 
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"     >> 初始化完成 {new Random().Next(31, 50)}% ...");
+                new Log($"     >> 初始化完成 {new Random().Next(31, 50)}% ...", ConsoleColor.DarkYellow);
 
-                //执行运行统计
-                new Lib_SelfCount();
+                //运行统计
+                Lib_SelfCount.PostInfo.Running();
 
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"     >> 初始化完成 {new Random().Next(71, 90)}% ...");
+                new Log($"     >> 初始化完成 {new Random().Next(71, 90)}% ...", ConsoleColor.DarkYellow);
 
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"     √ 已完成 {Console.Title} v{latest_ver} 初始化检查。");
+                new Log($"     √ 已完成 {Console.Title} v{latest_ver} 初始化检查。", ConsoleColor.DarkGreen);
 
                 string now_ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 if (new Version(latest_ver) > new Version(now_ver))
                 {
                     //发现新版本
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine($"\n------> 正在更新 {Console.Title} ...");
+                    new Log($"\n------> 正在更新 {Console.Title} ...", ConsoleColor.DarkCyan);
 
                     //下载文件
                     string save_to = Environment.CurrentDirectory + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
@@ -134,8 +127,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //重启自身完成更新
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"\n     √ 已更新至 {Console.Title} v{latest_ver} 版本，程序即将自动重启，请稍候。");
+                    new Log($"\n     √ 已更新至 {Console.Title} v{latest_ver} 版本，程序即将自动重启，请稍候。", ConsoleColor.DarkGreen);
 
                     Thread.Sleep(3000);
 
@@ -149,9 +141,8 @@ namespace LKY_OfficeTools.Lib
             }
             catch /*(Exception Ex)*/
             {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"      * 暂时跳过更新检查！");
-                //Console.WriteLine(Ex.Message.ToString());
+                new Log($"      * 暂时跳过更新检查！", ConsoleColor.DarkYellow);
+                //new Log(Ex.Message.ToString());
                 return false;
             }
 

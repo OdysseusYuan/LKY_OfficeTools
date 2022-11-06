@@ -9,6 +9,7 @@ using LKY_OfficeTools.Common;
 using System;
 using System.Collections.Generic;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -85,51 +86,41 @@ namespace LKY_OfficeTools.Lib
                 string cmd_kms_url = $"cscript ospp.vbs /sethst:{kms_server}";                          //设置激活KMS地址
                 string cmd_activate = "cscript ospp.vbs /act";                                              //开始激活
 
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine($"\n------> 正在激活 Microsoft Office v{OfficeNetVersion.latest_version} ...");
+                new Log($"\n------> 正在激活 Microsoft Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
 
                 //执行：安装序列号
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"\n     >> 安装 Office 序列号 ...");
+                new Log($"\n     >> 安装 Office 序列号 ...", ConsoleColor.DarkYellow);
                 string log_install_key = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_install_key})");
                 if (!log_install_key.ToLower().Contains("successful"))
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine($"     × 安装序列号失败，激活终止，请稍后重试！如有问题请联系开发者。");
+                    new Log($"     × 安装序列号失败，激活终止，请稍后重试！如有问题请联系开发者。", ConsoleColor.DarkRed);
                     return -2;
                 }
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"     √ 安装序列号完成。");
+                new Log($"     √ 安装序列号完成。", ConsoleColor.DarkGreen);
 
                 //执行：设置激活KMS地址
                 string kms_flag = kms_server.Replace("kms.", "");
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"\n     >> 设置 Office [{kms_flag}] 激活载体 ...");
+                new Log($"\n     >> 设置 Office [{kms_flag}] 激活载体 ...", ConsoleColor.DarkYellow);
                 string log_kms_url = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_kms_url})");
                 if (!log_kms_url.ToLower().Contains("successful"))
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine($"     × 设置激活载体失败，激活终止，请稍后重试！如有问题请联系开发者。");
+                    new Log($"     × 设置激活载体失败，激活终止，请稍后重试！如有问题请联系开发者。", ConsoleColor.DarkRed);
                     return 0;
                 }
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"     √ 设置激活载体完成。");
+                new Log($"     √ 设置激活载体完成。", ConsoleColor.DarkGreen);
 
                 //执行：开始激活
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"\n     >> 执行 Office 激活 ...");
+                new Log($"\n     >> 执行 Office 激活 ...", ConsoleColor.DarkYellow);
                 string log_activate = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_activate})");
                 if (!log_activate.ToLower().Contains("successful"))
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine($"     × 无法执行激活，请稍后重试！如有问题请联系开发者。");
+                    new Log($"     × 无法执行激活，请稍后重试！如有问题请联系开发者。", ConsoleColor.DarkRed);
                     return -1;
                 }
                 /*Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"     √ 执行激活完成。");*/
+                new Log($"     √ 执行激活完成。");*/
 
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 激活成功。");
+                new Log($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 激活成功。", ConsoleColor.DarkGreen);
 
                 return 1;
 
@@ -139,7 +130,7 @@ namespace LKY_OfficeTools.Lib
 
                 //开始激活
                 string log_activate = Com_ExeOS.RunCmd(cmd);
-                Console.WriteLine("结果：" + log_activate);
+                new Log("结果：" + log_activate);
                 */
             }
             return -10;

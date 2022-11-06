@@ -9,12 +9,21 @@ using LKY_OfficeTools.Common;
 using LKY_OfficeTools.Lib;
 using System;
 using System.Reflection;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools
 {
     internal class OfficeTools
     {
         static void Main(string[] args)
+        {
+            Entry();
+        }
+
+        /// <summary>
+        /// 函数入口
+        /// </summary>
+        private static void Entry()
         {
             //欢迎话术
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -23,15 +32,14 @@ namespace LKY_OfficeTools
             Console.Title = $"LKY Office Tools v{version}";
 
             //Header
-            Console.WriteLine($"LKY Office Tools [版本 {version}]\n" +
+            new Log($"LKY Office Tools [版本 {version}]\n" +
                 $"版权所有（C）LiuKaiyuan (Odysseus.Yuan)。保留所有权利。\n\n" +
-                $"探讨 {Console.Title} 相关内容，可发送邮件至：liukaiyuan@sjtu.edu.cn");
+                $"探讨 {Console.Title} 相关内容，可发送邮件至：liukaiyuan@sjtu.edu.cn", ConsoleColor.Gray);
 
             //确认联网情况
             if (!Com_NetworkOS.Check.IsConnected)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"\n     × 请确保当前电脑可正常访问互联网！");
+                new Log($"\n     × 请确保当前电脑可正常访问互联网！", ConsoleColor.DarkRed);
 
                 //退出机制
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -55,6 +63,9 @@ namespace LKY_OfficeTools
                 //继续
                 new Lib_OfficeInstall();
 
+                //日志回收
+                Lib_SelfCount.PostInfo.Finish();
+
                 //退出机制
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write("\n请按任意键退出 ...");
@@ -62,6 +73,9 @@ namespace LKY_OfficeTools
             }
             else
             {
+                //日志回收
+                Lib_SelfCount.PostInfo.Finish();
+
                 return;
             }
         }

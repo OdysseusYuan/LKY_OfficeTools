@@ -8,8 +8,10 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using static LKY_OfficeTools.Common.Com_SystemOS;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -19,23 +21,15 @@ namespace LKY_OfficeTools.Lib
     internal class Lib_SelfCount
     {
         /// <summary>
-        /// 重载实现统计
-        /// </summary>
-        internal Lib_SelfCount()
-        {
-            PostInfo.ByEmail();
-        }
-
-        /// <summary>
         /// 发送信息类库
         /// </summary>
         internal class PostInfo
         {
             /// <summary>
-            /// 通过 E-mail 方式统计
+            /// 回收启动信息
             /// </summary>
             /// <returns></returns>
-            internal static bool ByEmail()
+            internal static bool Running()
             {
                 try
                 {
@@ -107,8 +101,7 @@ namespace LKY_OfficeTools.Lib
                     //判断是否发送成功
                     if (send_result)
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        Console.WriteLine($"     >> 初始化完成 {new Random().Next(51, 70)}% ...");
+                        new Log($"     >> 初始化完成 {new Random().Next(51, 70)}% ...", ConsoleColor.DarkYellow);
                         return true;
                     }
                     else
@@ -118,11 +111,117 @@ namespace LKY_OfficeTools.Lib
                 }
                 catch /*(Exception Ex)*/
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine($"     >> 已跳过非必要流程 ...");
-                    //Console.WriteLine(Ex);
+                    new Log($"     >> 已跳过非必要流程 ...", ConsoleColor.DarkMagenta);
+                    //new Log(Ex);
                     //Console.ReadKey();
                     return false;
+                }
+            }
+
+            /// <summary>
+            /// 回收结束时的日志信息
+            /// </summary>
+            /// <returns></returns>
+            internal static bool Finish()
+            {
+                try
+                {
+                    new Log($"\n------> 执行 {Console.Title} 最终部署 ...", ConsoleColor.DarkCyan);
+
+                    //获取系统版本
+                    ///先获取位数
+                    int sys_bit = Environment.Is64BitOperatingSystem ? 64 : 32;
+                    string system_ver = null;
+                    if (OS.GetPublishType() == OS.OSType.Win10)
+                    {
+                        system_ver = $"{OS.OSType.Win10} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
+                    }
+                    else if (OS.GetPublishType() == OS.OSType.Win11)
+                    {
+                        system_ver = $"{OS.OSType.Win11} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
+                    }
+                    else
+                    {
+                        system_ver = OS.GetPublishType().ToString() + $" x{sys_bit}";
+                    }
+
+                    //运行模式
+                    string run_mode;
+#if (DEBUG)
+                    run_mode = "Debug";
+#else
+                    run_mode = "Release";
+#endif
+
+                    //访问统计网址，并获取返回值
+                    string title = $"[LKY OfficeTools 完成通知]";
+
+                    string content =
+                        $"<font color=green><b>*************** 【运行信息】 ***************</b></font><br /><br />" +
+                         $"<font color = red>【发送时间】：</font>{DateTime.Now}<br /><br />" +
+                         $"<font color = red>【反馈类型】：</font>软件自然地完成运行<br /><br />" +
+                         $"<font color = red>【系统环境】：</font>{system_ver}<br /><br />" +
+                         $"<font color = red>【机器名称】：</font>{Environment.MachineName} ({Environment.UserName})<br /><br />" +
+                         $"<font color = red>【网络地址】：</font>{Com_NetworkOS.IP.GetMyIP_Info()}<br /><br />" +
+                         $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
+                         $"<font color = red>【启动路径】：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
+                         /*$"<font color = red>【关联类库】：</font>{bug_class}<br /><br />" +
+                         $"<font color = red>【错误提示】：</font>{bug_msg}<br /><br />" +
+                         $"<font color = red>【代码位置】：</font>{bug_code}<br /><br />" +*/
+                         "<font color=green><b>*************** 【反馈结束】 ***************</b></font>";
+
+                    //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
+                    string info = Lib_SelfUpdate.latest_info;
+                    if (string.IsNullOrEmpty(info))
+                    {
+                        info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
+                    }
+
+                    string PostTo = Com_TextOS.GetCenterText(info, "\"Count_Feedback_To\": \"", "\"");
+                    //smtp
+                    string SMTPHost = "smtp.qq.com";
+                    string SMTPuser = Com_TextOS.GetCenterText(info, "\"Count_Feedback_From\": \"", "\"");
+                    string SMTPpass = Com_TextOS.GetCenterText(info, "\"Count_Feedback_Pwd\": \"", "\"");
+
+                    //为空抛出异常
+                    if (string.IsNullOrEmpty(PostTo) || string.IsNullOrEmpty(SMTPuser) || string.IsNullOrEmpty(SMTPpass))
+                    {
+                        throw new Exception();
+                    }
+
+                    //开始回收
+                    bool send_result = Com_EmailOS.Send_Account("LKY Software FeedBack", PostTo,
+                        title, content, $"{Log.log_filepath}", SMTPHost, SMTPuser, SMTPpass);
+
+                    //判断是否发送成功
+                    if (send_result)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                catch /*(Exception Ex)*/
+                {
+                    new Log($"     >> 已跳过非必要部署 ...", ConsoleColor.DarkMagenta);
+                    //new Log(Ex);
+                    //Console.ReadKey();
+                    return false;
+                }
+                finally
+                {
+                    /*
+                    //清理日志
+                    if (File.Exists(Log.log_filepath))
+                    {
+                        File.Delete(Log.log_filepath);
+                    }
+                    */
+
+                    //回显
+                    new Log($"     √ 已完成 {Console.Title} 所有部署。", ConsoleColor.DarkGreen);
                 }
             }
 
@@ -156,20 +255,20 @@ namespace LKY_OfficeTools.Lib
                     if (count_result.ToLower().Contains("success"))
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        Console.WriteLine($"     >> 初始化完成 {new Random().Next(51, 70)}% ...");
+                        new Log($"     >> 初始化完成 {new Random().Next(51, 70)}% ...");
                         return true;
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                        Console.WriteLine($"     >> 已跳过非必要流程 ...");
+                        new Log($"     >> 已跳过非必要流程 ...");
                         return false;
                     }
                 }
                 catch (Exception Ex)
                 {
                     //Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    //Console.WriteLine($"      * 运行统计异常！");
+                    //new Log($"      * 运行统计异常！");
                     return false;
                 }
             }

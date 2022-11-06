@@ -43,7 +43,7 @@ namespace LKY_OfficeTools.Common
             catch /*(Exception Ex)*/
             {
                 //Console.ForegroundColor = ConsoleColor.DarkYellow;
-                //Console.WriteLine(Ex);
+                //new Log(Ex);
                 return null;
             }
         }

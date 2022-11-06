@@ -65,7 +65,7 @@ namespace LKY_OfficeTools.Common
             }
             catch (SmtpException ex)
             {
-                Console.WriteLine(ex);
+                new Log(ex);
                 return false;
             }
         }
@@ -137,7 +137,7 @@ namespace LKY_OfficeTools.Common
             }
             catch /*(Exception err)*/
             {
-                //Console.WriteLine(err);
+                //new Log(err);
                 //Console.ReadKey();
                 return false;
             }

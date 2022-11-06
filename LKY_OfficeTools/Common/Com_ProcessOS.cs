@@ -55,7 +55,7 @@ namespace LKY_OfficeTools.Common
                 catch /*(Exception Ex)*/
                 {
                     //Console.ForegroundColor = ConsoleColor.DarkRed;
-                    //Console.WriteLine(Ex.Message.ToString());
+                    //new Log(Ex.Message.ToString());
                     return false;
                 }
             }

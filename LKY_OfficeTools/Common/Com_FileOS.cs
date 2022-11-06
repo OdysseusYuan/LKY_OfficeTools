@@ -44,7 +44,7 @@ namespace LKY_OfficeTools.Common
                     //判断是否替换成功
                     if (string.IsNullOrEmpty(xml_new_content))
                     {
-                        //Console.WriteLine("替换失败！");
+                        //new Log("替换失败！");
                         return false;
                     }
 
@@ -56,7 +56,7 @@ namespace LKY_OfficeTools.Common
                 catch /*(Exception Ex)*/
                 {
                     //Console.ForegroundColor = ConsoleColor.DarkRed;
-                    //Console.WriteLine(Ex.Message.ToString());
+                    //new Log(Ex.Message.ToString());
                     return false;
                 }
             }
@@ -105,11 +105,11 @@ namespace LKY_OfficeTools.Common
                             if (dir.FullName.Contains("$RECYCLE.BIN") || dir.FullName.Contains("System Volume Information"))
                             {
                                 //Console.ForegroundColor = ConsoleColor.DarkGray;
-                                //Console.WriteLine("跳过: " + dir.FullName);
+                                //new Log("跳过: " + dir.FullName);
                             }
                             else
                             {
-                                //Console.WriteLine("----->: " + dir.FullName);
+                                //new Log("----->: " + dir.FullName);
                                 GetFilesByExtension(dir.FullName, fileType);
                             }
                         }
@@ -119,15 +119,15 @@ namespace LKY_OfficeTools.Common
                         //遍历下一个子目录
                         foreach (DirectoryInfo subFolders in folder.GetDirectories())
                         {
-                            //Console.WriteLine(subFolders.FullName);
+                            //new Log(subFolders.FullName);
                             GetFilesByExtension(subFolders.FullName, fileType);
                         }
                     }
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine("不存在: " + dirPath);
+                    /*Console.ForegroundColor = ConsoleColor.DarkGray;
+                    new Log("不存在: " + dirPath);*/
                 }
             }
         }

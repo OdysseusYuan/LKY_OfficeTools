@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -52,8 +53,7 @@ namespace LKY_OfficeTools.Lib
                 OfficeLocalInstall.State install_state = OfficeLocalInstall.GetState();
                 if (install_state == OfficeLocalInstall.State.Installed)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！");
+                    new Log($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！", ConsoleColor.DarkMagenta);
                     return -1;
                 }
                 ///当不存在 \Configuration\ 项 or 不存在 VersionToReport or 其版本与最新版不一致时，需要下载新文件。
@@ -66,8 +66,7 @@ namespace LKY_OfficeTools.Lib
                 List<string> save_files = new List<string>();
 
                 //下载开始
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine($"\n------> 开始下载 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...");
+                new Log($"\n------> 开始下载 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
                 //延迟，让用户看到开始下载
                 Thread.Sleep(1000);
 
@@ -80,18 +79,15 @@ namespace LKY_OfficeTools.Lib
                     //保存到List里面，用于后续检查
                     save_files.Add(save_path);
 
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine($"\n     >> 下载 {new FileInfo(save_path).Name} 文件 ...");
+                    new Log($"\n     >> 下载 {new FileInfo(save_path).Name} 文件 ...", ConsoleColor.DarkYellow);
 
                     //遇到重复的文件可以断点续传
                     Aria2c.DownFile(a, save_path);
 
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"     √ {new FileInfo(save_path).Name} 已下载。\n");
+                    new Log($"     √ {new FileInfo(save_path).Name} 已下载。\n", ConsoleColor.DarkGreen);
                 }
 
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine($"\n------> 正在检查 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...");
+                new Log($"\n------> 正在检查 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
 
                 foreach (var b in save_files)
                 {
@@ -100,26 +96,23 @@ namespace LKY_OfficeTools.Lib
                     //下载完成的标志：文件存在，且不存在临时文件
                     if (File.Exists(b) && !File.Exists(aria_tmp_file))
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        Console.WriteLine($"     >> 检查 {new FileInfo(b).Name} ...");
+                        new Log($"     >> 检查 {new FileInfo(b).Name} ...", ConsoleColor.DarkYellow);
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine($"     >> 文件 {new FileInfo(b).Name} 存在异常，重试中 ...");
+                        new Log($"     >> 文件 {new FileInfo(b).Name} 存在异常，重试中 ...", ConsoleColor.DarkRed);
                         FilesDownload();
                     }
                 }
 
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 下载完成。\n");
+                new Log($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 下载完成。\n", ConsoleColor.DarkGreen);
 
                 return 1;
             }
             catch /*(Exception Ex)*/
             {
                 //Console.ForegroundColor = ConsoleColor.DarkRed;
-                //Console.WriteLine(Ex.Message.ToString());
+                //new Log(Ex.Message.ToString());
                 return 0;
             }
         }

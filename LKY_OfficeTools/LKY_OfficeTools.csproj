@@ -85,6 +85,7 @@
     <Compile Include="Lib\Lib_OfficeInfo.cs" />
     <Compile Include="Lib\Lib_OfficeInstall.cs" />
     <Compile Include="Lib\Lib_SelfCount.cs" />
+    <Compile Include="Lib\Lib_SelfLog.cs" />
     <Compile Include="Lib\Lib_SelfUpdate.cs" />
     <Compile Include="OfficeTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

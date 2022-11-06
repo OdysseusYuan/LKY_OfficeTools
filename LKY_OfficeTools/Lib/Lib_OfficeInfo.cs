@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -39,8 +40,7 @@ namespace LKY_OfficeTools.Lib
             {
                 try
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine("\n------> 正在获取最新 Microsoft Office 版本 ...");
+                    new Log("\n------> 正在获取最新 Microsoft Office 版本 ...", ConsoleColor.DarkCyan);
 
                     //获取频道信息       
                     string office_info = Com_WebOS.Visit_WebClient(office_info_url);
@@ -54,7 +54,7 @@ namespace LKY_OfficeTools.Lib
                         //赋值对应的下载地址
                         office_file_root_url = Com_TextOS.GetCenterText(latest_info, "baseUrl\":\"", "\"");              //获取url
 
-                        //Console.WriteLine(office_file_root_url);
+                        //new Log(office_file_root_url);
 
                         return latest_version;
                     }
@@ -65,7 +65,7 @@ namespace LKY_OfficeTools.Lib
                 catch /*(WebException webEx)*/
                 {
                     //Console.ForegroundColor = ConsoleColor.DarkRed;
-                    //Console.WriteLine(webEx.Message.ToString());
+                    //new Log(webEx.Message.ToString());
                     return null;
                 }
 
@@ -83,15 +83,13 @@ namespace LKY_OfficeTools.Lib
 
                     if (version_info == null || string.IsNullOrEmpty(office_file_root_url))     //下载根地址为空时，视为失败
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine("     × 最新版本获取失败，请稍后重试！");
+                        new Log("     × 最新版本获取失败，请稍后重试！", ConsoleColor.DarkRed);
                         return null;
                     }
 
                     string ver = version_info.ToString();
 
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"     √ 已完成，最新版：{ver}。");
+                    new Log($"     √ 已完成，最新版：{ver}。", ConsoleColor.DarkGreen);
 
                     //延迟，让用户看清版本号
                     Thread.Sleep(500);
@@ -137,10 +135,10 @@ namespace LKY_OfficeTools.Lib
 
                     /*
                     Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine($"\n------> 预计下载文件：");
+                    new Log($"\n------> 预计下载文件：");
                     foreach (var a in file_list)
                     {
-                        Console.WriteLine($"      > {a}");
+                        new Log($"      > {a}");
                     }
                     Console.Read();
                     */
@@ -151,7 +149,7 @@ namespace LKY_OfficeTools.Lib
                 catch /*(WebException webEx)*/
                 {
                     //Console.ForegroundColor = ConsoleColor.DarkRed;
-                    //Console.WriteLine(webEx.Message.ToString());
+                    //new Log(webEx.Message.ToString());
                     return null;
                 }
 

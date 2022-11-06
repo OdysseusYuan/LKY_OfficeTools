@@ -7,6 +7,7 @@
 
 using System;
 using System.Security.Principal;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -31,14 +32,12 @@ namespace LKY_OfficeTools.Common
         /// </summary>
         internal static void PrivilegeAttention()
         {
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine($"\n\n------> 正在进行 权限检查 ...");
+            new Log($"\n\n------> 正在进行 权限检查 ...", ConsoleColor.DarkCyan);
 
             //提权检验，非提权，激活会出问题
             if (!IsRunByAdmin())
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × 权限错误，请以管理员身份运行此文件！");
+                new Log($"     × 权限错误，请以管理员身份运行此文件！", ConsoleColor.DarkRed);
 
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write("\n请按任意键退出 ...");
@@ -46,8 +45,7 @@ namespace LKY_OfficeTools.Common
                 Environment.Exit(-1);
             }
 
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine($"     √ 权限检查通过。");
+            new Log($"     √ 权限检查通过。", ConsoleColor.DarkGreen);
         }
     }
 }

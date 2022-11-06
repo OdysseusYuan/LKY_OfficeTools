@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -43,13 +44,11 @@ namespace LKY_OfficeTools.Lib
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine($"     × 因 Office 安装失败，自动跳过激活流程！");
+                        new Log($"     × 因 Office 安装失败，自动跳过激活流程！", ConsoleColor.DarkRed);
                     }
                     return;
                 case 0:
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine($"     × 未能找到可用的 Office 安装文件！");
+                    new Log($"     × 未能找到可用的 Office 安装文件！", ConsoleColor.DarkRed);
                     return;
                 case -1:
                     //无需下载安装，直接进入激活模块
@@ -71,8 +70,7 @@ namespace LKY_OfficeTools.Lib
             //检查ODT文件是否存在
             if (!File.Exists(ODT_path_exe) || !File.Exists(ODT_path_exe))
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × 目录：{ODT_path_root} 下文件丢失，请重新下载本软件！");
+                new Log($"     × 目录：{ODT_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
                 return false;
             }
 
@@ -83,8 +81,7 @@ namespace LKY_OfficeTools.Lib
             //检查是否修改成功（安装目录）
             if (!isNewInstallPath)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × 配置 Install 信息错误！");
+                new Log($"     × 配置 Install 信息错误！", ConsoleColor.DarkRed);
                 return false;
             }
 
@@ -94,8 +91,7 @@ namespace LKY_OfficeTools.Lib
             //检查是否修改成功（版本号）
             if (!isNewVersion)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × 配置 Version 信息错误！");
+                new Log($"     × 配置 Version 信息错误！", ConsoleColor.DarkRed);
                 return false;
             }
 
@@ -115,24 +111,21 @@ namespace LKY_OfficeTools.Lib
             //检查是否修改成功（位数）
             if (!isNewBit)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × 配置 Edition 信息错误！");
+                new Log($"     × 配置 Edition 信息错误！", ConsoleColor.DarkRed);
                 return false;
             }
 
             //开始安装
             string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
 
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine($"\n------> 开始安装 Microsoft Office v{OfficeNetVersion.latest_version} ...");
+            new Log($"\n------> 开始安装 Microsoft Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
 
             bool isInstallFinish = Com_ExeOS.RunExe(ODT_path_exe, install_args);
 
             //检查是否因配置不正确等导致，意外退出安装
             if (!isInstallFinish)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × Microsoft Office v{OfficeNetVersion.latest_version} 安装意外结束！");
+                new Log($"     × Microsoft Office v{OfficeNetVersion.latest_version} 安装意外结束！", ConsoleColor.DarkRed);
                 return false;
             }
 
@@ -141,8 +134,7 @@ namespace LKY_OfficeTools.Lib
             if (install_state == OfficeLocalInstall.State.Nothing)
             {
                 //找不到 ClickToRun 注册表
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"     × Microsoft Office v{OfficeNetVersion.latest_version} 安装失败！");
+                new Log($"     × Microsoft Office v{OfficeNetVersion.latest_version} 安装失败！", ConsoleColor.DarkRed);
                 return false;
             }
             else
@@ -152,15 +144,13 @@ namespace LKY_OfficeTools.Lib
                     //一切正常
                     Com_ProcessOS.KillProcess("OfficeClickToRun");      //结束无关进程
                     Com_ProcessOS.KillProcess("OfficeC2RClient");       //结束无关进程
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 已安装完成。");
+                    new Log($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 已安装完成。", ConsoleColor.DarkGreen);
                     return true;
                 }
                 else if (install_state == OfficeLocalInstall.State.VersionDiff)
                 {
                     //版本号和一开始下载的版本号不一致
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"     × 未能正确安装 Microsoft Office v{OfficeNetVersion.latest_version} 版本！");
+                    new Log($"     × 未能正确安装 Microsoft Office v{OfficeNetVersion.latest_version} 版本！", ConsoleColor.DarkGreen);
                     return false;
                 }
                 else
