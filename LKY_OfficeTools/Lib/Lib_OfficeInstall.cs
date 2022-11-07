@@ -76,8 +76,8 @@ namespace LKY_OfficeTools.Lib
                     Pop_Office_ID = "ProPlus2021Volume";
                 }
 
-                //Office ID完全不同时，需要卸载旧版本
-                if (Current_Office_ID != Pop_Office_ID)
+                //Office ID完全不同时（剔除 Current_Office_ID 键值为空，也就是注册表键值不存在的情况），需要卸载旧版本
+                if (!string.IsNullOrEmpty(Current_Office_ID) && Current_Office_ID != Pop_Office_ID)
                 {
                     new Log($"      * 发现冲突的 Office 版本：{Current_Office_ID}，如需安装最新版，请先卸载旧版本。", ConsoleColor.DarkRed);
 
