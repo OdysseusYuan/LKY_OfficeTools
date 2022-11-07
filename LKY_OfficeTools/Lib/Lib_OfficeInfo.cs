@@ -40,7 +40,7 @@ namespace LKY_OfficeTools.Lib
             {
                 try
                 {
-                    new Log("\n------> 正在获取最新 Microsoft Office 版本 ...", ConsoleColor.DarkCyan);
+                    new Log("\n------> 正在获取 最新 Microsoft Office 版本 ...", ConsoleColor.DarkCyan);
 
                     //获取频道信息       
                     string office_info = Com_WebOS.Visit_WebClient(office_info_url);

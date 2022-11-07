@@ -58,7 +58,7 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
-                new Log($"\n------> 正在进行 Office 冲突检查 ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 正在进行 Office 安装环境检查 ...", ConsoleColor.DarkCyan);
 
                 //先获取目前已经安装的 Office 版本
                 string Current_Office_ID = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
@@ -134,6 +134,7 @@ namespace LKY_OfficeTools.Lib
                 else
                 {
                     //不存在版本冲突时，直接开始安装
+                    new Log($"     √ 已通过 Office 安装环境检查。", ConsoleColor.DarkGreen);
                     return StartInstall();
                 }
             }
