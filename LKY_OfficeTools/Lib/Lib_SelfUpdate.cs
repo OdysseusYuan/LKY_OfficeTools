@@ -117,6 +117,11 @@ namespace LKY_OfficeTools.Lib
                         {
                             File.Move(self_RunPath, self_RunPath + ".old");
                         }
+
+                        //增加目录创建，否则目标文件拷贝将会失败
+                        string move_dir = new FileInfo(move_to).DirectoryName;
+                        Directory.CreateDirectory(move_dir);                    //目录已经存在时，重复创建，不会引发异常
+
                         File.Copy(now_file, move_to, true);
                     }
 

@@ -6,7 +6,6 @@
  */
 
 using LKY_OfficeTools.Common;
-using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Threading;
@@ -52,6 +51,100 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
+        /// <summary>
+        /// 冲突版本检查，卸载和主发行版本不一样的的 Office
+        /// </summary>
+        internal static bool ConflictCheck()
+        {
+            try
+            {
+                new Log($"\n------> 正在进行 Office 冲突检查 ...", ConsoleColor.DarkCyan);
+
+                //先获取目前已经安装的 Office 版本
+                string Current_Office_ID = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+
+                //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
+                string info = Lib_SelfUpdate.latest_info;
+                if (string.IsNullOrEmpty(info))
+                {
+                    info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
+                }
+                string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");
+                ///获取失败时，默认使用 2021VOL 版
+                if (string.IsNullOrEmpty(Pop_Office_ID))
+                {
+                    Pop_Office_ID = "ProPlus2021Volume";
+                }
+
+                //Office ID完全不同时，需要卸载旧版本
+                if (Current_Office_ID != Pop_Office_ID)
+                {
+                    new Log($"      * 发现冲突的 Office 版本：{Current_Office_ID}，如需安装最新版，请先卸载旧版本。", ConsoleColor.DarkRed);
+
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    Console.Write($"        卸载旧版全部组件，并仅安装新版 Word、Excel、PPT 三件套，请按 回车键 继续 ...");
+                    if (Console.ReadKey().Key == ConsoleKey.Enter)
+                    {
+                        new Log($"\n     √ 您已确认卸载 Office [{Current_Office_ID}] 旧版本。", ConsoleColor.DarkGreen);
+
+                        //定义ODT文件位置
+                        string ODT_path_root = Environment.CurrentDirectory + @"\SDK\ODT\";
+                        string ODT_path_exe = ODT_path_root + @"ODT.exe";
+                        string ODT_path_xml = ODT_path_root + @"uninstall.xml";    //此文件需要新生成
+
+                        //生成卸载xml
+                        string xml_content = "<Configuration>\n  <Remove All=\"TRUE\" />\n  <Display Level=\"NONE\" AcceptEULA=\"TRUE\"/>\n</Configuration>";
+                        File.WriteAllText(ODT_path_xml, xml_content);
+
+                        //检查ODT文件是否存在
+                        if (!File.Exists(ODT_path_exe) || !File.Exists(ODT_path_xml))
+                        {
+                            new Log($"     × 目录：{ODT_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
+                            return false;
+                        }
+
+                        //执行卸载命令
+                        new Log($"\n------> 正在卸载 Office [{Current_Office_ID}] 旧版本 ...", ConsoleColor.DarkCyan);
+                        Thread.Sleep(1000);     //基于体验，延迟1s
+                        new Log($"     >> 此过程大约会持续几分钟的时间，请耐心等待 ...", ConsoleColor.DarkYellow);
+
+                        string uninstall_args = $"/configure \"{ODT_path_xml}\"";
+                        bool isUninstall = Com_ExeOS.RunExe(ODT_path_exe, uninstall_args);
+                        var reg_info = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+
+                        //未正常结束卸载 OR 注册表键值不为空 时，视为卸载失败
+                        if (!isUninstall || !string.IsNullOrEmpty(reg_info))
+                        {
+                            new Log($"     × 卸载冲突版本失败。您可联系开发者进行咨询！", ConsoleColor.DarkRed);
+                            return false;
+                        }
+
+                        //卸载正常 + 注册表已清空时，开始安装新版本
+                        new Log($"     √ 卸载 Office [{Current_Office_ID}] 旧版本完成。", ConsoleColor.DarkGreen);
+
+                        //卸载成功后，开始安装新版本
+                        return StartInstall();
+                    }
+                    else
+                    {
+                        new Log($"\n     × 您已拒绝卸载 Office 其他版本，新版本无法安装！", ConsoleColor.DarkRed);
+                        return false;
+                    }
+                }
+                else
+                {
+                    //不存在版本冲突时，直接开始安装
+                    return StartInstall();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /* ----------- 因 v1.0.3 及其以前的版本存在 升级时的 有新目录拷贝会导致异常的错误，
+         * ----------- 当前迭代暂时不考虑使用 SaRAC
         /// <summary>
         /// 冲突版本检查，卸载和主发行版本不一样的的 Office
         /// </summary>
@@ -160,7 +253,7 @@ namespace LKY_OfficeTools.Lib
             {
                 return false;
             }
-        }
+        }*/
 
         /// <summary>
         /// 开始安装 Office

@@ -78,11 +78,11 @@ namespace LKY_OfficeTools.Lib
                         $"<font color=green><b>****************************** 【运行信息】 ******************************</b></font><br /><br />" +
                          $"<font color = red>【发送时间】：</font>{DateTime.Now}<br /><br />" +
                          $"<font color = red>【反馈类型】：</font>软件例行启动<br /><br />" +
+                         $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
+                         $"<font color = red>【启动路径】：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
                          $"<font color = red>【系统环境】：</font>{system_ver}<br /><br />" +
                          $"<font color = red>【机器名称】：</font>{Environment.MachineName} ({Environment.UserName})<br /><br />" +
                          $"<font color = red>【网络地址】：</font>{Com_NetworkOS.IP.GetMyIP_Info()}<br /><br />" +
-                         $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
-                         $"<font color = red>【启动路径】：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
                          $"<font color = red>【软件列表】：</font>{soft_info}<br /><br />" +
                          /*$"<font color = red>【关联类库】：</font>{bug_class}<br /><br />" +
                          $"<font color = red>【错误提示】：</font>{bug_msg}<br /><br />" +
@@ -177,11 +177,11 @@ namespace LKY_OfficeTools.Lib
                         $"<font color=green><b>****************************** 【运行信息】 ******************************</b></font><br /><br />" +
                          $"<font color = red>【发送时间】：</font>{DateTime.Now}<br /><br />" +
                          $"<font color = red>【反馈类型】：</font>软件自然地完成运行<br /><br />" +
+                         $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
+                         $"<font color = red>【启动路径】：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
                          $"<font color = red>【系统环境】：</font>{system_ver}<br /><br />" +
                          $"<font color = red>【机器名称】：</font>{Environment.MachineName} ({Environment.UserName})<br /><br />" +
                          $"<font color = red>【网络地址】：</font>{Com_NetworkOS.IP.GetMyIP_Info()}<br /><br />" +
-                         $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
-                         $"<font color = red>【启动路径】：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
                          /*$"<font color = red>【关联类库】：</font>{bug_class}<br /><br />" +
                          $"<font color = red>【错误提示】：</font>{bug_msg}<br /><br />" +
                          $"<font color = red>【代码位置】：</font>{bug_code}<br /><br />" +*/
