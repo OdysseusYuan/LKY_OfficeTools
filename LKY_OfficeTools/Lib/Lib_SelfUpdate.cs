@@ -137,7 +137,10 @@ namespace LKY_OfficeTools.Lib
                     Thread.Sleep(5000);
 
                     //启动实例
-                    Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+                    Process p = new Process();
+                    p.StartInfo.FileName = Process.GetCurrentProcess().MainModule.FileName;             //需要启动的程序名       
+                    p.StartInfo.Arguments = "/none_welcome_confirm";                                            //启动参数
+                    p.Start();
                     //关闭当前实例
                     Process.GetCurrentProcess().Kill();
                 }

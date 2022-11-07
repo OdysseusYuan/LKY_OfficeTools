@@ -17,13 +17,20 @@ namespace LKY_OfficeTools
     {
         static void Main(string[] args)
         {
-            Entry();
+            //命令行检测
+            string arg = null;
+            foreach (var now_arg in args)
+            {
+                arg += now_arg + ";";
+            }
+
+            Entry(arg);
         }
 
         /// <summary>
         /// 函数入口
         /// </summary>
-        private static void Entry()
+        private static void Entry(string args = null)
         {
             //欢迎话术
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -59,10 +66,20 @@ namespace LKY_OfficeTools
                 return;
             }
 
-            //等待用户
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write("\n请按 回车键 开始部署 ...");
-            if (Console.ReadKey().Key == ConsoleKey.Enter)
+            //根据命令行判断是否等待用户
+            bool isContinue = false;
+            if (!string.IsNullOrEmpty(args) && args.Contains("/none_welcome_confirm"))
+            {
+                isContinue = true;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write("\n请按 回车键 开始部署 ...");
+                isContinue = (Console.ReadKey().Key == ConsoleKey.Enter);
+            }
+            
+            if (isContinue)
             {
                 //权限检查
                 Com_PrivilegeOS.PrivilegeAttention();
