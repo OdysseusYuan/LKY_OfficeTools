@@ -1,6 +1,6 @@
 ﻿<Configuration>
 	<Add OfficeClientEdition="{InstallBit}" Channel="PerpetualVL2021" SourcePath="{InstallPath}" AllowCdnFallback="true" Version="{InstallVersion}">
-		<Product ID="ProPlus2021Volume">
+		<Product ID="{ProductIDInfo}">
 			<Language ID="zh-cn" />
 			<ExcludeApp ID="Access" />
 			<ExcludeApp ID="Lync" />

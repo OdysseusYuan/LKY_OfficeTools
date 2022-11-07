@@ -8,6 +8,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Common
 {
@@ -19,7 +20,7 @@ namespace LKY_OfficeTools.Common
         /// <summary>
         /// 系统级别类库
         /// </summary>
-        internal class OS
+        internal class OSVersion
         {
             /// <summary>
             /// 操作系统类别枚举
@@ -99,11 +100,7 @@ namespace LKY_OfficeTools.Common
                     else if (ver.Major == 10 && ver.Minor == 0)     //正确获取win10版本号，需要在exe里面加入app.manifest
                     {
                         //检查注册表，因为win10和11的主版本号都为10，只能用buildID来判断了
-                        RegistryKey HKLM = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine,
-                                Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32);      //判断操作系统版本（64位\32位）打开注册表项，不然 x86编译的本程序 读取 x64的程序会出现无法读取 已经存在于注册表 中的数据
-                        string reg_path = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
-                        RegistryKey office_reg = HKLM.OpenSubKey(reg_path);
-                        string curr_ver = office_reg.GetValue("CurrentBuild").ToString();
+                        string curr_ver = Registry.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
 
                         if (!string.IsNullOrEmpty(curr_ver) && int.Parse(curr_ver) < 22000)       //Win11目前内部版本号
                         {
@@ -134,11 +131,7 @@ namespace LKY_OfficeTools.Common
                 try
                 {
                     //检查注册表
-                    RegistryKey HKLM = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine,
-                            Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32);      //判断操作系统版本（64位\32位）打开注册表项，不然 x86编译的本程序 读取 x64的程序会出现无法读取 已经存在于注册表 中的数据
-                    string reg_path = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
-                    RegistryKey office_reg = HKLM.OpenSubKey(reg_path);
-                    string curr_mode = office_reg.GetValue("CurrentBuild").ToString();
+                    string curr_mode = Registry.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
 
                     //为空返回未知
                     if (string.IsNullOrEmpty(curr_mode))
@@ -161,6 +154,100 @@ namespace LKY_OfficeTools.Common
                     return "error!";
                 }
             }            
+        }
+
+        /// <summary>
+        /// 注册表操作类库
+        /// </summary>
+        internal class Registry
+        {
+            /// <summary>
+            /// 获取指定路径下的注册表键值。
+            /// 默认注册表根部项为 HKLM
+            /// </summary>
+            /// <returns></returns>
+            internal static string GetValue(string path, string key, RegistryHive root = RegistryHive.LocalMachine)
+            {
+                try
+                {
+                    RegistryKey HK_Root = RegistryKey.OpenBaseKey(root,
+                        Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32);      //判断操作系统版本（64位\32位）打开注册表项，不然 x86编译的本程序 读取 x64的程序会出现无法读取 已经存在于注册表 中的数据
+
+                    RegistryKey path_reg = HK_Root.OpenSubKey(path);    //先获取路径
+
+                    if (path_reg == null)
+                    {
+                        //找不到注册表路径
+                        return null;
+                    }
+                    else
+                    {
+                        object value = path_reg.GetValue(key);
+                        if (value != null)      //必须先判断不为null，否则会抛出异常
+                        {
+                            //一切正常
+                            return value.ToString();
+                        }
+                        else
+                        {
+                            //Key不存在或值为空
+                            return null;
+                        }
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 软件操作类库
+        /// </summary>
+        internal class SoftWare
+        {
+            /// <summary>
+            /// 获取已安装软件列表
+            /// </summary>
+            /// <returns></returns>
+            public static List<string> GetList()
+            {
+                try
+                {
+                    //从注册表中获取控制面板“卸载程序”中的程序和功能列表
+                    RegistryKey Key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+                        "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
+                    if (Key != null) //如果系统禁止访问则返回null
+                    {
+                        List<string> software_info = new List<string>();
+
+                        foreach (string SubKeyName in Key.GetSubKeyNames())
+                        {
+                            //打开对应的软件名称
+                            RegistryKey SubKey = Key.OpenSubKey(SubKeyName);
+                            if (SubKey != null)
+                            {
+                                string DisplayName = SubKey.GetValue("DisplayName", "NONE").ToString();
+
+                                //过滤条件
+                                if (DisplayName != "NONE" && !DisplayName.Contains("vs") && !DisplayName.Contains("Visual C++") &&
+                                    !DisplayName.Contains(".NET"))
+                                {
+                                    software_info.Add(DisplayName);
+                                }
+                            }
+                        }
+
+                        return software_info;
+                    }
+                    return null;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
         }
     }
 }

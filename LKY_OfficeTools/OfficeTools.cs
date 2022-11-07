@@ -37,7 +37,7 @@ namespace LKY_OfficeTools
                 $"探讨 {Console.Title} 相关内容，可发送邮件至：liukaiyuan@sjtu.edu.cn", ConsoleColor.Gray);
 
             //确认系统情况
-            if (int.Parse(Com_SystemOS.OS.GetBuildNumber()) < 15063)
+            if (int.Parse(Com_SystemOS.OSVersion.GetBuildNumber()) < 15063)
             {
                 //小于 Win10 1703 的操作系统，激活存在失败问题
                 new Log($"\n     × 请将当前操作系统升级至 Windows 10 (1703) 或其以上版本，否则 Office 无法进行正版激活！", ConsoleColor.DarkRed);

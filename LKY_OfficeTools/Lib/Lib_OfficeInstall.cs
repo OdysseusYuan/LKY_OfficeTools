@@ -8,13 +8,8 @@
 using LKY_OfficeTools.Common;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Threading;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
@@ -32,12 +27,12 @@ namespace LKY_OfficeTools.Lib
         {
             //下载后，开始安装
             int DownCode = Lib_OfficeDownload.FilesDownload();
-            
+
             //判断下载情况
             switch (DownCode)
             {
                 case 1:
-                    if (StartInstall())
+                    if (ConflictCheck())        //冲突检查，通过进入安装，不通过直接返回false
                     {
                         //安装成功，进入激活程序
                         new Lib_OfficeActivate();
@@ -58,6 +53,116 @@ namespace LKY_OfficeTools.Lib
         }
 
         /// <summary>
+        /// 冲突版本检查，卸载和主发行版本不一样的的 Office
+        /// </summary>
+        internal static bool ConflictCheck()
+        {
+            try
+            {
+                new Log($"\n------> 正在进行 Office 冲突检查 ...", ConsoleColor.DarkCyan);
+
+                //先获取目前已经安装的 Office 版本
+                string Current_Office_ID = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+
+                //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
+                string info = Lib_SelfUpdate.latest_info;
+                if (string.IsNullOrEmpty(info))
+                {
+                    info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
+                }
+                string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");
+                ///获取失败时，默认使用 2021VOL 版
+                if (string.IsNullOrEmpty(Pop_Office_ID))
+                {
+                    Pop_Office_ID = "ProPlus2021Volume";
+                }
+
+                //Office ID完全不同时，需要卸载旧版本
+                if (Current_Office_ID != Pop_Office_ID)
+                {
+                    new Log($"      * 发现冲突的 Office 版本：{Current_Office_ID}，如需安装最新版，请先卸载旧版本。", ConsoleColor.DarkRed);
+
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    Console.Write($"        卸载旧版全部组件，并仅安装新版 Word、Excel、PPT 三件套，请按 回车键 继续 ...");
+                    if (Console.ReadKey().Key == ConsoleKey.Enter)
+                    {
+                        new Log($"\n     √ 您已确认卸载 Office [{Current_Office_ID}] 旧版本。", ConsoleColor.DarkGreen);
+
+                        //定义SaRAC文件位置
+                        string SaRAC_path_root = Environment.CurrentDirectory + @"\SDK\SaRAC\";
+                        string SaRAC_path_exe = SaRAC_path_root + @"SaRACmd.exe";
+
+                        //检查SaRAC文件是否存在
+                        if (!File.Exists(SaRAC_path_exe))
+                        {
+                            new Log($"     × 目录：{SaRAC_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
+                            return false;
+                        }
+
+                        //执行卸载命令
+                        new Log($"\n------> 正在卸载 Office [{Current_Office_ID}] 旧版本 ...", ConsoleColor.DarkCyan);
+                        Thread.Sleep(1000);     //基于体验，延迟1s
+                        new Log($"     >> 此过程大约会持续几分钟的时间，请耐心等待 ...", ConsoleColor.DarkYellow);
+
+                        string cmd_switch_cd = $"pushd \"{SaRAC_path_root}\"";             //切换至SaRAC文件目录
+                        string cmd_unstall = $"SaRAcmd.exe -S OfficeScrubScenario -AcceptEula -Officeversion All";
+                        string uninstall_result = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_unstall})");
+                        if (!uninstall_result.ToLower().Contains("successful"))
+                        {
+                            //首次卸载不成功时，尝试 ODT 模式卸载
+                            //定义ODT文件位置
+                            string ODT_path_root = Environment.CurrentDirectory + @"\SDK\ODT\";
+                            string ODT_path_exe = ODT_path_root + @"ODT.exe";
+                            string ODT_path_xml = ODT_path_root + @"uninstall.xml";    //此文件需要新生成
+
+                            //生成卸载xml
+                            string xml_content = "<Configuration>\n  <Remove All=\"TRUE\" />\n  <Display Level=\"NONE\" AcceptEULA=\"TRUE\"/>\n</Configuration>";
+                            File.WriteAllText(ODT_path_xml, xml_content);
+
+                            //检查ODT文件是否存在
+                            if (!File.Exists(ODT_path_exe) || !File.Exists(ODT_path_xml))
+                            {
+                                new Log($"     × 目录：{ODT_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
+                                return false;
+                            }
+
+                            //执行卸载命令
+                            new Log($"     >> 再次尝试卸载 Office [{Current_Office_ID}] 旧版本 ...", ConsoleColor.DarkCyan);
+                            string uninstall_args = $"/configure \"{ODT_path_xml}\"";
+                            bool isUninstall = Com_ExeOS.RunExe(ODT_path_exe, uninstall_args);
+                            var reg_info = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+                            
+                            //未正常结束卸载 OR 注册表键值不为空 时，视为卸载失败
+                            if (!isUninstall || !string.IsNullOrEmpty(reg_info))
+                            {
+                                new Log($"     × 卸载冲突版本失败。您可联系开发者进行咨询！", ConsoleColor.DarkRed);
+                                return false;
+                            }
+                        }
+                        new Log($"     √ 卸载 Office [{Current_Office_ID}] 旧版本完成。", ConsoleColor.DarkGreen);
+
+                        //卸载成功后，开始安装新版本
+                        return StartInstall();
+                    }
+                    else
+                    {
+                        new Log($"\n     × 您已拒绝卸载 Office 其他版本，新版本无法安装！", ConsoleColor.DarkRed);
+                        return false;
+                    }
+                }
+                else
+                {
+                    //不存在版本冲突时，直接开始安装
+                    return StartInstall();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 开始安装 Office
         /// </summary>
         internal static bool StartInstall()
@@ -68,7 +173,7 @@ namespace LKY_OfficeTools.Lib
             string ODT_path_xml = ODT_path_root + @"config.xml";
 
             //检查ODT文件是否存在
-            if (!File.Exists(ODT_path_exe) || !File.Exists(ODT_path_exe))
+            if (!File.Exists(ODT_path_exe) || !File.Exists(ODT_path_xml))
             {
                 new Log($"     × 目录：{ODT_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
                 return false;
@@ -115,6 +220,28 @@ namespace LKY_OfficeTools.Lib
                 return false;
             }
 
+            ///修改 Product ID
+            ///先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
+            string info = Lib_SelfUpdate.latest_info;
+            if (string.IsNullOrEmpty(info))
+            {
+                info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
+            }
+            string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");
+            ///获取失败时，默认使用 2021VOL 版
+            if (string.IsNullOrEmpty(Pop_Office_ID))
+            {
+                Pop_Office_ID = "ProPlus2021Volume";
+            }
+            bool isNewID = Com_FileOS.XML.SetValue(ODT_path_xml, "Product ID", Pop_Office_ID);
+
+            //检查是否修改成功（Product ID）
+            if (!isNewID)
+            {
+                new Log($"     × 配置 Product ID 信息错误！", ConsoleColor.DarkRed);
+                return false;
+            }
+
             //开始安装
             string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
 
@@ -158,7 +285,7 @@ namespace LKY_OfficeTools.Lib
                     //未在预期内的结果都返回false
                     return false;
                 }
-            } 
+            }
         }
     }
 }

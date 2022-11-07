@@ -83,9 +83,10 @@ namespace LKY_OfficeTools.Common
         /// <param name="SMTPHost">smtp服务器</param>
         /// <param name="SMTPuser">邮箱</param>
         /// <param name="SMTPpass">密码</param>
+        /// <param name="priority">邮件优先级，默认为一般，设置为高时，收件人看到标题旁边，会有红色叹号</param>
         /// <returns></returns>
         public static bool Send_Account( string send_from_username, string send_to_mail, string mail_subject,
-            string mail_body, string mail_file, string SMTPHost, string SMTPuser, string SMTPpass)
+            string mail_body, string mail_file, string SMTPHost, string SMTPuser, string SMTPpass, MailPriority priority = MailPriority.Normal)
         {
             ////设置from和to地址
             MailAddress from = new MailAddress(SMTPuser, send_from_username);
@@ -117,8 +118,8 @@ namespace LKY_OfficeTools.Common
                 ////邮件采用的编码
                 oMail.BodyEncoding = Encoding.UTF8;
 
-                ////设置邮件的优先级为高
-                oMail.Priority = MailPriority.High;
+                ////设置邮件的优先级
+                oMail.Priority = priority;
 
                 ////发送邮件
                 SmtpClient client = new SmtpClient();

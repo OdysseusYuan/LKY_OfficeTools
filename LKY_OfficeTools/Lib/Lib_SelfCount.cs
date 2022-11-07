@@ -9,6 +9,7 @@ using LKY_OfficeTools.Common;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Mail;
 using System.Reflection;
 using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_SelfLog;
@@ -37,17 +38,17 @@ namespace LKY_OfficeTools.Lib
                     ///先获取位数
                     int sys_bit = Environment.Is64BitOperatingSystem ? 64 : 32;
                     string system_ver = null;
-                    if (OS.GetPublishType() == OS.OSType.Win10)
+                    if (OSVersion.GetPublishType() == OSVersion.OSType.Win10)
                     {
-                        system_ver = $"{OS.OSType.Win10} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
+                        system_ver = $"{OSVersion.OSType.Win10} ({OSVersion.GetBuildNumber(false)}) x{sys_bit} v{OSVersion.GetBuildNumber()}";
                     }
-                    else if (OS.GetPublishType() == OS.OSType.Win11)
+                    else if (OSVersion.GetPublishType() == OSVersion.OSType.Win11)
                     {
-                        system_ver = $"{OS.OSType.Win11} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
+                        system_ver = $"{OSVersion.OSType.Win11} ({OSVersion.GetBuildNumber(false)}) x{sys_bit} v{OSVersion.GetBuildNumber()}";
                     }
                     else
                     {
-                        system_ver = OS.GetPublishType().ToString() + $" x{sys_bit}";
+                        system_ver = OSVersion.GetPublishType().ToString() + $" x{sys_bit}";
                     }
 
                     //运行模式
@@ -58,11 +59,23 @@ namespace LKY_OfficeTools.Lib
                     run_mode = "Release";
 #endif
 
-                    //访问统计网址，并获取返回值
+                    //标题
+#if (DEBUG)
+                    string title = $"[LKY OfficeTools 启动通知 ({run_mode})]";
+#else
                     string title = $"[LKY OfficeTools 启动通知]";
+#endif
+
+                    //获取软件列表
+                    string soft_info = null;
+                    var soft_list = SoftWare.GetList();
+                    foreach (var now_soft in soft_list)
+                    {
+                        soft_info = $"{now_soft}<br /> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {soft_info}";
+                    }
 
                     string content =
-                        $"<font color=green><b>*************** 【运行信息】 ***************</b></font><br /><br />" +
+                        $"<font color=green><b>****************************** 【运行信息】 ******************************</b></font><br /><br />" +
                          $"<font color = red>【发送时间】：</font>{DateTime.Now}<br /><br />" +
                          $"<font color = red>【反馈类型】：</font>软件例行启动<br /><br />" +
                          $"<font color = red>【系统环境】：</font>{system_ver}<br /><br />" +
@@ -70,10 +83,11 @@ namespace LKY_OfficeTools.Lib
                          $"<font color = red>【网络地址】：</font>{Com_NetworkOS.IP.GetMyIP_Info()}<br /><br />" +
                          $"<font color = red>【软件版本】：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
                          $"<font color = red>【启动路径】：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
+                         $"<font color = red>【软件列表】：</font>{soft_info}<br /><br />" +
                          /*$"<font color = red>【关联类库】：</font>{bug_class}<br /><br />" +
                          $"<font color = red>【错误提示】：</font>{bug_msg}<br /><br />" +
                          $"<font color = red>【代码位置】：</font>{bug_code}<br /><br />" +*/
-                         "<font color=green><b>*************** 【反馈结束】 ***************</b></font>";
+                         "<font color=green><b>****************************** 【反馈结束】 ******************************</b></font>";
 
                     //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
                     string info = Lib_SelfUpdate.latest_info;
@@ -132,17 +146,17 @@ namespace LKY_OfficeTools.Lib
                     ///先获取位数
                     int sys_bit = Environment.Is64BitOperatingSystem ? 64 : 32;
                     string system_ver = null;
-                    if (OS.GetPublishType() == OS.OSType.Win10)
+                    if (OSVersion.GetPublishType() == OSVersion.OSType.Win10)
                     {
-                        system_ver = $"{OS.OSType.Win10} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
+                        system_ver = $"{OSVersion.OSType.Win10} ({OSVersion.GetBuildNumber(false)}) x{sys_bit} v{OSVersion.GetBuildNumber()}";
                     }
-                    else if (OS.GetPublishType() == OS.OSType.Win11)
+                    else if (OSVersion.GetPublishType() == OSVersion.OSType.Win11)
                     {
-                        system_ver = $"{OS.OSType.Win11} ({OS.GetBuildNumber(false)}) x{sys_bit} v{OS.GetBuildNumber()}";
+                        system_ver = $"{OSVersion.OSType.Win11} ({OSVersion.GetBuildNumber(false)}) x{sys_bit} v{OSVersion.GetBuildNumber()}";
                     }
                     else
                     {
-                        system_ver = OS.GetPublishType().ToString() + $" x{sys_bit}";
+                        system_ver = OSVersion.GetPublishType().ToString() + $" x{sys_bit}";
                     }
 
                     //运行模式
@@ -153,11 +167,14 @@ namespace LKY_OfficeTools.Lib
                     run_mode = "Release";
 #endif
 
-                    //访问统计网址，并获取返回值
+#if (DEBUG)
+                    string title = $"[LKY OfficeTools 完成通知 ({run_mode})]";
+#else
                     string title = $"[LKY OfficeTools 完成通知]";
+#endif
 
                     string content =
-                        $"<font color=green><b>*************** 【运行信息】 ***************</b></font><br /><br />" +
+                        $"<font color=green><b>****************************** 【运行信息】 ******************************</b></font><br /><br />" +
                          $"<font color = red>【发送时间】：</font>{DateTime.Now}<br /><br />" +
                          $"<font color = red>【反馈类型】：</font>软件自然地完成运行<br /><br />" +
                          $"<font color = red>【系统环境】：</font>{system_ver}<br /><br />" +
@@ -168,7 +185,7 @@ namespace LKY_OfficeTools.Lib
                          /*$"<font color = red>【关联类库】：</font>{bug_class}<br /><br />" +
                          $"<font color = red>【错误提示】：</font>{bug_msg}<br /><br />" +
                          $"<font color = red>【代码位置】：</font>{bug_code}<br /><br />" +*/
-                         "<font color=green><b>*************** 【反馈结束】 ***************</b></font>";
+                         "<font color=green><b>****************************** 【反馈结束】 ******************************</b></font>";
 
                     //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
                     string info = Lib_SelfUpdate.latest_info;
@@ -189,9 +206,21 @@ namespace LKY_OfficeTools.Lib
                         throw new Exception();
                     }
 
+                    //判断Log是否有错误
+                    MailPriority priority = MailPriority.Normal;                        //一个初始的消息
+                    if (File.Exists(Log.log_filepath))
+                    {
+                        string log_content = File.ReadAllText(Log.log_filepath);
+                        if (log_content.Contains("×"))
+                        {
+                            //有错误信息，设置为高优信息
+                            priority = MailPriority.High;
+                        }
+                    }
+
                     //开始回收
                     bool send_result = Com_EmailOS.Send_Account("LKY Software FeedBack", PostTo,
-                        title, content, $"{Log.log_filepath}", SMTPHost, SMTPuser, SMTPpass);
+                        title, content, $"{Log.log_filepath}", SMTPHost, SMTPuser, SMTPpass, priority);
 
                     //判断是否发送成功
                     if (send_result)

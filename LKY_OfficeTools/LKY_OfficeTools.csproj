@@ -96,9 +96,207 @@
     <None Include="Example\LKY_OfficeTools_AppInfo.json" />
     <None Include="Example\office_channels.json" />
     <None Include="Properties\app.manifest" />
+    <None Include="SDK\SaRAC\SaRACmd.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\ThinClient.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />
+    <None Include="SDK\SaRAC\BPA.CommonOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\BPA.ConfigCollectorOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\BPA.NetworkCollectorOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\BPA.OfficeCommonOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\BPA.OutlookCollectorOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\BPA.UserInterfaceOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\cleanospp_64.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\cleanospp_86.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Diagnostics.Tracing.TraceEvent.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Exchange.Data.Common.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Identity.Client.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.IdentityModel.Abstractions.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Office.Diagnostics.OffCAT.APIOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Office.Diagnostics.OffCAT.CommonOffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Office.Interop.Outlook.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.Common.DataObject.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.Common.Logging.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.Common.Serialization.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.Common.Utility.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.AnalyzerProxy.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.Common.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.CommonStrings.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.Logging.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.OffCAT.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.OffCATStrings.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.OfficeCommon.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.OfficeRecovery.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.OfficeSetup.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.OutlookCommon.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Analyzers.OutlookExpertExperience.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Common.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.DataProviders.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Analysis.Engine.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.ASL.Contract.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.ASL.SaraModule.Contract.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.Common.Core.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.DataObjects.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Online.CSE.HRC.TDS.Contract.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Outlook.Services.Authentication.Contracts.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Outlook.Services.Contracts.Tracing.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Outlook.Services.Diagnostics.Contracts.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.AppPlugins.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Framework.Common.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Framework.TaskEngine.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Framework.TaskEngine.HRC.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Localization.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Models.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Plugins.Common.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Plugins.Office.TaskPlugin.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Plugins.Outlook.TaskPlugin.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Sara.Prism.PubSubEvents.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Support.Diagnostics.Telemetry.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Support.DiagnosticsFramework.Contracts.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Support.DiagnosticsFramework.Proxy.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.Support.PortableDiagnostics.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Microsoft.WindowsAzure.ServiceRuntime.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\msvcr100_64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\msvcr100_86.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Newtonsoft.Json.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\Polly.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\SaRACmd.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\SaraEULA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SDK\SaRAC\System.Management.Automation.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="SDK\Aria2c\aria2c.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
