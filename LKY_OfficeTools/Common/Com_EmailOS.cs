@@ -6,10 +6,12 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Windows.Documents;
 
 namespace LKY_OfficeTools.Common
 {
@@ -86,44 +88,50 @@ namespace LKY_OfficeTools.Common
         /// <param name="priority">邮件优先级，默认为一般，设置为高时，收件人看到标题旁边，会有红色叹号</param>
         /// <returns></returns>
         public static bool Send_Account( string send_from_username, string send_to_mail, string mail_subject,
-            string mail_body, string mail_file, string SMTPHost, string SMTPuser, string SMTPpass, MailPriority priority = MailPriority.Normal)
+            string mail_body, List<string> mail_file, string SMTPHost, string SMTPuser, string SMTPpass, MailPriority priority = MailPriority.Normal)
         {
-            ////设置from和to地址
+            //设置from和to地址
             MailAddress from = new MailAddress(SMTPuser, send_from_username);
             MailAddress to = new MailAddress(send_to_mail);
 
-            ////创建一个MailMessage对象
+            //创建一个MailMessage对象
             MailMessage oMail = new MailMessage(from, to);
 
             try
             {
-                //// 添加附件
-                if (mail_file != "" && File.Exists(mail_file))
+                // 添加附件
+                if (mail_file != null)
                 {
-                    oMail.Attachments.Add(new Attachment(mail_file));
+                    foreach (var now_file in mail_file)
+                    {
+                        if (File.Exists(now_file))
+                        {
+                            oMail.Attachments.Add(new Attachment(now_file));
+                        }
+                    }
                 }
 
-                ////邮件标题
+                //邮件标题
                 oMail.Subject = mail_subject;
 
                 //设置邮件为html格式
                 oMail.IsBodyHtml = true;
 
-                ////邮件内容
+                //邮件内容
                 oMail.Body = mail_body;
 
-                ////邮件格式
+                //邮件格式
                 oMail.IsBodyHtml = true;
 
-                ////邮件采用的编码
+                //邮件采用的编码
                 oMail.BodyEncoding = Encoding.UTF8;
 
-                ////设置邮件的优先级
+                //设置邮件的优先级
                 oMail.Priority = priority;
 
-                ////发送邮件
+                //发送邮件
                 SmtpClient client = new SmtpClient();
-                ////client.UseDefaultCredentials = false;
+                //client.UseDefaultCredentials = false;
                 client.Host = SMTPHost;
 
                 //企业邮箱需设置端口，个人邮箱不需要
@@ -144,7 +152,7 @@ namespace LKY_OfficeTools.Common
             }
             finally
             {
-                ////释放资源
+                //释放资源
                 oMail.Dispose();
             }
         }

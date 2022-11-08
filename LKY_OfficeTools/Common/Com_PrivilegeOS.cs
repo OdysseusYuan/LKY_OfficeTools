@@ -7,7 +7,7 @@
 
 using System;
 using System.Security.Principal;
-using static LKY_OfficeTools.Lib.Lib_SelfLog;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {

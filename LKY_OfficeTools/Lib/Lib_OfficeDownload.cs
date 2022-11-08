@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
-using static LKY_OfficeTools.Lib.Lib_SelfLog;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -82,7 +82,11 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n     >> 下载 {new FileInfo(save_path).Name} 文件 ...", ConsoleColor.DarkYellow);
 
                     //遇到重复的文件可以断点续传
-                    Aria2c.DownFile(a, save_path);
+                    if (Aria2c.DownFile(a, save_path) == 0)
+                    {
+                        //如果因为核心下载exe丢失，导致下载失败，直接中止
+                        return 0;
+                    }
 
                     new Log($"     √ {new FileInfo(save_path).Name} 已下载。\n", ConsoleColor.DarkGreen);
                 }

@@ -10,7 +10,7 @@ using System;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
-using static LKY_OfficeTools.Lib.Lib_SelfLog;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -64,10 +64,10 @@ namespace LKY_OfficeTools.Lib
                 string Current_Office_ID = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
                 //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-                string info = Lib_SelfUpdate.latest_info;
+                string info = Lib_AppUpdate.latest_info;
                 if (string.IsNullOrEmpty(info))
                 {
-                    info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
+                    info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
                 }
                 string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");
                 ///获取失败时，默认使用 2021VOL 版
@@ -79,7 +79,7 @@ namespace LKY_OfficeTools.Lib
                 //Office ID完全不同时（剔除 Current_Office_ID 键值为空，也就是注册表键值不存在的情况），需要卸载旧版本
                 if (!string.IsNullOrEmpty(Current_Office_ID) && Current_Office_ID != Pop_Office_ID)
                 {
-                    new Log($"      * 发现冲突的 Office 版本：{Current_Office_ID}，如需安装最新版，请先卸载旧版本。", ConsoleColor.DarkRed);
+                    new Log($"      * 发现冲突的 Office 版本：{Current_Office_ID}，如需安装最新版，请先卸载旧版本。", ConsoleColor.DarkMagenta);
 
                     Console.ForegroundColor = ConsoleColor.Gray;
                     Console.Write($"        卸载旧版全部组件，并仅安装新版 Word、Excel、PPT 三件套，请按 回车键 继续 ...");
@@ -174,7 +174,7 @@ namespace LKY_OfficeTools.Lib
                 //Office ID完全不同时，需要卸载旧版本
                 if (Current_Office_ID != Pop_Office_ID)
                 {
-                    new Log($"      * 发现冲突的 Office 版本：{Current_Office_ID}，如需安装最新版，请先卸载旧版本。", ConsoleColor.DarkRed);
+                    new Log($"      * 发现冲突的 Office 版本：{Current_Office_ID}，如需安装最新版，请先卸载旧版本。", ConsoleColor.DarkMagenta);
 
                     Console.ForegroundColor = ConsoleColor.Gray;
                     Console.Write($"        卸载旧版全部组件，并仅安装新版 Word、Excel、PPT 三件套，请按 回车键 继续 ...");
@@ -316,10 +316,10 @@ namespace LKY_OfficeTools.Lib
 
             ///修改 Product ID
             ///先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-            string info = Lib_SelfUpdate.latest_info;
+            string info = Lib_AppUpdate.latest_info;
             if (string.IsNullOrEmpty(info))
             {
-                info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
+                info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
             }
             string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");
             ///获取失败时，默认使用 2021VOL 版

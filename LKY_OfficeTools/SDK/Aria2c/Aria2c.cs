@@ -8,13 +8,23 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.IO;
-using static LKY_OfficeTools.Lib.Lib_SelfLog;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.SDK.Aria2c
 {
+    /// <summary>
+    /// Aria2c 类库
+    /// </summary>
     internal class Aria2c
     {
-        internal static bool DownFile(string uri, string save_to)
+        /// <summary>
+        /// 使用 Aria2c 下载单个文件。
+        /// 返回值：1~下载完成；0~因aria2c.exe丢失导致无法下载；-1~因为非已知的原因下载失败。
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="save_to"></param>
+        /// <returns></returns>
+        internal static int DownFile(string uri, string save_to)
         {
             try
             {
@@ -24,7 +34,7 @@ namespace LKY_OfficeTools.SDK.Aria2c
                 if (!File.Exists(aria2c_path))
                 {
                     new Log("     × aria2c.exe 文件丢失！", ConsoleColor.DarkRed);
-                    return false;
+                    return 0;
                 }
 
                 string file_path = new FileInfo(save_to).DirectoryName;     //保存的文件路径，不含文件名
@@ -36,7 +46,7 @@ namespace LKY_OfficeTools.SDK.Aria2c
 
                 Com_ExeOS.RunExe(aria2c_path, aria2c_params);
 
-                return true;
+                return 1;
             }
             catch /*(Exception Ex)*/
             {
@@ -44,7 +54,7 @@ namespace LKY_OfficeTools.SDK.Aria2c
 
                 //Console.ForegroundColor = ConsoleColor.DarkRed;
                 //new Log(error);
-                return false;
+                return -1;
             }
         }
 

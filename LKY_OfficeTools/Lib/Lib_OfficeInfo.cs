@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading;
-using static LKY_OfficeTools.Lib.Lib_SelfLog;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {

@@ -8,8 +8,8 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.Collections.Generic;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
-using static LKY_OfficeTools.Lib.Lib_SelfLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -37,10 +37,10 @@ namespace LKY_OfficeTools.Lib
         internal static void Activating()
         {
             //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-            string info = Lib_SelfUpdate.latest_info;
+            string info = Lib_AppUpdate.latest_info;
             if (string.IsNullOrEmpty(info))
             {
-                info = Com_WebOS.Visit_WebClient(Lib_SelfUpdate.update_json_url);
+                info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
             }
 
             string KMS_info = Com_TextOS.GetCenterText(info, "\"KMS_List\": \"", "\"");
@@ -48,6 +48,7 @@ namespace LKY_OfficeTools.Lib
             //为空抛出异常
             if (!string.IsNullOrEmpty(KMS_info))
             {
+                int try_times = 1;                                  //激活尝试的次数，初始值为1
                 KMS_List = new List<string>(KMS_info.Split(','));
                 foreach (var now_kms in KMS_List)
                 {
@@ -59,6 +60,7 @@ namespace LKY_OfficeTools.Lib
                     }
                     else
                     {
+                        new Log($"\n     >> 即将尝试第 {++try_times} 次激活 ...", ConsoleColor.DarkYellow);
                         continue;
                     }
                 }
@@ -93,7 +95,7 @@ namespace LKY_OfficeTools.Lib
                 string log_install_key = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_install_key})");
                 if (!log_install_key.ToLower().Contains("successful"))
                 {
-                    new Log($"     × 安装序列号失败，激活终止，请稍后重试！如有问题请联系开发者。", ConsoleColor.DarkRed);
+                    new Log($"     × 安装序列号失败，激活停止。", ConsoleColor.DarkRed);
                     return -2;
                 }
                 new Log($"     √ 安装序列号完成。", ConsoleColor.DarkGreen);
@@ -104,7 +106,7 @@ namespace LKY_OfficeTools.Lib
                 string log_kms_url = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_kms_url})");
                 if (!log_kms_url.ToLower().Contains("successful"))
                 {
-                    new Log($"     × 设置激活载体失败，激活终止，请稍后重试！如有问题请联系开发者。", ConsoleColor.DarkRed);
+                    new Log($"     × 设置激活载体失败，激活停止", ConsoleColor.DarkRed);
                     return 0;
                 }
                 new Log($"     √ 设置激活载体完成。", ConsoleColor.DarkGreen);
@@ -114,7 +116,7 @@ namespace LKY_OfficeTools.Lib
                 string log_activate = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_activate})");
                 if (!log_activate.ToLower().Contains("successful"))
                 {
-                    new Log($"     × 无法执行激活，请稍后重试！如有问题请联系开发者。", ConsoleColor.DarkRed);
+                    new Log($"     × 无法执行激活，激活停止。", ConsoleColor.DarkRed);
                     return -1;
                 }
                 /*Console.ForegroundColor = ConsoleColor.Green;

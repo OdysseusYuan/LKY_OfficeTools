@@ -9,7 +9,7 @@ using LKY_OfficeTools.Common;
 using LKY_OfficeTools.Lib;
 using System;
 using System.Reflection;
-using static LKY_OfficeTools.Lib.Lib_SelfLog;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools
 {
@@ -37,6 +37,9 @@ namespace LKY_OfficeTools
 
             //设置标题
             Console.Title = $"LKY Office Tools v{version}";
+
+            //清理冗余信息
+            Log.Clean();
 
             //Header
             new Log($"LKY Office Tools [版本 {version}]\n" +
@@ -85,13 +88,13 @@ namespace LKY_OfficeTools
                 Com_PrivilegeOS.PrivilegeAttention();
 
                 //更新检查
-                Lib_SelfUpdate.Check_Latest_Version();
+                Lib_AppUpdate.Check_Latest_Version();
 
                 //继续
                 new Lib_OfficeInstall();
 
                 //日志回收
-                Lib_SelfCount.PostInfo.Finish();
+                Lib_AppCount.PostInfo.Finish();
 
                 //退出机制
                 QuitMsg();
@@ -99,7 +102,7 @@ namespace LKY_OfficeTools
             else
             {
                 //日志回收
-                Lib_SelfCount.PostInfo.Finish();
+                Lib_AppCount.PostInfo.Finish();
 
                 return;
             }

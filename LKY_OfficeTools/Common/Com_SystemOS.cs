@@ -8,6 +8,9 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Common
@@ -246,6 +249,54 @@ namespace LKY_OfficeTools.Common
                 catch
                 {
                     return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 屏幕相关类库
+        /// </summary>
+        internal class Screen
+        {
+            /// <summary>
+            /// 抓取屏幕并保存至文件
+            /// </summary>
+            /// <param name="save_to"></param>
+            /// <param name="file_type"></param>
+            /// <returns></returns>
+            internal static bool CaptureToSave(string save_to, ImageFormat file_type = null)
+            {
+                try
+                {
+                    //初始化屏幕尺寸
+                    int screenLeft = SystemInformation.VirtualScreen.Left;
+                    int screenTop = SystemInformation.VirtualScreen.Top;
+                    int screenWidth = SystemInformation.VirtualScreen.Width;
+                    int screenHeight = SystemInformation.VirtualScreen.Height;
+
+                    //接收截图
+                    using (Bitmap bmp = new Bitmap(screenWidth, screenHeight))
+                    {
+                        //抓取
+                        using (Graphics g = Graphics.FromImage(bmp))
+                        {
+                            g.CopyFromScreen(screenLeft, screenTop, 0, 0, bmp.Size);
+                        }
+
+                        //判断保存格式
+                        if (file_type == null)
+                        {
+                            file_type = ImageFormat.Png;
+                        }
+
+                        bmp.Save(save_to, file_type);
+                    }
+
+                    return true;
+                }
+                catch
+                {
+                    return false;
                 }
             }
         }
