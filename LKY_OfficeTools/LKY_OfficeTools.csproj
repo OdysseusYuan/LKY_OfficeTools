@@ -98,7 +98,6 @@
     <None Include="Example\LKY_OfficeTools_AppInfo.json" />
     <None Include="Example\office_channels.json" />
     <None Include="Properties\app.manifest" />
-    <EmbeddedResource Include="Resource\qqwry.dat" />
     <None Include="SDK\SaRAC\SaRACmd.exe.config" />
     <None Include="SDK\SaRAC\ThinClient.ps1" />
   </ItemGroup>
@@ -187,5 +186,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
