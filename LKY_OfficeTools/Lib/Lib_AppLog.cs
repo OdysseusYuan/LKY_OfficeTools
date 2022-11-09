@@ -51,7 +51,7 @@ namespace LKY_OfficeTools.Lib
                         if (string.IsNullOrEmpty(log_filepath))
                         {
                             string file_name = datatime_format + ".log";
-                            log_filepath = $"{Lib_AppInfo.Path.AppLog}\\{file_name}";
+                            log_filepath = $"{Lib_AppInfo.Path.Dir_Log}\\{file_name}";
                         }
 
                         //目录不存在时创建目录
@@ -66,7 +66,7 @@ namespace LKY_OfficeTools.Lib
                         if (str.Contains("×"))
                         {
                             string err_filename = datatime_format + ".png";
-                            err_filename = $"{Lib_AppInfo.Path.AppLog}\\{err_filename}";
+                            err_filename = $"{Lib_AppInfo.Path.Dir_Log}\\{err_filename}";
                             if (Com_SystemOS.Screen.CaptureToSave(err_filename))
                             {
                                 error_screen_path.Add(err_filename);
@@ -112,11 +112,11 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //清理整个Log文件夹
-                    if (Directory.Exists(Lib_AppInfo.Path.AppLog))
+                    if (Directory.Exists(Lib_AppInfo.Path.Dir_Log))
                     {
                         try
                         {
-                            Directory.Delete(Lib_AppInfo.Path.AppLog, true);
+                            Directory.Delete(Lib_AppInfo.Path.Dir_Log, true);
                         }
                         catch { }
                     }

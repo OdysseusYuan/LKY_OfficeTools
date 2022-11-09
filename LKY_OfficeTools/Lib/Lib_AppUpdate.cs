@@ -89,7 +89,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n------> 正在更新 {Console.Title} ...", ConsoleColor.DarkCyan);
 
                     //下载文件
-                    string save_to = Lib_AppInfo.Path.AppDocument + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
+                    string save_to = Lib_AppInfo.Path.Dir_Document + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
                     Aria2c.DownFile(latest_down_url, save_to);
 
                     //解压文件

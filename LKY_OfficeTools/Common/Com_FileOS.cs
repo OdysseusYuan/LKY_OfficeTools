@@ -77,7 +77,7 @@ namespace LKY_OfficeTools.Common
             /// </summary>
             /// <param name="dirPath"></param>
             /// <param name="isRoot"></param>
-            public void GetFilesByExtension(string dirPath, string fileType = "*", bool isRoot = false)
+            internal void GetFilesByExtension(string dirPath, string fileType = "*", bool isRoot = false)
             {
                 if (Directory.Exists(dirPath))     //目录存在
                 {
@@ -132,5 +132,122 @@ namespace LKY_OfficeTools.Common
             }
         }
 
+        /// <summary>
+        /// 转换文件不同格式，如：流、文件流等
+        /// </summary>
+        internal class Covert
+        {
+            /* - - - - - - - - - - - - - - - - - - - - - - - - 
+             * Stream 和 byte[] 之间的转换
+             * - - - - - - - - - - - - - - - - - - - - - - - */
+            /// <summary>
+            /// 将 Stream 转成 byte[]
+            /// </summary>
+            internal static byte[] StreamToBytes(Stream stream)
+            {
+                byte[] bytes = new byte[stream.Length];
+                stream.Read(bytes, 0, bytes.Length);
+
+                // 设置当前流的位置为流的开始
+                stream.Seek(0, SeekOrigin.Begin);
+                return bytes;
+            }
+
+            /// <summary>
+            /// 将 byte[] 转成 Stream
+            /// </summary>
+            internal static Stream BytesToStream(byte[] bytes)
+            {
+                Stream stream = new MemoryStream(bytes);
+                return stream;
+            }
+
+
+            /* - - - - - - - - - - - - - - - - - - - - - - - - 
+             * Stream 和 文件之间的转换
+             * - - - - - - - - - - - - - - - - - - - - - - - */
+            /// <summary>
+            /// 将 Stream 写入文件
+            /// </summary>
+            internal static void StreamToFile(Stream stream, string fileName)
+            {
+                // 把 Stream 转换成 byte[]
+                byte[] bytes = new byte[stream.Length];
+                stream.Read(bytes, 0, bytes.Length);
+                // 设置当前流的位置为流的开始
+                stream.Seek(0, SeekOrigin.Begin);
+
+                // 把 byte[] 写入文件
+                FileStream fs = new FileStream(fileName, FileMode.Create);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(bytes);
+                bw.Close();
+                fs.Close();
+            }
+
+            /// <summary>
+            /// 从文件读取 Stream
+            /// </summary>
+            internal static Stream FileToStream(string fileName)
+            {
+                // 打开文件
+                FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                // 读取文件的 byte[]
+                byte[] bytes = new byte[fileStream.Length];
+                fileStream.Read(bytes, 0, bytes.Length);
+                fileStream.Close();
+                // 把 byte[] 转换成 Stream
+                Stream stream = new MemoryStream(bytes);
+                return stream;
+            }
+        }
+
+        /// <summary>
+        /// 文件写出类
+        /// </summary>
+        internal class Write
+        {
+            /// <summary>
+            /// 将已知的所有文本一次性写入文本，并覆盖此前内容
+            /// </summary>
+            /// <returns></returns>
+            internal static bool FromAllText(string all_text, string to_path)
+            {
+                try
+                {
+                    File.WriteAllText(to_path, all_text, Encoding.UTF8);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 将Stream数据写出到本地文件
+            /// </summary>
+            /// <returns></returns>
+            internal static bool FromStream(Stream stream, string to_path)
+            {
+                try
+                {
+                    byte[] Save = Covert.StreamToBytes(stream);
+
+                    //创建文件所在目录
+                    Directory.CreateDirectory(new FileInfo(to_path).DirectoryName);
+
+                    FileStream fsObj = new FileStream(to_path, FileMode.Create);
+                    fsObj.Write(Save, 0, Save.Length);
+                    fsObj.Close();
+
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
     }
 }

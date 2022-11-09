@@ -41,6 +41,9 @@ namespace LKY_OfficeTools
             //清理冗余信息
             Log.Clean();
 
+            //数字签名证书检查
+            new Lib_AppSignCert();
+
             //Header
             new Log($"LKY Office Tools [版本 {version}]\n" +
                 $"版权所有（C）LiuKaiyuan (Odysseus.Yuan)。保留所有权利。\n\n" +
