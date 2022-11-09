@@ -88,7 +88,7 @@ namespace LKY_OfficeTools.Lib
                         return 0;
                     }
 
-                    new Log($"     √ {new FileInfo(save_path).Name} 已下载。\n", ConsoleColor.DarkGreen);
+                    new Log($"     √ {new FileInfo(save_path).Name} 已下载。", ConsoleColor.DarkGreen);
                 }
 
                 new Log($"\n------> 正在检查 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
