@@ -82,10 +82,11 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n     >> 下载 {new FileInfo(save_path).Name} 文件 ...", ConsoleColor.DarkYellow);
 
                     //遇到重复的文件可以断点续传
-                    if (Aria2c.DownFile(a, save_path) == 0)
+                    int down_result = Aria2c.DownFile(a, save_path);
+                    if (down_result != 1)
                     {
                         //如果因为核心下载exe丢失，导致下载失败，直接中止
-                        return 0;
+                        throw new Exception();
                     }
 
                     new Log($"     √ {new FileInfo(save_path).Name} 已下载。", ConsoleColor.DarkGreen);
@@ -113,10 +114,9 @@ namespace LKY_OfficeTools.Lib
 
                 return 1;
             }
-            catch /*(Exception Ex)*/
+            catch (Exception Ex)
             {
-                //Console.ForegroundColor = ConsoleColor.DarkRed;
-                //new Log(Ex.Message.ToString());
+                new Log(Ex.ToString());
                 return 0;
             }
         }

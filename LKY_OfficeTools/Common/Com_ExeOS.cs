@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -55,10 +56,9 @@ namespace LKY_OfficeTools.Common
 
                 return true;
             }
-            catch /*(Exception Ex)*/
+            catch (Exception Ex)
             {
-                //Console.ForegroundColor = ConsoleColor.DarkRed;
-                //new Log(Ex.Message.ToString());
+                new Log(Ex.ToString());
                 return false;
             }
         }
@@ -110,10 +110,9 @@ namespace LKY_OfficeTools.Common
 
                 return strOuput;
             }
-            catch /*(Exception Ex)*/
+            catch (Exception Ex)
             {
-                //Console.ForegroundColor = ConsoleColor.DarkRed;
-                //new Log(Ex.Message.ToString());
+                new Log(Ex.ToString());
                 return null;
             }
         }

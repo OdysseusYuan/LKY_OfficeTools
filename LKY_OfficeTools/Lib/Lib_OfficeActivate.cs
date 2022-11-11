@@ -9,6 +9,7 @@ using LKY_OfficeTools.Common;
 using System;
 using System.Collections.Generic;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppLog.Log;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Lib
@@ -49,7 +50,7 @@ namespace LKY_OfficeTools.Lib
             if (!string.IsNullOrEmpty(KMS_info))
             {
                 int try_times = 1;                                  //激活尝试的次数，初始值为1
-                KMS_List = new List<string>(KMS_info.Split(','));
+                KMS_List = new List<string>(KMS_info.Split(';'));
                 foreach (var now_kms in KMS_List)
                 {
                     //激活成功时，结束；未安装Office导致不成功，也跳出。其余问题多次尝试不同激活服务器
@@ -60,7 +61,10 @@ namespace LKY_OfficeTools.Lib
                     }
                     else
                     {
-                        new Log($"\n     >> 即将尝试第 {++try_times} 次激活 ...", ConsoleColor.DarkYellow);
+                        if (try_times < KMS_List.Count)
+                        {
+                            new Log($"\n     >> 即将尝试第 {++try_times} 次激活 ...", ConsoleColor.DarkYellow);
+                        }
                         continue;
                     }
                 }
@@ -95,6 +99,7 @@ namespace LKY_OfficeTools.Lib
                 string log_install_key = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_install_key})");
                 if (!log_install_key.ToLower().Contains("successful"))
                 {
+                    new Log(log_install_key);    //保存错误原因
                     new Log($"     × 安装序列号失败，激活停止。", ConsoleColor.DarkRed);
                     return -2;
                 }
@@ -106,6 +111,7 @@ namespace LKY_OfficeTools.Lib
                 string log_kms_url = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_kms_url})");
                 if (!log_kms_url.ToLower().Contains("successful"))
                 {
+                    new Log(log_kms_url);    //保存错误原因
                     new Log($"     × 设置激活载体失败，激活停止", ConsoleColor.DarkRed);
                     return 0;
                 }
@@ -116,6 +122,7 @@ namespace LKY_OfficeTools.Lib
                 string log_activate = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_activate})");
                 if (!log_activate.ToLower().Contains("successful"))
                 {
+                    new Log(log_activate);    //保存错误原因
                     new Log($"     × 无法执行激活，激活停止。", ConsoleColor.DarkRed);
                     return -1;
                 }

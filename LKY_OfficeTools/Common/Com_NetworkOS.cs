@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -69,8 +70,9 @@ namespace LKY_OfficeTools.Common
 
                     return $"{ip} ({ip_location})";
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     //意外失败，返回error
                     return "ip_info_error!";
                 }
@@ -124,8 +126,9 @@ namespace LKY_OfficeTools.Common
                         return GetIPFromHtml(my_ip_page);
                     }
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return null;
                 }
             }
@@ -161,8 +164,9 @@ namespace LKY_OfficeTools.Common
                     //无任何问题，直接返回该值
                     return ip_location;
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return null;
                 }
             }
@@ -186,8 +190,9 @@ namespace LKY_OfficeTools.Common
                     }
                     return ip;
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return null;
                 }
             }

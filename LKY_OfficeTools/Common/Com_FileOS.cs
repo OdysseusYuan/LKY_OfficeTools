@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -53,10 +54,9 @@ namespace LKY_OfficeTools.Common
 
                     return true;
                 }
-                catch /*(Exception Ex)*/
+                catch (Exception Ex)
                 {
-                    //Console.ForegroundColor = ConsoleColor.DarkRed;
-                    //new Log(Ex.Message.ToString());
+                    new Log(Ex.ToString());
                     return false;
                 }
             }
@@ -218,8 +218,9 @@ namespace LKY_OfficeTools.Common
                     File.WriteAllText(to_path, all_text, Encoding.UTF8);
                     return true;
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return false;
                 }
             }
@@ -243,8 +244,9 @@ namespace LKY_OfficeTools.Common
 
                     return true;
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return false;
                 }
             }

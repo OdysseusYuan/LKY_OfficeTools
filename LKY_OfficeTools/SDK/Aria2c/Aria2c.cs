@@ -33,7 +33,7 @@ namespace LKY_OfficeTools.SDK.Aria2c
 
                 if (!File.Exists(aria2c_path))
                 {
-                    new Log("     × aria2c.exe 文件丢失！", ConsoleColor.DarkRed);
+                    new Log($"     × {aria2c_path} 文件丢失！", ConsoleColor.DarkRed);
                     return 0;
                 }
 
@@ -48,12 +48,9 @@ namespace LKY_OfficeTools.SDK.Aria2c
 
                 return 1;
             }
-            catch /*(Exception Ex)*/
+            catch (Exception Ex)
             {
-                //string error = Ex.Message.ToString();
-
-                //Console.ForegroundColor = ConsoleColor.DarkRed;
-                //new Log(error);
+                new Log(Ex.ToString());
                 return -1;
             }
         }

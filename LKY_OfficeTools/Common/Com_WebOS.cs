@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -40,10 +41,9 @@ namespace LKY_OfficeTools.Common
                     return encoding.GetString(pageData);
                 }
             }
-            catch /*(Exception Ex)*/
+            catch (Exception Ex)
             {
-                //Console.ForegroundColor = ConsoleColor.DarkYellow;
-                //new Log(Ex);
+                new Log(Ex.ToString());
                 return null;
             }
         }

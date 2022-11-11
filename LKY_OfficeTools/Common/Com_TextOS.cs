@@ -8,6 +8,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -33,10 +34,9 @@ namespace LKY_OfficeTools.Common
                 string result = from_text.Substring(0, right_str_Index);    //获取最终值
                 return result;
             }
-            catch /*(Exception Ex)*/
+            catch (Exception Ex)
             {
-                //Console.ForegroundColor = ConsoleColor.DarkRed;
-                //new Log(Ex.Message.ToString());
+                new Log(Ex.ToString());
                 return null;
             }
         }

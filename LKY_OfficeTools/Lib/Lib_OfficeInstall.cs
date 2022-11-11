@@ -6,11 +6,13 @@
  */
 
 using LKY_OfficeTools.Common;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Threading;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -61,7 +63,7 @@ namespace LKY_OfficeTools.Lib
                 new Log($"\n------> 正在进行 Office 安装环境检查 ...", ConsoleColor.DarkCyan);
 
                 //先获取目前已经安装的 Office 版本
-                string Current_Office_ID = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+                string Current_Office_ID = Register.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
                 //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
                 string info = Lib_AppUpdate.latest_info;
@@ -109,8 +111,12 @@ namespace LKY_OfficeTools.Lib
                         new Log($"     >> 此过程大约会持续几分钟的时间，请耐心等待 ...", ConsoleColor.DarkYellow);
 
                         string uninstall_args = $"/configure \"{ODT_path_xml}\"";
-                        bool isUninstall = Com_ExeOS.RunExe(ODT_path_exe, uninstall_args);
-                        var reg_info = Com_SystemOS.Registry.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+                        bool isUninstall = Com_ExeOS.RunExe(ODT_path_exe, uninstall_args);      //卸载
+
+                        //暂时先不启用
+                        //Register.DeleteItem(Registry.LocalMachine, @"SOFTWARE\Microsoft", "Office");    //清除注册表残余
+
+                        var reg_info = Register.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
                         //未正常结束卸载 OR 注册表键值不为空 时，视为卸载失败
                         if (!isUninstall || !string.IsNullOrEmpty(reg_info))
@@ -138,8 +144,9 @@ namespace LKY_OfficeTools.Lib
                     return StartInstall();
                 }
             }
-            catch
+            catch (Exception Ex)
             {
+                new Log(Ex.ToString());
                 return false;
             }
         }
@@ -337,10 +344,15 @@ namespace LKY_OfficeTools.Lib
             }
 
             //开始安装
-            string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
-
             new Log($"\n------> 开始安装 Microsoft Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
 
+            ///先结束掉可能还在安装的 Office 进程
+            Com_ProcessOS.KillProcess("OfficeClickToRun");
+            Com_ProcessOS.KillProcess("OfficeC2RClient");
+            Com_ProcessOS.KillProcess("ODT");
+
+            ///命令安装
+            string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
             bool isInstallFinish = Com_ExeOS.RunExe(ODT_path_exe, install_args);
 
             //检查是否因配置不正确等导致，意外退出安装
@@ -356,6 +368,7 @@ namespace LKY_OfficeTools.Lib
             {
                 //找不到 ClickToRun 注册表
                 new Log($"     × Microsoft Office v{OfficeNetVersion.latest_version} 安装失败！", ConsoleColor.DarkRed);
+                new Log(install_state);
                 return false;
             }
             else
@@ -371,7 +384,8 @@ namespace LKY_OfficeTools.Lib
                 else if (install_state == OfficeLocalInstall.State.VersionDiff)
                 {
                     //版本号和一开始下载的版本号不一致
-                    new Log($"     × 未能正确安装 Microsoft Office v{OfficeNetVersion.latest_version} 版本！", ConsoleColor.DarkGreen);
+                    new Log($"     × 未能正确安装 Microsoft Office v{OfficeNetVersion.latest_version} 版本！", ConsoleColor.DarkRed);
+                    new Log(install_state);
                     return false;
                 }
                 else

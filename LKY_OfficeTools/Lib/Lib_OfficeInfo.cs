@@ -62,10 +62,9 @@ namespace LKY_OfficeTools.Lib
                     { return null; }
                 }
 
-                catch /*(WebException webEx)*/
+                catch (Exception Ex)
                 {
-                    //Console.ForegroundColor = ConsoleColor.DarkRed;
-                    //new Log(webEx.Message.ToString());
+                    new Log(Ex.ToString());
                     return null;
                 }
 
@@ -146,10 +145,9 @@ namespace LKY_OfficeTools.Lib
                     return file_list;
                 }
 
-                catch /*(WebException webEx)*/
+                catch (Exception Ex)
                 {
-                    //Console.ForegroundColor = ConsoleColor.DarkRed;
-                    //new Log(webEx.Message.ToString());
+                    new Log(Ex.ToString());
                     return null;
                 }
 

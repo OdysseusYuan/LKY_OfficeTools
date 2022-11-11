@@ -64,7 +64,7 @@ namespace LKY_OfficeTools.Lib
                     }
                 }
 
-                new Log($"     >> 初始化完成 {new Random().Next(10, 30)}% ...", ConsoleColor.DarkYellow);
+                new Log($"     >> 初始化完成 {new Random().Next(1, 10)}% ...", ConsoleColor.DarkYellow);
 
                 //获取版本信息
                 latest_info = Com_WebOS.Visit_WebClient(update_json_url);
@@ -73,12 +73,12 @@ namespace LKY_OfficeTools.Lib
                 string latest_ver = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version\": \"", "\"");
                 string latest_down_url = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version_Update_Url\": \"", "\"");
 
-                new Log($"     >> 初始化完成 {new Random().Next(31, 50)}% ...", ConsoleColor.DarkYellow);
+                new Log($"     >> 初始化完成 {new Random().Next(11, 30)}% ...", ConsoleColor.DarkYellow);
 
                 //运行统计
                 Lib_AppCount.PostInfo.Running();
 
-                new Log($"     >> 初始化完成 {new Random().Next(71, 90)}% ...", ConsoleColor.DarkYellow);
+                new Log($"     >> 初始化完成 {new Random().Next(91, 100)}% ...", ConsoleColor.DarkYellow);
 
                 new Log($"     √ 已完成 {Console.Title} v{latest_ver} 初始化检查。", ConsoleColor.DarkGreen);
 
@@ -90,7 +90,13 @@ namespace LKY_OfficeTools.Lib
 
                     //下载文件
                     string save_to = Lib_AppInfo.Path.Dir_Document + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
-                    Aria2c.DownFile(latest_down_url, save_to);
+                    int down_result = Aria2c.DownFile(latest_down_url, save_to);
+
+                    //下载不成功时，抛出
+                    if (down_result != 1)
+                    {
+                        throw new Exception();
+                    }
 
                     //解压文件
                     string extra_to = Path.GetDirectoryName(save_to) + "\\" + $"{Console.Title}_update_{latest_ver}";
@@ -156,10 +162,10 @@ namespace LKY_OfficeTools.Lib
 
                 return true;
             }
-            catch /*(Exception Ex)*/
+            catch (Exception Ex)
             {
+                new Log(Ex.ToString());
                 new Log($"      * 暂时跳过更新检查！", ConsoleColor.DarkMagenta);
-                //new Log(Ex.Message.ToString());
                 return false;
             }
 

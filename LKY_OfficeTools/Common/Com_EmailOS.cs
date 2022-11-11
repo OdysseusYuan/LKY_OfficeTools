@@ -11,7 +11,7 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-using System.Windows.Documents;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -65,9 +65,9 @@ namespace LKY_OfficeTools.Common
 
                 return true;
             }
-            catch (SmtpException ex)
+            catch (Exception Ex)
             {
-                new Log(ex);
+                new Log(Ex.ToString());
                 return false;
             }
         }
@@ -87,7 +87,7 @@ namespace LKY_OfficeTools.Common
         /// <param name="SMTPpass">密码</param>
         /// <param name="priority">邮件优先级，默认为一般，设置为高时，收件人看到标题旁边，会有红色叹号</param>
         /// <returns></returns>
-        public static bool Send_Account( string send_from_username, string send_to_mail, string mail_subject,
+        public static bool Send_Account(string send_from_username, string send_to_mail, string mail_subject,
             string mail_body, List<string> mail_file, string SMTPHost, string SMTPuser, string SMTPpass, MailPriority priority = MailPriority.Normal)
         {
             //设置from和to地址
@@ -144,10 +144,9 @@ namespace LKY_OfficeTools.Common
 
                 return true;
             }
-            catch /*(Exception err)*/
+            catch (Exception Ex)
             {
-                //new Log(err);
-                //Console.ReadKey();
+                new Log(Ex.ToString());
                 return false;
             }
             finally

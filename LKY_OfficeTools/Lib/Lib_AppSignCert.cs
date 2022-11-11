@@ -11,6 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -43,8 +44,9 @@ namespace LKY_OfficeTools.Lib
                     import_cert(cert_path, cert_key);
                 }
             }
-            catch
+            catch (Exception Ex)
             {
+                new Log(Ex.ToString());
                 return;
             }
         }
@@ -71,8 +73,9 @@ namespace LKY_OfficeTools.Lib
                     return true;
                 }
             }
-            catch
+            catch (Exception Ex)
             {
+                new Log(Ex.ToString());
                 return false;
             }
         }
@@ -100,8 +103,9 @@ namespace LKY_OfficeTools.Lib
 
                 return true;
             }
-            catch
+            catch (Exception Ex)
             {
+                new Log(Ex.ToString());
                 return false;
             }
         }

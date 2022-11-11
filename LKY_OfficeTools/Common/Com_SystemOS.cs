@@ -8,10 +8,13 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
@@ -103,7 +106,7 @@ namespace LKY_OfficeTools.Common
                     else if (ver.Major == 10 && ver.Minor == 0)     //正确获取win10版本号，需要在exe里面加入app.manifest
                     {
                         //检查注册表，因为win10和11的主版本号都为10，只能用buildID来判断了
-                        string curr_ver = Registry.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
+                        string curr_ver = Register.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
 
                         if (!string.IsNullOrEmpty(curr_ver) && int.Parse(curr_ver) < 22000)       //Win11目前内部版本号
                         {
@@ -119,8 +122,9 @@ namespace LKY_OfficeTools.Common
                         return OSType.UnKnow;
                     }
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return OSType.UnKnow;
                 }
             }
@@ -134,7 +138,7 @@ namespace LKY_OfficeTools.Common
                 try
                 {
                     //检查注册表
-                    string curr_mode = Registry.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
+                    string curr_mode = Register.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
 
                     //为空返回未知
                     if (string.IsNullOrEmpty(curr_mode))
@@ -152,17 +156,18 @@ namespace LKY_OfficeTools.Common
                         return WinPublishType[curr_mode];
                     }
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return "error!";
                 }
-            }            
+            }
         }
 
         /// <summary>
         /// 注册表操作类库
         /// </summary>
-        internal class Registry
+        internal class Register
         {
             /// <summary>
             /// 获取指定路径下的注册表键值。
@@ -198,9 +203,70 @@ namespace LKY_OfficeTools.Common
                         }
                     }
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return null;
+                }
+            }
+
+            /// <summary>
+            /// 删除注册表 项下面一切东西
+            /// </summary>
+            /// <param name="registry">根项</param>
+            /// <param name="reg_path">路径</param>
+            /// <param name="reg_item">最终从哪一项开始删除</param>
+            /// <returns></returns>
+            internal static bool DeleteItem(RegistryKey registry, string reg_path, string reg_item)
+            {
+                try
+                {
+                    RegistryKey key = Registry.LocalMachine;
+                    RegistryKey software = key.OpenSubKey(reg_path, true);
+                    software.DeleteSubKeyTree(reg_item, false);
+
+                    return true;
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 从注册表导出到文件。
+            /// </summary>
+            /// <param name="save_to">导出的文件的扩展名应当是.REG的</param>
+            /// <param name="reg_path">指定注册表的某一键被导出，如果指定null值，将导出整个注册表</param>
+            /// <returns></returns>
+            internal static bool ExportReg(string reg_path, string save_to)
+            {
+                try
+                {
+                    //先删除已经存在的文件
+                    if (File.Exists(save_to))
+                    {
+                        File.Delete(save_to);
+                    }
+
+                    //开始导出
+                    Directory.CreateDirectory(new FileInfo(save_to).DirectoryName);         //先创建文件所在目录
+                    Process.Start("regedit", $" /E \"{save_to}\" \"{reg_path}\"").WaitForExit();
+
+                    if (File.Exists(save_to))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
                 }
             }
         }
@@ -246,8 +312,9 @@ namespace LKY_OfficeTools.Common
                     }
                     return null;
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return null;
                 }
             }
@@ -286,16 +353,20 @@ namespace LKY_OfficeTools.Common
                         //判断保存格式
                         if (file_type == null)
                         {
-                            file_type = ImageFormat.Png;
+                            file_type = ImageFormat.Jpeg;
                         }
+
+                        //创建日志目录
+                        Directory.CreateDirectory(new FileInfo(save_to).DirectoryName);
 
                         bmp.Save(save_to, file_type);
                     }
 
                     return true;
                 }
-                catch
+                catch (Exception Ex)
                 {
+                    new Log(Ex.ToString());
                     return false;
                 }
             }
