@@ -6,7 +6,6 @@
  */
 
 using LKY_OfficeTools.Common;
-using LKY_OfficeTools.SDK.Aria2c;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +13,10 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_FileOS;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppReport;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -46,7 +48,7 @@ namespace LKY_OfficeTools.Lib
         /// 检查自身最新版本
         /// </summary>
         /// <returns></returns>
-        internal static bool Check_Latest_Version()
+        internal static bool Check()
         {
             try
             {
@@ -56,7 +58,7 @@ namespace LKY_OfficeTools.Lib
                 ScanFiles oldFiles = new ScanFiles();
                 oldFiles.GetFilesByExtension(Environment.CurrentDirectory, ".old");
                 ///无 old 文件时，自动跳过
-                if (oldFiles.FilesList != null)
+                if (oldFiles.FilesList != null && oldFiles.FilesList.Count > 0)
                 {
                     foreach (var now_file in oldFiles.FilesList)
                     {
@@ -75,8 +77,8 @@ namespace LKY_OfficeTools.Lib
 
                 new Log($"     >> 初始化完成 {new Random().Next(11, 30)}% ...", ConsoleColor.DarkYellow);
 
-                //运行统计
-                Lib_AppCount.PostInfo.Running();
+                //启动打点
+                Pointing(RunType.Starting, true);
 
                 new Log($"     >> 初始化完成 {new Random().Next(91, 100)}% ...", ConsoleColor.DarkYellow);
 
@@ -89,8 +91,8 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n------> 正在更新 {Console.Title} ...", ConsoleColor.DarkCyan);
 
                     //下载文件
-                    string save_to = Lib_AppInfo.Path.Dir_Document + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
-                    int down_result = Aria2c.DownFile(latest_down_url, save_to);
+                    string save_to = App.Path.Dir_Document + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
+                    int down_result = Lib_Aria2c.DownFile(latest_down_url, save_to);
 
                     //下载不成功时，抛出
                     if (down_result != 1)
@@ -110,18 +112,41 @@ namespace LKY_OfficeTools.Lib
                     File.Delete(save_to);
 
                     //扫描文件
-                    ScanFiles scanFiles = new ScanFiles();
-                    scanFiles.GetFilesByExtension(extra_to);
+                    ScanFiles new_files = new ScanFiles();
+                    new_files.GetFilesByExtension(extra_to);
                     ///可更新文件为空，跳过更新
-                    if (scanFiles.FilesList == null)
+                    if (new_files.FilesList == null)
                     {
                         throw new Exception();
                     }
 
-                    //复制文件
-                    ///获得自身主程序路径
+                    //获得自身主程序路径
                     string self_RunPath = new FileInfo(Process.GetCurrentProcess().MainModule.FileName).FullName;
-                    foreach (var now_file in scanFiles.FilesList)
+
+                    //删除旧的文件
+                    ScanFiles old_files = new ScanFiles();
+                    old_files.GetFilesByExtension(extra_to);
+                    if (old_files.FilesList != null && old_files.FilesList.Count > 0 )
+                    {
+                        foreach (var now_file in old_files.FilesList)
+                        {
+                            //除了自身exe外，删除全部旧的文件
+                            if (now_file != self_RunPath)
+                            {
+                                try
+                                {
+                                    File.Delete(now_file);
+                                }
+                                catch (Exception Ex)
+                                {
+                                    new Log(Ex.ToString());
+                                }
+                            }
+                        }
+                    }
+
+                    //复制新文件
+                    foreach (var now_file in new_files.FilesList)
                     {
                         //获得文件相对路径
                         string file_relative_path = now_file.Replace(extra_to, "\\");

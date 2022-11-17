@@ -8,7 +8,8 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.IO;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -35,7 +36,7 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// 所有日志的文字记录
             /// </summary>
-            internal static string log_info = null;
+            internal static string log_info = string.Empty;
 
             /*
             /// <summary>
@@ -63,6 +64,20 @@ namespace LKY_OfficeTools.Lib
                 /// 既展示文字，又写入log
                 /// </summary>
                 Display_Write
+            }
+
+            /// <summary>
+            /// 按键退出 & 完成善后
+            /// </summary>
+            internal static void QuitMsg()
+            {
+                //清理SDK缓存
+                Lib_AppSdk.Clean();
+
+                //退出机制
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write("\n请按任意键退出 ...");
+                Console.ReadKey();
             }
 
             /// <summary>
@@ -109,7 +124,7 @@ namespace LKY_OfficeTools.Lib
                         {
                             now_log = $"<font color=red><b>{now_log}</b></font>";          //有错误标红、加粗
                         }
-                        else if(str.Contains("Exception"))
+                        else if (str.Contains("Exception"))
                         {
                             now_log = $"<font color=\"#ff4c00\">{now_log}</font>";       //抛出异常用橙红色
                         }
@@ -157,7 +172,7 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// 因为安装 Office 错误产生的注册表日志
             /// </summary>
-            internal Log(OfficeLocalInstall.State install_error)
+            internal Log(InstallState install_error)
             {
                 try
                 {
@@ -166,15 +181,34 @@ namespace LKY_OfficeTools.Lib
                     string office_reg_path = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Office";
 
                     //依据不同的安装错误生成不同的注册表文件名
-                    switch (install_error)
+                    string reg_filename = "error";
+
+                    //包含未安装标记
+                    if (install_error.HasFlag(InstallState.None))
                     {
-                        case OfficeLocalInstall.State.Nothing:
-                            reg_install_error = Lib_AppInfo.Path.Dir_Log + "\\error_install_nothing.reg";
-                            break;
-                        case OfficeLocalInstall.State.VersionDiff:
-                            reg_install_error = Lib_AppInfo.Path.Dir_Log + "\\error_install_verdiff.reg";
-                            break;
+                        reg_filename += "_none";
                     }
+
+                    //包含不同版本标记
+                    if (install_error.HasFlag(InstallState.Diff))
+                    {
+                        reg_filename += "_diff";
+                    }
+
+                    //包含多版本标记
+                    if (install_error.HasFlag(InstallState.Multi))
+                    {
+                        reg_filename += "_multi";
+                    }
+
+                    //包含安装正确标记
+                    if (install_error.HasFlag(InstallState.Correct))
+                    {
+                        reg_filename += "_correct";
+                    }
+
+                    //合成最终注册表路径
+                    reg_install_error = App.Path.Dir_Log + $@"\{reg_filename}.reg";
 
                     //生成注册表信息
                     Com_SystemOS.Register.ExportReg(office_reg_path, reg_install_error);
@@ -230,11 +264,11 @@ namespace LKY_OfficeTools.Lib
                     */
 
                     //清理整个Log文件夹
-                    if (Directory.Exists(Lib_AppInfo.Path.Dir_Log))
+                    if (Directory.Exists(App.Path.Dir_Log))
                     {
                         try
                         {
-                            Directory.Delete(Lib_AppInfo.Path.Dir_Log, true);
+                            Directory.Delete(App.Path.Dir_Log, true);
                         }
                         catch (Exception Ex)
                         {

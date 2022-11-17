@@ -5,13 +5,13 @@
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
  */
 
-using LKY_OfficeTools.SDK.Aria2c;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -42,7 +42,7 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //获取下载列表
-                down_list = OfficeNetVersion.Get_OfficeFileList();
+                down_list = OfficeNetVersion.GetOfficeFileList();
                 if (down_list == null)
                 {
                     //中断安装
@@ -50,8 +50,8 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 //判断是否已经安装了当前版本
-                OfficeLocalInstall.State install_state = OfficeLocalInstall.GetState();
-                if (install_state == OfficeLocalInstall.State.Installed)
+                InstallState install_state = GetOfficeState();
+                if (install_state.HasFlag(InstallState.Correct))          //只要有标记为安装了最新版，无论是否存在多个版本，也无需下载
                 {
                     new Log($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！", ConsoleColor.DarkMagenta);
                     return -1;
@@ -66,7 +66,7 @@ namespace LKY_OfficeTools.Lib
                 List<string> save_files = new List<string>();
 
                 //下载开始
-                new Log($"\n------> 开始下载 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 开始下载 Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
                 //延迟，让用户看到开始下载
                 Thread.Sleep(1000);
 
@@ -82,7 +82,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n     >> 下载 {new FileInfo(save_path).Name} 文件 ...", ConsoleColor.DarkYellow);
 
                     //遇到重复的文件可以断点续传
-                    int down_result = Aria2c.DownFile(a, save_path);
+                    int down_result = Lib_Aria2c.DownFile(a, save_path);
                     if (down_result != 1)
                     {
                         //如果因为核心下载exe丢失，导致下载失败，直接中止
@@ -92,7 +92,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"     √ {new FileInfo(save_path).Name} 已下载。", ConsoleColor.DarkGreen);
                 }
 
-                new Log($"\n------> 正在检查 Microsoft Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 正在检查 Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
 
                 foreach (var b in save_files)
                 {
@@ -110,7 +110,7 @@ namespace LKY_OfficeTools.Lib
                     }
                 }
 
-                new Log($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 下载完成。\n", ConsoleColor.DarkGreen);
+                new Log($"     √ Office v{OfficeNetVersion.latest_version} 下载完成。", ConsoleColor.DarkGreen);
 
                 return 1;
             }

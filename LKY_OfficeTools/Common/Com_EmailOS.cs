@@ -100,7 +100,7 @@ namespace LKY_OfficeTools.Common
             try
             {
                 // 添加附件
-                if (mail_file != null)
+                if (mail_file != null && mail_file.Count > 0)
                 {
                     foreach (var now_file in mail_file)
                     {

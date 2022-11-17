@@ -7,7 +7,9 @@
 
 using System;
 using System.Security.Principal;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppReport;
 
 namespace LKY_OfficeTools.Common
 {
@@ -39,9 +41,11 @@ namespace LKY_OfficeTools.Common
             {
                 new Log($"     × 权限错误，请以管理员身份运行此文件！", ConsoleColor.DarkRed);
 
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("\n请按任意键退出 ...");
-                Console.Read();
+                Pointing(App.State.RunType.Finish_Fail);  //回收
+
+                //退出提示
+                Log.QuitMsg();
+
                 Environment.Exit(-1);
             }
 

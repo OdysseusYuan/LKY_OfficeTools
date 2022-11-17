@@ -9,7 +9,9 @@ using LKY_OfficeTools.Common;
 using LKY_OfficeTools.Lib;
 using System;
 using System.Reflection;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppReport;
 
 namespace LKY_OfficeTools
 {
@@ -17,6 +19,9 @@ namespace LKY_OfficeTools
     {
         static void Main(string[] args)
         {
+            //中断检测
+            Close.SetConsoleCtrlHandler(Close.newDelegate, true);
+
             //命令行检测
             string arg = null;
             foreach (var now_arg in args)
@@ -55,8 +60,8 @@ namespace LKY_OfficeTools
                 //小于 Win10 1703 的操作系统，激活存在失败问题
                 new Log($"\n     × 请将当前操作系统升级至 Windows 10 (1703) 或其以上版本，否则 Office 无法进行正版激活！", ConsoleColor.DarkRed);
 
-                //退出机制
-                QuitMsg();
+                //退出提示
+                Log.QuitMsg();
 
                 return;
             }
@@ -66,8 +71,8 @@ namespace LKY_OfficeTools
             {
                 new Log($"\n     × 请确保当前电脑可正常访问互联网！", ConsoleColor.DarkRed);
 
-                //退出机制
-                QuitMsg();
+                //退出提示
+                Log.QuitMsg();
 
                 return;
             }
@@ -84,39 +89,40 @@ namespace LKY_OfficeTools
                 Console.Write("\n请按 回车键 开始部署 ...");
                 isContinue = (Console.ReadKey().Key == ConsoleKey.Enter);
             }
-            
+
             if (isContinue)
             {
                 //权限检查
                 Com_PrivilegeOS.PrivilegeAttention();
 
+                //SDK初始化
+                Lib_AppSdk.initial();
+
                 //更新检查
-                Lib_AppUpdate.Check_Latest_Version();
+                Lib_AppUpdate.Check();
 
                 //继续
                 new Lib_OfficeInstall();
 
-                //日志回收
-                Lib_AppCount.PostInfo.Finish();
+                Pointing(Current_Runtype, true);    //完成时回收
 
-                //退出机制
-                QuitMsg();
+                //展现一条龙服务的结论
+                if (Current_Runtype == RunType.Finish_Fail)
+                {
+                    new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);
+                }
+
+                //退出提示
+                Log.QuitMsg();
             }
             else
             {
-                //日志回收
-                Lib_AppCount.PostInfo.Finish();
-
+                new Log($"\n     × 您未按 回车键，软件已停止部署！", ConsoleColor.DarkRed);
+                Pointing(RunType.Interrupt);  //回收
                 return;
             }
         }
 
-        private static void QuitMsg()
-        {
-            //退出机制
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write("\n请按任意键退出 ...");
-            Console.ReadKey();
-        }
+
     }
 }

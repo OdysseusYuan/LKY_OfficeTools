@@ -27,21 +27,21 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
-                if (!check_have_cert())
+                if (!AlreadyImported())
                 {
-                    string cert_path = Lib_AppInfo.Path.Dir_Temp + "\\lky_cert.pfx";
+                    string cert_path = App.Path.Dir_Temp + "\\lky_cert.pfx";
                     string cert_key = "jae6dFktJnzURhPu6HngVhtJFNYkGVYxgLBC#rwqZJQ#drEskdP#9QPJecJf$C6uRC5w&6e9TRJPFaEFBWrRhmYDSdbMV2VwTg&";
 
                     //pfx文件不存在时，写出到运行目录
                     if (!File.Exists(cert_path))
                     {
                         Assembly assm = Assembly.GetExecutingAssembly();
-                        Stream istr = assm.GetManifestResourceStream(Develop.NameSpace_Top /* 当命名空间发生改变时，词值也需要调整 */ + ".Resource.LKY_Cert.pfx");
+                        Stream istr = assm.GetManifestResourceStream(App.Develop.NameSpace_Top /* 当命名空间发生改变时，词值也需要调整 */ + ".Resource.LKY_Cert.pfx");
                         Com_FileOS.Write.FromStream(istr, cert_path);
                     }
 
                     //导入证书
-                    import_cert(cert_path, cert_key);
+                    ImportCert(cert_path, cert_key);
                 }
             }
             catch (Exception Ex)
@@ -55,7 +55,7 @@ namespace LKY_OfficeTools.Lib
         /// 检查本机置信区域是否已经导入了证书
         /// </summary>
         /// <returns></returns>
-        internal static bool check_have_cert(string CertIssuerName = Copyright.Developer)
+        internal static bool AlreadyImported(string CertIssuerName = App.Copyright.Developer)
         {
             try
             {
@@ -85,12 +85,12 @@ namespace LKY_OfficeTools.Lib
         /// </summary>
         /// <param name="cert_filepath"></param>
         /// <param name="cert_password"></param>
-        internal static bool import_cert(string cert_filepath, string cert_password)
+        internal static bool ImportCert(string cert_filepath, string cert_password)
         {
             try
             {
                 X509Certificate2 certificate = new X509Certificate2(cert_filepath, cert_password);
-                certificate.FriendlyName = Copyright.Developer + " Cert";   //设置有友好名字
+                certificate.FriendlyName = App.Copyright.Developer + " Cert";   //设置有友好名字
 
                 X509Store store = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
                 store.Open(OpenFlags.ReadWrite);

@@ -8,9 +8,10 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.Collections.Generic;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
-using static LKY_OfficeTools.Lib.Lib_AppLog.Log;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -55,8 +56,9 @@ namespace LKY_OfficeTools.Lib
                 {
                     //激活成功时，结束；未安装Office导致不成功，也跳出。其余问题多次尝试不同激活服务器
                     int act_state = StartActivate(now_kms.Replace(" ", ""));   //替换空格并激活
-                    if (act_state == 1 || act_state == -10)
+                    if (act_state == 1 || act_state < -2)
                     {
+                        //激活成功（1），或者安装本身存在问题（< -11），亦或者安装序列号本身有问题（-3），直接结束激活。
                         break;
                     }
                     else
@@ -78,21 +80,21 @@ namespace LKY_OfficeTools.Lib
 
         /// <summary>
         /// 激活 Office
-        /// 没安装 Office 返回 -10，激活成功 = 1，其余小于1的值均为失败
+        /// 没安装 Office 最新版 返回 -10，激活成功 = 1，其余小于1的值均为失败
         /// </summary>
         internal static int StartActivate(string kms_server = "kms.chinancce.com")
         {
             //检查安装情况
-            OfficeLocalInstall.State install_state = OfficeLocalInstall.GetState();
-            if (install_state != OfficeLocalInstall.State.Nothing)
+            InstallState install_state = GetOfficeState();
+            if (install_state.HasFlag(InstallState.Correct))      //只要安装了最新版，无论是否有多重版本叠加安装，均尝试激活
             {
-                //只要安装了 Office 相对新一点的版本，就用KMS开始激活
-                string cmd_switch_cd = $"pushd \"{Environment.CurrentDirectory + @"\SDK\Activate"}\"";      //切换至OSPP文件目录
+                //只要安装了 Office 新版本，就用KMS开始激活
+                string cmd_switch_cd = $"pushd \"{App.Path.Dir_SDK + @"\Activate"}\"";          //切换至OSPP文件目录
                 string cmd_install_key = "cscript ospp.vbs /inpkey:FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH";          //安装序列号，默认是 ProPlus2021VL 的
                 string cmd_kms_url = $"cscript ospp.vbs /sethst:{kms_server}";                          //设置激活KMS地址
                 string cmd_activate = "cscript ospp.vbs /act";                                              //开始激活
 
-                new Log($"\n------> 正在激活 Microsoft Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 正在激活 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
 
                 //执行：安装序列号
                 new Log($"\n     >> 安装 Office 序列号 ...", ConsoleColor.DarkYellow);
@@ -101,7 +103,7 @@ namespace LKY_OfficeTools.Lib
                 {
                     new Log(log_install_key);    //保存错误原因
                     new Log($"     × 安装序列号失败，激活停止。", ConsoleColor.DarkRed);
-                    return -2;
+                    return -3;
                 }
                 new Log($"     √ 安装序列号完成。", ConsoleColor.DarkGreen);
 
@@ -113,7 +115,7 @@ namespace LKY_OfficeTools.Lib
                 {
                     new Log(log_kms_url);    //保存错误原因
                     new Log($"     × 设置激活载体失败，激活停止", ConsoleColor.DarkRed);
-                    return 0;
+                    return -2;
                 }
                 new Log($"     √ 设置激活载体完成。", ConsoleColor.DarkGreen);
 
@@ -126,23 +128,32 @@ namespace LKY_OfficeTools.Lib
                     new Log($"     × 无法执行激活，激活停止。", ConsoleColor.DarkRed);
                     return -1;
                 }
-                /*Console.ForegroundColor = ConsoleColor.Green;
-                new Log($"     √ 执行激活完成。");*/
 
-                new Log($"     √ Microsoft Office v{OfficeNetVersion.latest_version} 激活成功。", ConsoleColor.DarkGreen);
+                new Log($"     √ Office v{OfficeNetVersion.latest_version} 激活成功。", ConsoleColor.DarkGreen);
+                App.State.Current_Runtype = App.State.RunType.Finish_Success;   //设置整体运行状态为成功
 
                 return 1;
-
-                /*
-                //汇总一句话命令
-                string cmd = $"({cmd_switch_cd})&({cmd_install_key})&({cmd_kms_url})&({cmd_activate})";
-
-                //开始激活
-                string log_activate = Com_ExeOS.RunCmd(cmd);
-                new Log("结果：" + log_activate);
-                */
             }
-            return -10;
+            else if (install_state.HasFlag(InstallState.Diff))
+            {
+                new Log($"     × 当前系统未安装最新版本的 Office，激活停止！", ConsoleColor.DarkRed);
+                return -12;
+            }
+            else if (install_state.HasFlag(InstallState.Multi))
+            {
+                new Log($"     × 当前系统存在多个 Office 版本，无法完成激活！", ConsoleColor.DarkRed);    //这种多版本出错是指，未正确安装最新版，而且系统还有多个版本
+                return -14;
+            }
+            else if (install_state.HasFlag(InstallState.None))
+            {
+                new Log($"     × 当前系统未安装任何 Office 版本，不需要激活！", ConsoleColor.DarkRed);
+                return -18;
+            }
+            else
+            {
+                new Log($"     × 因其它问题，Office 激活被迫停止！", ConsoleColor.DarkRed);
+                return -99;
+            }
         }
     }
 }

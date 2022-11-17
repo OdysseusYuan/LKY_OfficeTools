@@ -21,18 +21,34 @@ namespace LKY_OfficeTools.Common
         /// 获取中间文本
         /// </summary>
         /// <param name="from_text"></param>
-        /// <param name="left_str"></param>
-        /// <param name="right_str"></param>
+        /// <param name="str_left"></param>
+        /// <param name="str_right"></param>
         /// <returns></returns>
-        internal static string GetCenterText(string from_text, string left_str, string right_str)
+        internal static string GetCenterText(string str, string strLeft, string strRight)
         {
             try
             {
-                int left_str_Index = from_text.IndexOf(left_str);   //获取第一个满足左边字符的index
-                from_text = from_text.Substring(left_str_Index).Remove(0, left_str.Length);    //截取左侧文本开始之后的内容（不含左侧字符串）
-                int right_str_Index = from_text.IndexOf(right_str);   //获取第一个满足右边字符的index
-                string result = from_text.Substring(0, right_str_Index);    //获取最终值
-                return result;
+                if (str == null || str.Length == 0) return "";
+                if (strLeft != "")
+                {
+                    int indexLeft = str.IndexOf(strLeft);//左边字符串位置
+                    if (indexLeft < 0) return "";
+                    indexLeft = indexLeft + strLeft.Length;//左边字符串长度
+                    if (strRight != "")
+                    {
+                        int indexRight = str.IndexOf(strRight, indexLeft);//右边字符串位置
+                        if (indexRight < 0) return "";
+                        return str.Substring(indexLeft, indexRight - indexLeft);//indexRight - indexLeft是取中间字符串长度
+                    }
+                    else return str.Substring(indexLeft, str.Length - indexLeft);//取字符串右边
+                }
+                else
+                {
+                    //取字符串左边
+                    int indexRight = str.IndexOf(strRight);
+                    if (indexRight <= 0) return "";
+                    else return str.Substring(0, indexRight);
+                }
             }
             catch (Exception Ex)
             {
