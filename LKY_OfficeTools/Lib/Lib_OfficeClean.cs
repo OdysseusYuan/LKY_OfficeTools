@@ -161,7 +161,7 @@ namespace LKY_OfficeTools.Lib
                 }
             }
             /// <summary>
-            /// 使用 SaRA 完成卸载
+            /// 使用 SaRA 工具，卸载所有 非ODT 安装的 Office 版本
             /// </summary>
             /// <returns></returns>
             internal static bool BySaRA()
@@ -182,7 +182,7 @@ namespace LKY_OfficeTools.Lib
                         return false;
                     }
 
-                    new Log($"     >> 此过程会持续较长时间，这取决于您电脑中已安装的 Office 情况，请耐心等待 ...", ConsoleColor.DarkYellow);
+                    new Log($"     >> 此过程会持续较长时间，这取决于您电脑中 Office 已安装的数量，请耐心等待 ...", ConsoleColor.DarkYellow);
 
                     //执行卸载命令
                     string cmd_switch_cd = $"pushd \"{SaRA_path_root}\"";             //切换至SaRA文件目录
@@ -211,7 +211,7 @@ namespace LKY_OfficeTools.Lib
 
                     */
 
-                    new Log($"     √ 已完成 Office 卸载操作。", ConsoleColor.DarkGreen);
+                    new Log($"     √ 已完成 Office 冗余版本卸载。", ConsoleColor.DarkGreen);
 
                     return true;
                 }
@@ -223,7 +223,7 @@ namespace LKY_OfficeTools.Lib
             }
 
             /// <summary>
-            /// 使用ODT工具卸载所有Office版本
+            /// 使用 ODT 工具卸载所有使用 ODT 安装的 Office 版本
             /// </summary>
             /// <returns></returns>
             internal static bool ByODT()
@@ -272,7 +272,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //卸载正常 + 注册表已清空时，开始安装新版本
-                    new Log($"     √ 已完成 Office 卸载操作。", ConsoleColor.DarkGreen);
+                    new Log($"     √ 已完成 Office ODT 版本卸载。", ConsoleColor.DarkGreen);
                     return true;
                 }
                 catch (Exception Ex)

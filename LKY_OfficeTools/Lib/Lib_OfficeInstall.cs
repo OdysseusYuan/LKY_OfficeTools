@@ -208,18 +208,16 @@ namespace LKY_OfficeTools.Lib
                     new Log($"     ☆ 发现冲突的 Office 版本，如需安装最新版，必须先卸载旧版。", ConsoleColor.Gray);
 
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.Write($"        确认安装新版 Word、PPT、Excel、Outlook、OneNote、Access 六件套，并卸载旧版本，请按 回车键 继续 ...");
+                    Console.Write($"        确认安装新版 Word、PPT、Excel、Outlook、OneNote、Access 六件套，并卸载旧版本及其插件，请按 回车键 继续 ...");
                     if (Console.ReadKey().Key == ConsoleKey.Enter)
                     {
-                        new Log($"\n     √ 您已主动确认 卸载 Office 旧版本。", ConsoleColor.DarkGreen);
+                        new Log($"\n     √ 您已主动确认 卸载 Office 所有旧版本。", ConsoleColor.DarkGreen);
 
-                        //先使用 ODT 模式卸载
-                        if (!Uninstall.ByODT())
-                        {
-                            //不成功时，使用 SaRA 卸载
-                            new Log($"\n     >> 尝试其他方式卸载中，请稍候 ...", ConsoleColor.DarkYellow);
-                            Uninstall.BySaRA();
-                        }
+                        //先使用 ODT 模式卸载，其只能卸载使用 ODT 安装的2016及其以上版本的 Office，但是其耗时短。
+                        Uninstall.ByODT();
+                        new Log($"\n     >> 第二阶段卸载正在进行，请稍候 ...", ConsoleColor.DarkYellow);
+                        //第二阶段使用 SaRA 模式，因为它可以尽可能卸载所有 Office 版本（非ODT），但是耗时长
+                        Uninstall.BySaRA();
 
                         //无论哪种方式清理，都要再检查一遍是否卸载干净。如果 当前系统 Office 版本数量 > 0，启动强制模式
                         var installed_office = GetArchiDir();

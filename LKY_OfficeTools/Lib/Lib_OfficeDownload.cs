@@ -79,7 +79,7 @@ namespace LKY_OfficeTools.Lib
                     //保存到List里面，用于后续检查
                     save_files.Add(save_path);
 
-                    new Log($"\n     >> 下载 {new FileInfo(save_path).Name} 文件 ...", ConsoleColor.DarkYellow);
+                    new Log($"\n     >> 下载 {new FileInfo(save_path).Name} 文件中，请稍候 ...", ConsoleColor.DarkYellow);
 
                     //遇到重复的文件可以断点续传
                     int down_result = Lib_Aria2c.DownFile(a, save_path);
