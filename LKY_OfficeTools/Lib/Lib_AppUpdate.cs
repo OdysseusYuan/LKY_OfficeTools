@@ -91,7 +91,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n------> 正在更新 {Console.Title} ...", ConsoleColor.DarkCyan);
 
                     //下载文件
-                    string save_to = App.Path.Dir_Document + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
+                    string save_to = App.Path.Document_Dir + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
                     int down_result = Lib_Aria2c.DownFile(latest_down_url, save_to);
 
                     //下载不成功时，抛出

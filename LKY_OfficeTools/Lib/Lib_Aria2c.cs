@@ -30,7 +30,7 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //指定路径
-                string aria2c_path = App.Path.Dir_SDK + @"\Aria2c\aria2c.exe";
+                string aria2c_path = App.Path.SDK.Root + @"\Aria2c\aria2c.exe";
 
                 if (!File.Exists(aria2c_path))
                 {

@@ -30,22 +30,38 @@ namespace LKY_OfficeTools.Lib
                 /// <summary>
                 /// APP 文档根目录
                 /// </summary>
-                internal static string Dir_Document = $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}\\LKY Office Tools";
+                internal static string Document_Dir = $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}\\LKY Office Tools";
 
                 /// <summary>
                 /// APP 日志存储目录
                 /// </summary>
-                internal static string Dir_Log = $"{Dir_Document}\\Logs";
+                internal static string Log_Dir = $"{Document_Dir}\\Logs";
 
                 /// <summary>
                 /// APP 临时文件夹目录
                 /// </summary>
-                internal static string Dir_Temp = $"{Dir_Document}\\Temp";
+                internal static string Temp_Dir = $"{Document_Dir}\\Temp";
 
                 /// <summary>
-                /// APP SDK文件夹目录
+                /// SDK 文件子目录
                 /// </summary>
-                internal static string Dir_SDK = $"{Dir_Document}\\SDKs";
+                internal class SDK
+                {
+                    /// <summary>
+                    /// APP SDK文件夹目录
+                    /// </summary>
+                    internal static string Root = $"{Document_Dir}\\SDKs";
+
+                    /// <summary>
+                    /// Activate 激活文件目录
+                    /// </summary>
+                    internal static string OSPP_Dir = $"{Root}\\Activate";
+
+                    /// <summary>
+                    /// OSPP 文件路径
+                    /// </summary>
+                    internal static string OSPP_File = $"{OSPP_Dir}\\OSPP.VBS";
+                }
             }
 
             /// <summary>

@@ -357,7 +357,7 @@ namespace LKY_OfficeTools.Lib
             {
                 try
                 {
-                    string cmd_switch_cd = $"pushd \"{App.Path.Dir_SDK + @"\Activate"}\"";                  //切换至OSPP文件目录
+                    string cmd_switch_cd = $"pushd \"{App.Path.SDK.OSPP_Dir}\"";                  //切换至OSPP文件目录
                     string cmd_installed_info = "cscript ospp.vbs /dstatus";                                //查看激活状态
                     string detect_info = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
 

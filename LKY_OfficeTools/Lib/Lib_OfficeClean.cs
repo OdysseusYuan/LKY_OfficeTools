@@ -43,7 +43,7 @@ namespace LKY_OfficeTools.Lib
                     {
                         foreach (var now_key in office_installed_key)
                         {
-                            string cmd_switch_cd = $"pushd \"{App.Path.Dir_SDK + @"\Activate"}\"";                  //切换至OSPP文件目录
+                            string cmd_switch_cd = $"pushd \"{App.Path.SDK.Root + @"\Activate"}\"";                  //切换至OSPP文件目录
                             string cmd_remove = $"cscript ospp.vbs /unpkey:{now_key}";
                             string result_log = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_remove})");
                             if (result_log.Contains("success"))
@@ -53,7 +53,7 @@ namespace LKY_OfficeTools.Lib
                             else
                             {
                                 new Log(result_log);    //获取失败原因
-                                new Log($"     × {now_key} 对应的 Office 激活信息移除失败！", ConsoleColor.DarkRed);
+                                new Log($"     × {now_key} 激活信息移除失败！", ConsoleColor.DarkRed);
                                 return false;   //有一个产品卸载失败了，就直接返回 false。
                             }
                         }
@@ -172,13 +172,13 @@ namespace LKY_OfficeTools.Lib
                     Thread.Sleep(1000);     //基于体验，延迟1s
 
                     //定义SaRA文件位置
-                    string SaRA_path_root = App.Path.Dir_SDK + @"\SaRA";
+                    string SaRA_path_root = App.Path.SDK.Root + @"\SaRA";
                     string SaRA_path_exe = SaRA_path_root + @"\SaRACmd.exe";
 
                     //检查SaRA文件是否存在
                     if (!File.Exists(SaRA_path_exe))
                     {
-                        new Log($"     × 目录：{SaRA_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
+                        new Log($"     × 目录 {SaRA_path_root} 下文件丢失！", ConsoleColor.DarkRed);
                         return false;
                     }
 
@@ -234,9 +234,9 @@ namespace LKY_OfficeTools.Lib
                     Thread.Sleep(1000);     //基于体验，延迟1s
 
                     //定义ODT文件位置
-                    string ODT_path_root = App.Path.Dir_SDK + @"\ODT\";
-                    string ODT_path_exe = ODT_path_root + @"ODT.exe";
-                    string ODT_path_xml = ODT_path_root + @"uninstall.xml";    //此文件需要新生成
+                    string ODT_path_root = App.Path.SDK.Root + @"\ODT";
+                    string ODT_path_exe = ODT_path_root + @"\ODT.exe";
+                    string ODT_path_xml = ODT_path_root + @"\uninstall.xml";    //此文件需要新生成
 
                     //生成卸载xml
                     string xml_content = "<Configuration>\n  <Remove All=\"TRUE\" />\n  <Display Level=\"NONE\" AcceptEULA=\"TRUE\"/>\n</Configuration>";
@@ -245,7 +245,7 @@ namespace LKY_OfficeTools.Lib
                     //检查ODT文件是否存在
                     if (!File.Exists(ODT_path_exe) || !File.Exists(ODT_path_xml))
                     {
-                        new Log($"\n     × 目录：{ODT_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
+                        new Log($"     × 目录 {ODT_path_root} 下文件丢失！", ConsoleColor.DarkRed);
                         return false;
                     }
 

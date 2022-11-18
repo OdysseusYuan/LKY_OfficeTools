@@ -208,7 +208,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //合成最终注册表路径
-                    reg_install_error = App.Path.Dir_Log + $@"\{reg_filename}.reg";
+                    reg_install_error = App.Path.Log_Dir + $@"\{reg_filename}.reg";
 
                     //生成注册表信息
                     Com_SystemOS.Register.ExportReg(office_reg_path, reg_install_error);
@@ -264,11 +264,11 @@ namespace LKY_OfficeTools.Lib
                     */
 
                     //清理整个Log文件夹
-                    if (Directory.Exists(App.Path.Dir_Log))
+                    if (Directory.Exists(App.Path.Log_Dir))
                     {
                         try
                         {
-                            Directory.Delete(App.Path.Dir_Log, true);
+                            Directory.Delete(App.Path.Log_Dir, true);
                         }
                         catch (Exception Ex)
                         {

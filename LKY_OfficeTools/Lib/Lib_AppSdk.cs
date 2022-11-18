@@ -31,7 +31,7 @@ namespace LKY_OfficeTools.Lib
         /// <summary>
         /// 确定路径
         /// </summary>
-        private static string sdk_disk_path = App.Path.Dir_SDK + "\\LOT_SDKs.pkg";
+        private static string sdk_disk_path = App.Path.SDK.Root + "\\LOT_SDKs.pkg";
 
         /// <summary>
         /// 初始化释放 SDK 包
@@ -49,7 +49,7 @@ namespace LKY_OfficeTools.Lib
                 if (isToDisk)
                 {
                     //解压包
-                    ZipFile.ExtractToDirectory(sdk_disk_path, App.Path.Dir_SDK);
+                    ZipFile.ExtractToDirectory(sdk_disk_path, App.Path.SDK.Root);
                 }
 
                 return true;
@@ -57,7 +57,7 @@ namespace LKY_OfficeTools.Lib
             catch (Exception Ex)
             {
                 new Log(Ex.ToString());
-                new Log($"     × 软件 SDK 文件丢失，无法继续，请重新下载本软件或联系开发者！", ConsoleColor.DarkRed);
+                new Log($"\n\n     × 软件 SDK 文件丢失，无法继续，请重新下载本软件或联系开发者！", ConsoleColor.DarkRed);
 
                 //清理SDK缓存
                 Clean();
@@ -93,12 +93,12 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //目录不存在时，自动返回为真
-                if (!Directory.Exists(App.Path.Dir_SDK))
+                if (!Directory.Exists(App.Path.SDK.Root))
                 { 
                     return true;
                 }
 
-                Directory.Delete(App.Path.Dir_SDK, true);
+                Directory.Delete(App.Path.SDK.Root, true);
 
                 return true;
             }

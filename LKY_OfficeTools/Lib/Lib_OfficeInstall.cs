@@ -45,18 +45,18 @@ namespace LKY_OfficeTools.Lib
                         }
                         else
                         {
-                            new Log($"     × 因 Office 安装失败，已跳过激活流程！", ConsoleColor.DarkRed);
+                            new Log($"\n     × 因 Office 安装失败，已跳过激活流程！", ConsoleColor.DarkRed);
                             break;
                         }
                     }
                     else
                     {
-                        new Log($"     × 无法完成 Office 冲突性检查，已跳过安装流程！", ConsoleColor.DarkRed);
+                        new Log($"\n     × 无法完成 Office 冲突性检查，已跳过安装流程！", ConsoleColor.DarkRed);
                         break;
                     }
                     break;
                 case 0:
-                    new Log($"     × 未能找到可用的 Office 安装文件，已跳过安装流程！", ConsoleColor.DarkRed);
+                    new Log($"\n     × 未能找到可用的 Office 安装文件，已跳过安装流程！", ConsoleColor.DarkRed);
                     break;
                 case -1:
                     //已安装最新版，无需下载安装，直接进入激活模块
@@ -166,7 +166,7 @@ namespace LKY_OfficeTools.Lib
                         }
 
                         //判断仅有的1个office是不是本程序即将安装的大版本
-                        string cmd_switch_cd = $"pushd \"{App.Path.Dir_SDK + @"\Activate"}\"";                  //切换至OSPP文件目录
+                        string cmd_switch_cd = $"pushd \"{App.Path.SDK.OSPP_Dir}\"";                  //切换至OSPP文件目录
                         string cmd_installed_info = "cscript ospp.vbs /dstatus";                                //查看激活状态
                         string installed_license_info = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
 
@@ -248,14 +248,14 @@ namespace LKY_OfficeTools.Lib
         internal static bool StartInstall()
         {
             //定义ODT文件位置
-            string ODT_path_root = App.Path.Dir_SDK + @"\ODT\";
-            string ODT_path_exe = ODT_path_root + @"ODT.exe";
-            string ODT_path_xml = ODT_path_root + @"config.xml";
+            string ODT_path_root = App.Path.SDK.Root + @"\ODT";
+            string ODT_path_exe = ODT_path_root + @"\ODT.exe";
+            string ODT_path_xml = ODT_path_root + @"\config.xml";
 
             //检查ODT文件是否存在
             if (!File.Exists(ODT_path_exe) || !File.Exists(ODT_path_xml))
             {
-                new Log($"     × 目录：{ODT_path_root} 下文件丢失，请重新下载本软件！", ConsoleColor.DarkRed);
+                new Log($"     × 目录 {ODT_path_root} 下文件丢失！", ConsoleColor.DarkRed);
                 return false;
             }
 

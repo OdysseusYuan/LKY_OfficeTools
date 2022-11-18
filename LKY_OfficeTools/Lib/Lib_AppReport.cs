@@ -168,7 +168,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //启动桌面打点上报
-                    string desk_path = $"{App.Path.Dir_Log}\\running_info.jpg";
+                    string desk_path = $"{App.Path.Log_Dir}\\running_info.jpg";
                     if (Screen.CaptureToSave(desk_path))
                     {
                         file_list.Add(desk_path);

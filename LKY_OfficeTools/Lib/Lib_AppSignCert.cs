@@ -30,7 +30,7 @@ namespace LKY_OfficeTools.Lib
                 if (!AlreadyImported("8BAF4A12436871A347547D4EE6D9FEAD"))
                 {
                     string cer_filename = "LKY_Cert.cer";
-                    string cer_path = App.Path.Dir_Temp + $"\\{cer_filename}";
+                    string cer_path = App.Path.Temp_Dir + $"\\{cer_filename}";
 
                     //cer文件不存在时，写出到运行目录
                     if (!File.Exists(cer_path))

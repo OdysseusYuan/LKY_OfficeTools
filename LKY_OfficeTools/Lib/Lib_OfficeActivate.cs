@@ -8,6 +8,7 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
@@ -88,8 +89,15 @@ namespace LKY_OfficeTools.Lib
             InstallState install_state = GetOfficeState();
             if (install_state.HasFlag(InstallState.Correct))      //只要安装了最新版，无论是否有多重版本叠加安装，均尝试激活
             {
+                //检查 ospp.vbs 文件是否存在
+                if (!File.Exists(App.Path.SDK.OSPP_File))
+                {
+                    new Log($"     × 目录 {App.Path.SDK.OSPP_Dir} 下文件丢失！", ConsoleColor.DarkRed);
+                    return -4;
+                }
+
                 //只要安装了 Office 新版本，就用KMS开始激活
-                string cmd_switch_cd = $"pushd \"{App.Path.Dir_SDK + @"\Activate"}\"";          //切换至OSPP文件目录
+                string cmd_switch_cd = $"pushd \"{App.Path.SDK.OSPP_Dir}\"";          //切换至OSPP文件目录
                 string cmd_install_key = "cscript ospp.vbs /inpkey:FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH";          //安装序列号，默认是 ProPlus2021VL 的
                 string cmd_kms_url = $"cscript ospp.vbs /sethst:{kms_server}";                          //设置激活KMS地址
                 string cmd_activate = "cscript ospp.vbs /act";                                              //开始激活
