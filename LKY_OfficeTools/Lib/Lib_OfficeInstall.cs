@@ -8,10 +8,12 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.IO;
+using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.App;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_OfficeClean;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
@@ -34,6 +36,10 @@ namespace LKY_OfficeTools.Lib
             //判断下载情况
             switch (DownCode)
             {
+                case 2:
+                    //已安装最新版，无需下载安装，直接进入激活模块
+                    new Lib_OfficeActivate();
+                    break;
                 case 1:
                     if (ConflictCheck())        //冲突检查
                     {
@@ -59,16 +65,15 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n     × 未能找到可用的 Office 安装文件，已跳过安装流程！", ConsoleColor.DarkRed);
                     break;
                 case -1:
-                    //已安装最新版，无需下载安装，直接进入激活模块
-                    new Lib_OfficeActivate();
-                    break;
+                    //用户中止了下载，不执行附加内容
+                    return;
             }
 
             //全部完成后，判断是否成功
-            if (State.Current_Runtype != State.RunType.Finish_Success)
+            if (State.Current_StageType != State.ProcessStage.Finish_Success)
             {
-                //只要全部流程结束后，不是成功状态，就设置为 失败 
-                State.Current_Runtype = State.RunType.Finish_Fail;
+                //只要全部流程结束后，不是成功状态（并且没有中断情况），就设置为 失败 
+                State.Current_StageType = State.ProcessStage.Finish_Fail;
             }
         }
 
@@ -166,7 +171,7 @@ namespace LKY_OfficeTools.Lib
                         }
 
                         //判断仅有的1个office是不是本程序即将安装的大版本
-                        string cmd_switch_cd = $"pushd \"{App.Path.SDK.OSPP_Dir}\"";                  //切换至OSPP文件目录
+                        string cmd_switch_cd = $"pushd \"{AppPath.Documents.SDK.Activate}\"";                  //切换至OSPP文件目录
                         string cmd_installed_info = "cscript ospp.vbs /dstatus";                                //查看激活状态
                         string installed_license_info = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
 
@@ -207,31 +212,24 @@ namespace LKY_OfficeTools.Lib
                 {
                     new Log($"     ☆ 发现冲突的 Office 版本，如需安装最新版，必须先卸载旧版。", ConsoleColor.Gray);
 
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.Write($"        确认安装新版 Word、PPT、Excel、Outlook、OneNote、Access 六件套，并卸载旧版本及其插件，请按 回车键 继续 ...");
-                    if (Console.ReadKey().Key == ConsoleKey.Enter)
+                    //判断是否包含自动卸载标记
+                    if (!AppCommandFlag.HasFlag(ArgsFlag.Auto_Remove_Conflict_Office))
                     {
-                        new Log($"\n     √ 您已主动确认 卸载 Office 所有旧版本。", ConsoleColor.DarkGreen);
-
-                        //先使用 ODT 模式卸载，其只能卸载使用 ODT 安装的2016及其以上版本的 Office，但是其耗时短。
-                        Uninstall.ByODT();
-                        new Log($"\n     >> 第二阶段卸载正在进行，请稍候 ...", ConsoleColor.DarkYellow);
-                        //第二阶段使用 SaRA 模式，因为它可以尽可能卸载所有 Office 版本（非ODT），但是耗时长
-                        Uninstall.BySaRA();
-
-                        //无论哪种方式清理，都要再检查一遍是否卸载干净。如果 当前系统 Office 版本数量 > 0，启动强制模式
-                        var installed_office = GetArchiDir();
-                        if (installed_office != null && installed_office.Count > 0)
+                        if (Lib_AppMessage.KeyMsg.Confirm("确认安装新版 Word、PPT、Excel、Outlook、OneNote、Access 六件套，并卸载旧版本及其插件"))
                         {
-                            Uninstall.ForceDelete();    //无论清除是否成功，都继续安装新 office
+                            new Log($"\n     √ 您已主动确认 卸载 Office 所有旧版本。", ConsoleColor.DarkGreen);
+                            return RemoveAllOffice();
                         }
-
-                        return true;
+                        else
+                        {
+                            new Log($"\n     × 您已拒绝 卸载 Office 其他版本，新版本无法安装！", ConsoleColor.DarkRed);
+                            return false;
+                        }
                     }
                     else
                     {
-                        new Log($"\n     × 您已拒绝 卸载 Office 其他版本，新版本无法安装！", ConsoleColor.DarkRed);
-                        return false;
+                        //有自动卸载的标记，直接开始卸载
+                        return RemoveAllOffice();
                     }
                 }
             }
@@ -248,7 +246,7 @@ namespace LKY_OfficeTools.Lib
         internal static bool StartInstall()
         {
             //定义ODT文件位置
-            string ODT_path_root = App.Path.SDK.Root + @"\ODT";
+            string ODT_path_root = AppPath.Documents.SDK.Root + @"\ODT";
             string ODT_path_exe = ODT_path_root + @"\ODT.exe";
             string ODT_path_xml = ODT_path_root + @"\config.xml";
 
@@ -261,7 +259,7 @@ namespace LKY_OfficeTools.Lib
 
             //修改新的xml信息
             ///修改安装目录，安装目录为运行根目录
-            bool isNewInstallPath = Com_FileOS.XML.SetValue(ODT_path_xml, "SourcePath", Environment.CurrentDirectory);
+            bool isNewInstallPath = Com_FileOS.XML.SetValue(ODT_path_xml, "SourcePath", AppPath.Execute);
 
             //检查是否修改成功（安装目录）
             if (!isNewInstallPath)

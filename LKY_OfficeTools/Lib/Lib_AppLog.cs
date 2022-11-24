@@ -8,8 +8,9 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.IO;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
+using static LKY_OfficeTools.Lib.Lib_AppCommand;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -31,12 +32,12 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// 安装失败时注册表 导出后的文件路径
             /// </summary>
-            internal static string reg_install_error = null;
+            internal static string reg_install_error { get; set; }
 
             /// <summary>
             /// 所有日志的文字记录
             /// </summary>
-            internal static string log_info = string.Empty;
+            internal static string log_info { get; set; }
 
             /*
             /// <summary>
@@ -64,20 +65,6 @@ namespace LKY_OfficeTools.Lib
                 /// 既展示文字，又写入log
                 /// </summary>
                 Display_Write
-            }
-
-            /// <summary>
-            /// 按键退出 & 完成善后
-            /// </summary>
-            internal static void QuitMsg()
-            {
-                //清理SDK缓存
-                Lib_AppSdk.Clean();
-
-                //退出机制
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("\n请按任意键退出 ...");
-                Console.ReadKey();
             }
 
             /// <summary>
@@ -208,7 +195,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //合成最终注册表路径
-                    reg_install_error = App.Path.Log_Dir + $@"\{reg_filename}.reg";
+                    reg_install_error = Documents.Log + $@"\{reg_filename}.reg";
 
                     //生成注册表信息
                     Com_SystemOS.Register.ExportReg(office_reg_path, reg_install_error);
@@ -264,11 +251,11 @@ namespace LKY_OfficeTools.Lib
                     */
 
                     //清理整个Log文件夹
-                    if (Directory.Exists(App.Path.Log_Dir))
+                    if (Directory.Exists(Documents.Log))
                     {
                         try
                         {
-                            Directory.Delete(App.Path.Log_Dir, true);
+                            Directory.Delete(Documents.Log, true);
                         }
                         catch (Exception Ex)
                         {

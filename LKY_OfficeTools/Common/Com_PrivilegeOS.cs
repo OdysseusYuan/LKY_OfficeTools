@@ -7,8 +7,9 @@
 
 using System;
 using System.Security.Principal;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
 
 namespace LKY_OfficeTools.Common
@@ -34,17 +35,18 @@ namespace LKY_OfficeTools.Common
         /// </summary>
         internal static void PrivilegeAttention()
         {
-            new Log($"\n\n------> 正在进行 权限检查 ...", ConsoleColor.DarkCyan);
+            new Log($"\n------> 正在进行 权限检查 ...", ConsoleColor.DarkCyan);
 
             //提权检验，非提权，激活会出问题
             if (!IsRunByAdmin())
             {
                 new Log($"     × 权限错误，请以管理员身份运行此文件！", ConsoleColor.DarkRed);
 
-                Pointing(App.State.RunType.Finish_Fail);  //回收
+                Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
+                Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
-                Log.QuitMsg();
+                KeyMsg.Quit();
 
                 Environment.Exit(-1);
             }

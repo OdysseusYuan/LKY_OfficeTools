@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
@@ -24,6 +24,36 @@ namespace LKY_OfficeTools.Lib
     internal class Lib_OfficeClean
     {
         /// <summary>
+        /// 卸载所有的 Office 版本，并移除许可证信息
+        /// </summary>
+        /// <returns></returns>
+        internal static bool RemoveAllOffice()
+        {
+            try
+            {
+                //先使用 ODT 模式卸载，其只能卸载使用 ODT 安装的2016及其以上版本的 Office，但是其耗时短。
+                Uninstall.ByODT();
+                new Log($"\n     >> 第二阶段卸载正在进行，请稍候 ...", ConsoleColor.DarkYellow);
+                //第二阶段使用 SaRA 模式，因为它可以尽可能卸载所有 Office 版本（非ODT），但是耗时长
+                Uninstall.BySaRA();
+
+                //无论哪种方式清理，都要再检查一遍是否卸载干净。如果 当前系统 Office 版本数量 > 0，启动强制模式
+                var installed_office = OfficeLocalInstall.GetArchiDir();
+                if (installed_office != null && installed_office.Count > 0)
+                {
+                    Uninstall.ForceDelete();    //无论清除是否成功，都继续安装新 office
+                }
+
+                return true;
+            }
+            catch (Exception Ex)
+            {
+                new Log(Ex.ToString());
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 解除激活信息
         /// </summary>
         internal class Activate
@@ -32,7 +62,7 @@ namespace LKY_OfficeTools.Lib
             /// 移除所有激活信息
             /// </summary>
             /// <returns></returns>
-            internal static bool RemoveAll()
+            internal static bool Delete()
             {
                 try
                 {
@@ -43,7 +73,7 @@ namespace LKY_OfficeTools.Lib
                     {
                         foreach (var now_key in office_installed_key)
                         {
-                            string cmd_switch_cd = $"pushd \"{App.Path.SDK.Root + @"\Activate"}\"";                  //切换至OSPP文件目录
+                            string cmd_switch_cd = $"pushd \"{Documents.SDK.Root + @"\Activate"}\"";                  //切换至OSPP文件目录
                             string cmd_remove = $"cscript ospp.vbs /unpkey:{now_key}";
                             string result_log = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_remove})");
                             if (result_log.Contains("success"))
@@ -96,7 +126,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n------> 正在执行 Office 强行清理 ...", ConsoleColor.DarkCyan);
 
                     //移除激活信息
-                    Activate.RemoveAll();
+                    Activate.Delete();
 
                     //删除文件
                     try
@@ -172,7 +202,7 @@ namespace LKY_OfficeTools.Lib
                     Thread.Sleep(1000);     //基于体验，延迟1s
 
                     //定义SaRA文件位置
-                    string SaRA_path_root = App.Path.SDK.Root + @"\SaRA";
+                    string SaRA_path_root = Documents.SDK.Root + @"\SaRA";
                     string SaRA_path_exe = SaRA_path_root + @"\SaRACmd.exe";
 
                     //检查SaRA文件是否存在
@@ -234,7 +264,7 @@ namespace LKY_OfficeTools.Lib
                     Thread.Sleep(1000);     //基于体验，延迟1s
 
                     //定义ODT文件位置
-                    string ODT_path_root = App.Path.SDK.Root + @"\ODT";
+                    string ODT_path_root = Documents.SDK.Root + @"\ODT";
                     string ODT_path_exe = ODT_path_root + @"\ODT.exe";
                     string ODT_path_xml = ODT_path_root + @"\uninstall.xml";    //此文件需要新生成
 
@@ -252,7 +282,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"     >> 此过程大约会持续短暂的几分钟时间，请耐心等待 ...", ConsoleColor.DarkYellow);
 
                     //移除所有激活信息
-                    if (!Activate.RemoveAll())
+                    if (!Activate.Delete())
                     {
                         new Log("     × 移除激活信息失败！");
                         return false;

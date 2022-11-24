@@ -61,6 +61,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -81,8 +82,16 @@
     <Compile Include="Common\Com_SystemOS.cs" />
     <Compile Include="Common\Com_TextOS.cs" />
     <Compile Include="Common\Com_WebOS.cs" />
+    <Compile Include="Lib\Lib_AppCommand.cs" />
     <Compile Include="Lib\Lib_AppInfo.cs" />
+    <Compile Include="Lib\Lib_AppMessage.cs" />
     <Compile Include="Lib\Lib_AppSdk.cs" />
+    <Compile Include="Lib\Lib_AppService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Lib\Lib_AppService.Designer.cs">
+      <DependentUpon>Lib_AppService.cs</DependentUpon>
+    </Compile>
     <Compile Include="Lib\Lib_AppSignCert.cs" />
     <Compile Include="Lib\Lib_OfficeActivate.cs" />
     <Compile Include="Lib\Lib_OfficeDownload.cs" />

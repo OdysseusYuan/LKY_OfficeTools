@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
@@ -35,7 +36,7 @@ namespace LKY_OfficeTools.Lib
 
         /// <summary>
         /// 下载所有文件（Aria2c）
-        /// 返回值：-1【无需下载】，0【下载失败】，1【下载成功】
+        /// 返回值：-1【用户终止】，0【下载失败】，1【下载成功】，2【无需下载】
         /// </summary>
         internal static int FilesDownload()
         {
@@ -45,7 +46,7 @@ namespace LKY_OfficeTools.Lib
                 down_list = OfficeNetVersion.GetOfficeFileList();
                 if (down_list == null)
                 {
-                    //中断安装
+                    //因列表获取异常，停止下载
                     return 0;
                 }
 
@@ -54,13 +55,13 @@ namespace LKY_OfficeTools.Lib
                 if (install_state.HasFlag(InstallState.Correct))          //只要有标记为安装了最新版，无论是否存在多个版本，也无需下载
                 {
                     new Log($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！", ConsoleColor.DarkMagenta);
-                    return -1;
+                    return 2;
                 }
                 ///当不存在 \Configuration\ 项 or 不存在 VersionToReport or 其版本与最新版不一致时，需要下载新文件。
 
                 //定义下载目标地
-                string save_to = Environment.CurrentDirectory + @"\Office\Data\";       //文件必须位于 \Office\Data\ 下，
-                                                                                        //ODT安装必须在 Office 上一级目录上执行。
+                string save_to = AppPath.Execute + @"\Office\Data\";       //文件必须位于 \Office\Data\ 下，
+                                                                           //ODT安装必须在 Office 上一级目录上执行。
 
                 //计划保存的地址
                 List<string> save_files = new List<string>();
@@ -86,7 +87,13 @@ namespace LKY_OfficeTools.Lib
                     if (down_result != 1)
                     {
                         //如果因为核心下载exe丢失，导致下载失败，直接中止
-                        throw new Exception();
+                        throw new Exception($"下载 {a} 异常！");
+                    }
+
+                    //如果用户中断了下载，则直接跳出
+                    if (State.Current_StageType == State.ProcessStage.Interrupt)
+                    {
+                        return -1;
                     }
 
                     new Log($"     √ {new FileInfo(save_path).Name} 已下载。", ConsoleColor.DarkGreen);
@@ -106,7 +113,7 @@ namespace LKY_OfficeTools.Lib
                     else
                     {
                         new Log($"     >> 文件 {new FileInfo(b).Name} 存在异常，重试中 ...", ConsoleColor.DarkRed);
-                        FilesDownload();
+                        return FilesDownload();
                     }
                 }
 

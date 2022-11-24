@@ -38,8 +38,9 @@ namespace LKY_OfficeTools.Common
         /// 结束指定exe名称的进程
         /// </summary>
         /// <param name="exe_name">不要扩展名，例如：abc.exe，此处应填写abc</param>
+        /// <param name="forceClose">是否强制关闭</param>
         /// <returns></returns>
-        internal static bool KillProcess(string exe_name)
+        internal static bool KillProcess(string exe_name, bool forceClose = true)
         {
             //先判断是否存在进程
             if (ProcessIsRun(exe_name))
@@ -49,7 +50,16 @@ namespace LKY_OfficeTools.Common
                     Process[] p = Process.GetProcessesByName(exe_name);
                     foreach (Process now_p in p)
                     {
-                        now_p.Kill();
+                        if (forceClose)
+                        {
+                            //强制结束
+                            now_p.Kill();
+                        }
+                        else
+                        {
+                            //友好关闭
+                            now_p.CloseMainWindow();
+                        }
                     }
                     return true;
                 }

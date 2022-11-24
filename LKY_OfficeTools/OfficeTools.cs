@@ -9,8 +9,11 @@ using LKY_OfficeTools.Common;
 using LKY_OfficeTools.Lib;
 using System;
 using System.Reflection;
+using System.Text;
+using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
 
 namespace LKY_OfficeTools
@@ -19,23 +22,22 @@ namespace LKY_OfficeTools
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = Encoding.GetEncoding("gbk");       //设定编码，解决英文系统乱码问题
+
             //中断检测
             Close.SetConsoleCtrlHandler(Close.newDelegate, true);
 
             //命令行检测
-            string arg = null;
-            foreach (var now_arg in args)
-            {
-                arg += now_arg + ";";
-            }
+            new Lib_AppCommand(args);
 
-            Entry(arg);
+            //启动
+            Entry();
         }
 
         /// <summary>
         /// 函数入口
         /// </summary>
-        private static void Entry(string args = null)
+        private static void Entry()
         {
             //欢迎话术
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -61,7 +63,7 @@ namespace LKY_OfficeTools
                 new Log($"\n     × 请将当前操作系统升级至 Windows 10 (1703) 或其以上版本，否则 Office 无法进行正版激活！", ConsoleColor.DarkRed);
 
                 //退出提示
-                Log.QuitMsg();
+                KeyMsg.Quit();
 
                 return;
             }
@@ -72,22 +74,16 @@ namespace LKY_OfficeTools
                 new Log($"\n     × 请确保当前电脑可正常访问互联网！", ConsoleColor.DarkRed);
 
                 //退出提示
-                Log.QuitMsg();
+                KeyMsg.Quit();
 
                 return;
             }
 
-            //根据命令行判断是否等待用户
-            bool isContinue = false;
-            if (!string.IsNullOrEmpty(args) && args.Contains("/none_welcome_confirm"))
+            //根据命令行判断是否等待用户，没有标记时，需要人工来决定
+            bool isContinue = true;
+            if (!AppCommandFlag.HasFlag(ArgsFlag.None_Welcome_Confirm))
             {
-                isContinue = true;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("\n请按 回车键 开始部署 ...");
-                isContinue = (Console.ReadKey().Key == ConsoleKey.Enter);
+                isContinue = (KeyMsg.Confirm());
             }
 
             if (isContinue)
@@ -104,21 +100,21 @@ namespace LKY_OfficeTools
                 //继续
                 new Lib_OfficeInstall();
 
-                Pointing(Current_Runtype, true);    //完成时回收
+                Pointing(Current_StageType, true);    //回收
 
                 //展现一条龙服务的结论
-                if (Current_Runtype == RunType.Finish_Fail)
+                if (Current_StageType == ProcessStage.Finish_Fail)
                 {
                     new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);
                 }
 
                 //退出提示
-                Log.QuitMsg();
+                KeyMsg.Quit();
             }
             else
             {
                 new Log($"\n     × 您未按 回车键，软件已停止部署！", ConsoleColor.DarkRed);
-                Pointing(RunType.Interrupt);  //回收
+                Pointing(ProcessStage.Finish_Fail);  //回收
                 return;
             }
         }

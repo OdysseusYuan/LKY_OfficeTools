@@ -8,7 +8,7 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.IO;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
@@ -30,7 +30,7 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //指定路径
-                string aria2c_path = App.Path.SDK.Root + @"\Aria2c\aria2c.exe";
+                string aria2c_path = Documents.SDK.Root + @"\Aria2c\aria2c.exe";
 
                 if (!File.Exists(aria2c_path))
                 {
@@ -55,8 +55,5 @@ namespace LKY_OfficeTools.Lib
                 return -1;
             }
         }
-
-
-
     }
 }

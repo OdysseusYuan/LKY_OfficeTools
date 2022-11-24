@@ -83,9 +83,6 @@ namespace LKY_OfficeTools.Common
                 {
                     DirectoryInfo folder = new DirectoryInfo(dirPath);
 
-                    //Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    //Console.Write("\r正在检索: " + folder.FullName);
-
                     //获取当前目录下的文件名
                     foreach (FileInfo file in folder.GetFiles())
                     {
@@ -104,7 +101,7 @@ namespace LKY_OfficeTools.Common
                         {
                             if (dir.FullName.Contains("$RECYCLE.BIN") || dir.FullName.Contains("System Volume Information"))
                             {
-                                //Console.ForegroundColor = ConsoleColor.DarkGray;
+                                //Console.ForegroundColor = ConsoleColor.Gray;
                                 //new Log("跳过: " + dir.FullName);
                             }
                             else
@@ -126,7 +123,7 @@ namespace LKY_OfficeTools.Common
                 }
                 else
                 {
-                    /*Console.ForegroundColor = ConsoleColor.DarkGray;
+                    /*Console.ForegroundColor = ConsoleColor.Gray;
                     new Log("不存在: " + dirPath);*/
                 }
             }

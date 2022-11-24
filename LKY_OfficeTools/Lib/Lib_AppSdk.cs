@@ -11,7 +11,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
 
 namespace LKY_OfficeTools.Lib
@@ -31,7 +34,7 @@ namespace LKY_OfficeTools.Lib
         /// <summary>
         /// 确定路径
         /// </summary>
-        private static string sdk_disk_path = App.Path.SDK.Root + "\\LOT_SDKs.pkg";
+        private static string sdk_disk_path = Documents.SDK.Root + "\\LOT_SDKs.pkg";
 
         /// <summary>
         /// 初始化释放 SDK 包
@@ -41,6 +44,8 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
+                new Log($"\n------> 正在处理 {Console.Title} 组件信息 ...", ConsoleColor.DarkCyan);
+
                 //初始化前先清理SDK目录，防止因为文件已经存在，引发解压的catch
                 Clean();
 
@@ -49,22 +54,28 @@ namespace LKY_OfficeTools.Lib
                 if (isToDisk)
                 {
                     //解压包
-                    ZipFile.ExtractToDirectory(sdk_disk_path, App.Path.SDK.Root);
+                    ZipFile.ExtractToDirectory(sdk_disk_path, Documents.SDK.Root);
                 }
+
+                new Log($"     √ 已完成 {Console.Title} 组件配置。", ConsoleColor.DarkGreen);
 
                 return true;
             }
             catch (Exception Ex)
             {
                 new Log(Ex.ToString());
-                new Log($"\n\n     × 软件 SDK 文件丢失，无法继续，请重新下载本软件或联系开发者！", ConsoleColor.DarkRed);
+                new Log($"     × 软件 SDK 文件丢失，无法继续，请重新下载本软件或联系开发者！", ConsoleColor.DarkRed);
 
                 //清理SDK缓存
                 Clean();
 
-                Pointing(App.State.RunType.Finish_Fail);  //回收
+                Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
+                Pointing(ProcessStage.Finish_Fail);  //回收
 
-                Environment.Exit(-1);
+                //退出提示
+                KeyMsg.Quit();
+
+                Environment.Exit(-2);
                 return false;
             }
             finally
@@ -93,12 +104,12 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //目录不存在时，自动返回为真
-                if (!Directory.Exists(App.Path.SDK.Root))
+                if (!Directory.Exists(Documents.SDK.Root))
                 { 
                     return true;
                 }
 
-                Directory.Delete(App.Path.SDK.Root, true);
+                Directory.Delete(Documents.SDK.Root, true);
 
                 return true;
             }

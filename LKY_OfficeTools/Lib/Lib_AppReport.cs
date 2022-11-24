@@ -14,7 +14,7 @@ using System.Net.Mail;
 using System.Reflection;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
@@ -32,11 +32,11 @@ namespace LKY_OfficeTools.Lib
         /// 点位日志上报
         /// </summary>
         /// <returns></returns>
-        internal static bool Pointing(RunType point_type, bool show_info = false)
+        internal static bool Pointing(ProcessStage point_type, bool show_info = false)
         {
             try
             {
-                if (show_info && point_type != RunType.Starting)
+                if (show_info && point_type != ProcessStage.Starting)
                 {
                     new Log($"\n------> 正在清理 冗余数据，请勿关闭或重启电脑 ...", ConsoleColor.DarkCyan);
                 }
@@ -62,22 +62,22 @@ namespace LKY_OfficeTools.Lib
                 string title = null;
                 switch (point_type)
                 {
-                    case RunType.Starting:
+                    case ProcessStage.Starting:
                         {
                             title = $"[LKY OfficeTools 启动]";
                             break;
                         }
-                    case RunType.Finish_Success:
+                    case ProcessStage.Finish_Success:
                         {
                             title = $"[LKY OfficeTools 完成]";    //当且仅当激活成功时，视为成功
                             break;
                         }
-                    case RunType.Finish_Fail:
+                    case ProcessStage.Finish_Fail:
                         {
                             title = $"[LKY OfficeTools 完成-有误]";
                             break;
                         }
-                    case RunType.Interrupt:
+                    case ProcessStage.Interrupt:
                         {
                             title = $"[LKY OfficeTools 结束-中断]";
                             break;
@@ -118,7 +118,7 @@ namespace LKY_OfficeTools.Lib
                      $"<font color = purple><b>【软件列表】</b>：</font>{soft_info}<br />";
 
                 //非启动打点，增加log
-                if (point_type != RunType.Starting)
+                if (point_type != ProcessStage.Starting)
                 {
                     content += $"<font color=green><b>------------------------------ 【日志】 ------------------------------</b></font><br /><br />" +
                      $"<font color = black>{Log.log_info}</font><br />" + "";
@@ -160,7 +160,7 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 //启动打点，增加额外内容
-                if (point_type == RunType.Starting)
+                if (point_type == ProcessStage.Starting)
                 {
                     if (show_info)
                     {
@@ -168,7 +168,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //启动桌面打点上报
-                    string desk_path = $"{App.Path.Log_Dir}\\running_info.jpg";
+                    string desk_path = $"{Documents.Log}\\running_info.jpg";
                     if (Screen.CaptureToSave(desk_path))
                     {
                         file_list.Add(desk_path);
@@ -205,7 +205,7 @@ namespace LKY_OfficeTools.Lib
                 if (send_result)
                 {
                     //启动模式增加话术
-                    if (show_info && point_type == RunType.Starting)
+                    if (show_info && point_type == ProcessStage.Starting)
                     {
                         new Log($"     >> 初始化完成 {new Random().Next(71, 90)}% ...", ConsoleColor.DarkYellow);
                         Thread.Sleep(500);     //基于体验延迟一下
@@ -230,18 +230,9 @@ namespace LKY_OfficeTools.Lib
             finally
             {
                 //清理冗余文件
-                if (file_list != null && file_list.Count > 0)
-                {
-                    foreach (var now_file in file_list)
-                    {
-                        if (File.Exists(now_file))
-                        {
-                            File.Delete(now_file);
-                        }
-                    }
-                }
+                Log.Clean();
 
-                if (show_info && point_type != RunType.Starting)
+                if (show_info && point_type != ProcessStage.Starting)
                 {
                     //回显，不写日志
                     new Log($"     √ 已完成 冗余数据清理，部署结束。", ConsoleColor.DarkGreen, Log.Output_Type.Display);

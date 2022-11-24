@@ -11,6 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
@@ -30,7 +31,7 @@ namespace LKY_OfficeTools.Lib
                 if (!AlreadyImported("8BAF4A12436871A347547D4EE6D9FEAD"))
                 {
                     string cer_filename = "LKY_Cert.cer";
-                    string cer_path = App.Path.Temp_Dir + $"\\{cer_filename}";
+                    string cer_path = Documents.Temp + $"\\{cer_filename}";
 
                     //cer文件不存在时，写出到运行目录
                     if (!File.Exists(cer_path))
