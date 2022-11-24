@@ -8,13 +8,13 @@
 using LKY_OfficeTools.Common;
 using LKY_OfficeTools.Lib;
 using System;
-using System.Reflection;
 using System.Text;
 using static LKY_OfficeTools.Lib.Lib_AppCommand;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 
 namespace LKY_OfficeTools
 {
@@ -22,13 +22,13 @@ namespace LKY_OfficeTools
     {
         static void Main(string[] args)
         {
+            //命令行检测
+            new Lib_AppCommand(args);
+
             Console.OutputEncoding = Encoding.GetEncoding("gbk");       //设定编码，解决英文系统乱码问题
 
             //中断检测
             Close.SetConsoleCtrlHandler(Close.newDelegate, true);
-
-            //命令行检测
-            new Lib_AppCommand(args);
 
             //启动
             Entry();
@@ -40,21 +40,18 @@ namespace LKY_OfficeTools
         private static void Entry()
         {
             //欢迎话术
-            Version version = Assembly.GetExecutingAssembly().GetName().Version;
-
-            //设置标题
-            Console.Title = $"LKY Office Tools v{version}";
+            ///设置标题
+            Console.Title = $"{AppAttribute.AppName} v{AppAttribute.AppVersion}";
+            ///Header
+            new Log($"{AppAttribute.AppName} [版本 {AppAttribute.AppVersion}]\n" +
+                $"版权所有（C）LiuKaiyuan (Odysseus.Yuan)。保留所有权利。\n\n" +
+                $"探讨 {Console.Title} 相关内容，可发送邮件至：liukaiyuan@sjtu.edu.cn", ConsoleColor.Gray);
 
             //清理冗余信息
             Log.Clean();
 
             //数字签名证书检查
             new Lib_AppSignCert();
-
-            //Header
-            new Log($"LKY Office Tools [版本 {version}]\n" +
-                $"版权所有（C）LiuKaiyuan (Odysseus.Yuan)。保留所有权利。\n\n" +
-                $"探讨 {Console.Title} 相关内容，可发送邮件至：liukaiyuan@sjtu.edu.cn", ConsoleColor.Gray);
 
             //确认系统情况
             if (int.Parse(Com_SystemOS.OSVersion.GetBuildNumber()) < 15063)
@@ -100,10 +97,17 @@ namespace LKY_OfficeTools
                 //继续
                 new Lib_OfficeInstall();
 
-                Pointing(Current_StageType, true);    //回收
+                //部署成功时，提示是否配置为服务
+                if (Current_StageType == ProcessStage.Finish_Success)
+                {
+                    //添加服务
+                    Lib_AppServiceConfig.AddByUser();
 
-                //展现一条龙服务的结论
-                if (Current_StageType == ProcessStage.Finish_Fail)
+                    //回收
+                    Pointing(Current_StageType, true);
+                }
+                //部署失败，提示错误信息
+                else if (Current_StageType == ProcessStage.Finish_Fail)
                 {
                     new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);
                 }

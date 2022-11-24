@@ -8,9 +8,10 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.IO;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
+using System.Runtime.Remoting.Contexts;
+using System.Windows.Shapes;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
-using static LKY_OfficeTools.Lib.Lib_AppCommand;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -27,7 +28,7 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// 日志文件保存的位置
             /// </summary>
-            //internal static string log_filepath = null;
+            internal static string log_filepath = null;
 
             /// <summary>
             /// 安装失败时注册表 导出后的文件路径
@@ -86,24 +87,29 @@ namespace LKY_OfficeTools.Lib
                     {
                         string datatime_format = DateTime.Now.ToString("s").Replace("T", "_").Replace(":", "-");
 
-                        /* 不再写出到文件
 
-                        //为空时，创建日志路径
-                        if (string.IsNullOrEmpty(log_filepath))
+                        //服务模式，写出到日志文件
+                        if (Lib_AppState.Current_RunMode == Lib_AppState.RunMode.Service)
                         {
-                            string file_name = datatime_format + ".log";
-                            log_filepath = $"{Lib_AppInfo.Path.Dir_Log}\\{file_name}";
+                            //为空时，创建日志路径
+                            if (string.IsNullOrEmpty(log_filepath))
+                            {
+                                string file_name = "service_" + datatime_format + ".log";
+                                log_filepath = $"{Documents.Logs}\\{file_name}";
+                            }
+
+                            //目录不存在时创建目录
+                            Directory.CreateDirectory(new FileInfo(log_filepath).DirectoryName);
+
+                            //文件不存在时创建&写入
+                            Com_FileOS.Write.TextToFile(log_filepath, $"{datatime_format}, {str}");
+
+                            /*
+                            StreamWriter file = new StreamWriter(log_filepath, append: true);
+                            file.WriteLine($"{datatime_format}, {str}");
+                            file.Close();*/
                         }
 
-                        //目录不存在时创建目录
-                        Directory.CreateDirectory(new FileInfo(log_filepath).DirectoryName);
-
-                        //文件不存在时创建&写入
-                        StreamWriter file = new StreamWriter(log_filepath, append: true);
-                        file.WriteLine($"{datatime_format}, {str.Replace("\n", "")}");     //替换换行符
-                        file.Close();
-
-                        */
 
                         //将日志记录在内存中
                         string now_log = $"{datatime_format}, {str.Replace("\n", "")}";
@@ -147,8 +153,17 @@ namespace LKY_OfficeTools.Lib
             {
                 try
                 {
-                    //直接调用 重载：日志实现
-                    new Log($"---------- [Error Log: BEGIN] ----------<br />{err_str.Replace("\n", "<br />")}<br />---------- [END] ----------", ConsoleColor.Gray, Output_Type.Write);
+                    //整合格式
+                    string msg = $"---------- [Error Log: BEGIN] ----------\n{err_str}\n---------- [END] ----------";
+
+                    //非服务模式，替换换行符
+                    if (Lib_AppState.Current_RunMode != Lib_AppState.RunMode.Service)
+                    {
+                        msg = msg.Replace("\n", "<br />");
+                    }
+
+                    //输出日志
+                    new Log(msg, ConsoleColor.Gray, Output_Type.Write);
                 }
                 catch
                 {
@@ -195,7 +210,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //合成最终注册表路径
-                    reg_install_error = Documents.Log + $@"\{reg_filename}.reg";
+                    reg_install_error = Documents.Logs + $@"\{reg_filename}.reg";
 
                     //生成注册表信息
                     Com_SystemOS.Register.ExportReg(office_reg_path, reg_install_error);
@@ -251,11 +266,11 @@ namespace LKY_OfficeTools.Lib
                     */
 
                     //清理整个Log文件夹
-                    if (Directory.Exists(Documents.Log))
+                    if (Directory.Exists(Documents.Logs))
                     {
                         try
                         {
-                            Directory.Delete(Documents.Log, true);
+                            Directory.Delete(Documents.Logs, true);
                         }
                         catch (Exception Ex)
                         {

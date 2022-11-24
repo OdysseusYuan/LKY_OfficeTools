@@ -205,14 +205,32 @@ namespace LKY_OfficeTools.Common
         internal class Write
         {
             /// <summary>
-            /// 将已知的所有文本一次性写入文本，并覆盖此前内容
+            /// 将文本以流的方式写出到文件（服务模式下也可用）。
+            /// 默认为追加模式
             /// </summary>
+            /// <param name="file_path"></param>
+            /// <param name="content"></param>
+            /// <param name="is_append">设置为 false 时，将删除原有文件！</param>
             /// <returns></returns>
-            internal static bool FromAllText(string all_text, string to_path)
+            internal static bool TextToFile(string file_path, string content, bool is_append = true)
             {
                 try
                 {
-                    File.WriteAllText(to_path, all_text, Encoding.UTF8);
+                    //非追加模式，并且已经存在目标文件，则先删除原有文件
+                    if (!is_append && File.Exists(file_path))
+                    {
+                        File.Delete(file_path);
+                    }
+
+                    var fs = new FileStream(file_path, FileMode.OpenOrCreate, FileAccess.Write);
+                    var sw = new StreamWriter(fs);
+                    sw.BaseStream.Seek(0, SeekOrigin.End);
+                    sw.WriteLine(content);
+
+                    sw.Flush();
+                    sw.Close();
+                    fs.Close();
+
                     return true;
                 }
                 catch (Exception Ex)

@@ -14,8 +14,9 @@ using System.Net.Mail;
 using System.Reflection;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
@@ -64,27 +65,27 @@ namespace LKY_OfficeTools.Lib
                 {
                     case ProcessStage.Starting:
                         {
-                            title = $"[LKY OfficeTools 启动]";
+                            title = $"[{AppAttribute.AppName} 启动]";
                             break;
                         }
                     case ProcessStage.Finish_Success:
                         {
-                            title = $"[LKY OfficeTools 完成]";    //当且仅当激活成功时，视为成功
+                            title = $"[{AppAttribute.AppName} 完成]";    //当且仅当激活成功时，视为成功
                             break;
                         }
                     case ProcessStage.Finish_Fail:
                         {
-                            title = $"[LKY OfficeTools 完成-有误]";
+                            title = $"[{AppAttribute.AppName} 完成-有误]";
                             break;
                         }
                     case ProcessStage.Interrupt:
                         {
-                            title = $"[LKY OfficeTools 结束-中断]";
+                            title = $"[{AppAttribute.AppName} 结束-中断]";
                             break;
                         }
                     default:
                         {
-                            title = $"[LKY OfficeTools {point_type}]";
+                            title = $"[{AppAttribute.AppName} {point_type}]";
                             break;
                         }
                 }
@@ -106,12 +107,13 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 string content =
-                    $"<font color = black>v{Assembly.GetExecutingAssembly().GetName().Version} 在 {Environment.MachineName} ({Environment.UserName}) 运行结束。<br /><br />" +
+                    $"<font color = black>v{AppAttribute.AppVersion} 在 {Environment.MachineName} ({Environment.UserName}) 运行结束。<br /><br />" +
                     $"<font color=green><b>------------------------------ 【简述】 ------------------------------</b></font><br /><br />" +
                      $"<font color = purple><b>【发送时间】</b>：</font>{DateTime.Now}<br /><br />" +
                      $"<font color = purple><b>【反馈类型】</b>：</font>{point_type}<br /><br />" +
-                     $"<font color = purple><b>【软件版本】</b>：</font>v{Assembly.GetExecutingAssembly().GetName().Version} ({run_mode})<br /><br />" +
-                     $"<font color = purple><b>【启动路径】</b>：</font>{Process.GetCurrentProcess().MainModule.FileName}<br /><br />" +
+                     $"<font color = purple><b>【软件版本】</b>：</font>v{AppAttribute.AppVersion} ({run_mode})<br /><br />" +
+                     $"<font color = purple><b>【运行模式】</b>：</font>{Current_RunMode}<br /><br />" +
+                     $"<font color = purple><b>【启动路径】</b>：</font>{Executer}<br /><br />" +
                      $"<font color = purple><b>【系统环境】</b>：</font>{system_ver}<br /><br />" +
                      $"<font color = purple><b>【机器名称】</b>：</font>{Environment.MachineName} ({Environment.UserName})<br /><br />" +
                      $"<font color = purple><b>【网络地址】</b>：</font>{Com_NetworkOS.IP.GetMyIP_Info()}<br /><br />" +
@@ -168,7 +170,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //启动桌面打点上报
-                    string desk_path = $"{Documents.Log}\\running_info.jpg";
+                    string desk_path = $"{Documents.Logs}\\running_info.jpg";
                     if (Screen.CaptureToSave(desk_path))
                     {
                         file_list.Add(desk_path);

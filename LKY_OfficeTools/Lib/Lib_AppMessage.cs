@@ -7,6 +7,7 @@
 
 using System;
 using static LKY_OfficeTools.Lib.Lib_AppCommand;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -49,13 +50,42 @@ namespace LKY_OfficeTools.Lib
                 if (string.IsNullOrWhiteSpace(msg_str))
                 {
                     //msg为空，直接展示回车键继续，并且前面不空格
-                    Console.Write($"\n请按 回车键 继续 ...");
+                    msg_str = $"\n请按 回车键 继续 ...";
                 }
                 else
                 {
                     //msg不为空，一般在运行过程中的确认，有空格，并且增加逗号
-                    Console.Write($"        {msg_str}，请按 回车键 继续 ...");
+                    msg_str = $"        {msg_str}，请按 回车键 继续 ...";
                 }
+
+                Console.Write(msg_str);     //提示信息
+                new Log(msg_str, ConsoleColor.Gray, Log.Output_Type.Write);     //写入日志
+
+                if (Console.ReadKey().Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();    //增加一个空白行
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine();    //增加一个空白行
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 让用户选择的消息
+            /// 默认 按回车键 执行，按 其他键 跳过。
+            /// </summary>
+            internal static bool Choose(string todo_thing)
+            {
+                new Log($"\n     ☆ {todo_thing}", ConsoleColor.DarkYellow);
+
+                Console.ForegroundColor = ConsoleColor.Gray;
+                string msg = $"        按 回车键 确认执行上述操作，按 其它键 跳过此环节 ...";
+
+                Console.Write(msg);
+                new Log(msg, ConsoleColor.Gray, Log.Output_Type.Write);     //写入日志
 
                 if (Console.ReadKey().Key == ConsoleKey.Enter)
                 {

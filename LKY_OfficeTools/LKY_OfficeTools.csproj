@@ -78,20 +78,22 @@
     <Compile Include="Common\Com_FileOS.cs" />
     <Compile Include="Common\Com_NetworkOS.cs" />
     <Compile Include="Common\Com_PrivilegeOS.cs" />
-    <Compile Include="Common\Com_ProcessOS.cs" />
+    <Compile Include="Common\Com_ServiceOS.cs" />
     <Compile Include="Common\Com_SystemOS.cs" />
     <Compile Include="Common\Com_TextOS.cs" />
     <Compile Include="Common\Com_WebOS.cs" />
     <Compile Include="Lib\Lib_AppCommand.cs" />
+    <Compile Include="Lib\Lib_AppState.cs" />
     <Compile Include="Lib\Lib_AppInfo.cs" />
     <Compile Include="Lib\Lib_AppMessage.cs" />
     <Compile Include="Lib\Lib_AppSdk.cs" />
-    <Compile Include="Lib\Lib_AppService.cs">
+    <Compile Include="Lib\Lib_AppServiceHub.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Lib\Lib_AppService.Designer.cs">
-      <DependentUpon>Lib_AppService.cs</DependentUpon>
+    <Compile Include="Lib\Lib_AppServiceHub.Designer.cs">
+      <DependentUpon>Lib_AppServiceHub.cs</DependentUpon>
     </Compile>
+    <Compile Include="Lib\Lib_AppServiceConfig.cs" />
     <Compile Include="Lib\Lib_AppSignCert.cs" />
     <Compile Include="Lib\Lib_OfficeActivate.cs" />
     <Compile Include="Lib\Lib_OfficeDownload.cs" />

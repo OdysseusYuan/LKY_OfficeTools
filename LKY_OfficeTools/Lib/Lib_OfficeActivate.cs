@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
@@ -91,14 +91,14 @@ namespace LKY_OfficeTools.Lib
             if (install_state.HasFlag(InstallState.Correct))      //只要安装了最新版，无论是否有多重版本叠加安装，均尝试激活
             {
                 //检查 ospp.vbs 文件是否存在
-                if (!File.Exists(Documents.SDK.Activate_OSPP))
+                if (!File.Exists(Documents.SDKs.Activate_OSPP))
                 {
-                    new Log($"     × 目录 {Documents.SDK.Activate} 下文件丢失！", ConsoleColor.DarkRed);
+                    new Log($"     × 目录 {Documents.SDKs.Activate} 下文件丢失！", ConsoleColor.DarkRed);
                     return -4;
                 }
 
                 //只要安装了 Office 新版本，就用KMS开始激活
-                string cmd_switch_cd = $"pushd \"{Documents.SDK.Activate}\"";          //切换至OSPP文件目录
+                string cmd_switch_cd = $"pushd \"{Documents.SDKs.Activate}\"";          //切换至OSPP文件目录
                 string cmd_install_key = "cscript ospp.vbs /inpkey:FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH";          //安装序列号，默认是 ProPlus2021VL 的
                 string cmd_kms_url = $"cscript ospp.vbs /sethst:{kms_server}";                          //设置激活KMS地址
                 string cmd_activate = "cscript ospp.vbs /act";                                              //开始激活
@@ -107,7 +107,7 @@ namespace LKY_OfficeTools.Lib
 
                 //执行：安装序列号
                 new Log($"\n     >> 安装 Office 序列号 ...", ConsoleColor.DarkYellow);
-                string log_install_key = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_install_key})");
+                string log_install_key = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_install_key})");
                 if (!log_install_key.ToLower().Contains("successful"))
                 {
                     new Log(log_install_key);    //保存错误原因
@@ -119,7 +119,7 @@ namespace LKY_OfficeTools.Lib
                 //执行：设置激活KMS地址
                 string kms_flag = kms_server.Replace("kms.", "");
                 new Log($"\n     >> 设置 Office [{kms_flag}] 激活载体 ...", ConsoleColor.DarkYellow);
-                string log_kms_url = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_kms_url})");
+                string log_kms_url = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_kms_url})");
                 if (!log_kms_url.ToLower().Contains("successful"))
                 {
                     new Log(log_kms_url);    //保存错误原因
@@ -130,7 +130,7 @@ namespace LKY_OfficeTools.Lib
 
                 //执行：开始激活
                 new Log($"\n     >> 执行 Office 激活 ...", ConsoleColor.DarkYellow);
-                string log_activate = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_activate})");
+                string log_activate = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_activate})");
                 if (!log_activate.ToLower().Contains("successful"))
                 {
                     new Log(log_activate);    //保存错误原因
@@ -139,7 +139,7 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 new Log($"     √ Office v{OfficeNetVersion.latest_version} 激活成功。", ConsoleColor.DarkGreen);
-                App.State.Current_StageType = App.State.ProcessStage.Finish_Success;   //设置整体运行状态为成功
+                Lib_AppState.Current_StageType = Lib_AppState.ProcessStage.Finish_Success;   //设置整体运行状态为成功
 
                 return 1;
             }

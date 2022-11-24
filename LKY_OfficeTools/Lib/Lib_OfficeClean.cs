@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
@@ -73,9 +73,9 @@ namespace LKY_OfficeTools.Lib
                     {
                         foreach (var now_key in office_installed_key)
                         {
-                            string cmd_switch_cd = $"pushd \"{Documents.SDK.Root + @"\Activate"}\"";                  //切换至OSPP文件目录
+                            string cmd_switch_cd = $"pushd \"{Documents.SDKs.SDKs_Root + @"\Activate"}\"";                  //切换至OSPP文件目录
                             string cmd_remove = $"cscript ospp.vbs /unpkey:{now_key}";
-                            string result_log = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_remove})");
+                            string result_log = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_remove})");
                             if (result_log.Contains("success"))
                             {
                                 new Log($"     √ 已移除 {now_key} 激活信息。", ConsoleColor.DarkGreen);
@@ -202,7 +202,7 @@ namespace LKY_OfficeTools.Lib
                     Thread.Sleep(1000);     //基于体验，延迟1s
 
                     //定义SaRA文件位置
-                    string SaRA_path_root = Documents.SDK.Root + @"\SaRA";
+                    string SaRA_path_root = Documents.SDKs.SDKs_Root + @"\SaRA";
                     string SaRA_path_exe = SaRA_path_root + @"\SaRACmd.exe";
 
                     //检查SaRA文件是否存在
@@ -217,7 +217,7 @@ namespace LKY_OfficeTools.Lib
                     //执行卸载命令
                     string cmd_switch_cd = $"pushd \"{SaRA_path_root}\"";             //切换至SaRA文件目录
                     string cmd_unstall = $"SaRACmd.exe -S OfficeScrubScenario -AcceptEula -Officeversion All";
-                    string uninstall_result = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_unstall})");
+                    string uninstall_result = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_unstall})");
                     if (!uninstall_result.ToLower().Contains("successful"))
                     {
                         new Log(uninstall_result);
@@ -264,7 +264,7 @@ namespace LKY_OfficeTools.Lib
                     Thread.Sleep(1000);     //基于体验，延迟1s
 
                     //定义ODT文件位置
-                    string ODT_path_root = Documents.SDK.Root + @"\ODT";
+                    string ODT_path_root = Documents.SDKs.SDKs_Root + @"\ODT";
                     string ODT_path_exe = ODT_path_root + @"\ODT.exe";
                     string ODT_path_xml = ODT_path_root + @"\uninstall.xml";    //此文件需要新生成
 
@@ -290,7 +290,7 @@ namespace LKY_OfficeTools.Lib
 
                     //执行卸载命令
                     string uninstall_args = $"/configure \"{ODT_path_xml}\"";
-                    bool isUninstall = Com_ExeOS.RunExe(ODT_path_exe, uninstall_args);      //卸载
+                    bool isUninstall = Com_ExeOS.Run.Exe(ODT_path_exe, uninstall_args);      //卸载
 
                     var reg_info = Register.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 

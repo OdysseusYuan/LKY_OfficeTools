@@ -6,9 +6,8 @@
  */
 
 using System;
-using System.Windows.Forms;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -37,15 +36,29 @@ namespace LKY_OfficeTools.Lib
                         //单独arg非空判断
                         if (!string.IsNullOrWhiteSpace(now_arg))
                         {
-                            //对于服务模式，或者手动指定的 /passive 模式，自动跳过所有需要确认的步骤
-                            if (now_arg.Contains("/service") || now_arg.Contains("/passive"))
+                            //对于 /passive 模式，自动跳过所有需要确认的步骤
+                            if (now_arg.Contains("/passive"))
                             {
                                 SkipAllConfirm();
-                                App.State.Current_RunMode = App.State.RunMode.Service;
+                                Current_RunMode = RunMode.Passive;  //设置为被动模式
                                 break;
                             }
+                            //服务模式。该模式 与 passive 是互斥的。
+                            else if (now_arg.Contains("/service"))
+                            {
+                                Current_RunMode = RunMode.Service;  //设置为服务模式
+
+                                //以服务模式运行
+                                Lib_AppServiceConfig.Start();
+
+                                //找到服务模式，不再执行后续的
+                                Environment.Exit(-100);
+                            }
+                            //非服务、非被动模式
                             else
                             {
+                                Current_RunMode = RunMode.Manual;   //设置为手动模式
+
                                 if (now_arg.Contains("/none_welcome_confirm"))
                                 {
                                     AppCommandFlag |= ArgsFlag.None_Welcome_Confirm;
@@ -104,7 +117,7 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
-                AppCommandFlag |= 
+                AppCommandFlag |=
                     ArgsFlag.None_Welcome_Confirm |
                     ArgsFlag.None_Finish_PressKey |
                     ArgsFlag.Auto_Remove_Conflict_Office;

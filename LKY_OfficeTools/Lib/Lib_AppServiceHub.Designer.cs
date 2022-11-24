@@ -7,7 +7,7 @@
 
 namespace LKY_OfficeTools.Lib
 {
-    partial class Lib_AppService
+    partial class Lib_AppServiceHub
     {
         /// <summary> 
         /// 必需的设计器变量。

@@ -11,8 +11,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
@@ -28,13 +28,13 @@ namespace LKY_OfficeTools.Lib
         /// 资源在内存中的位置
         /// </summary>
         private static Stream sdk_package_res = Assembly.GetExecutingAssembly().
-            GetManifestResourceStream(App.Develop.NameSpace_Top /* 当命名空间发生改变时，词值也需要调整 */
+            GetManifestResourceStream(AppDevelop.NameSpace_Top /* 当命名空间发生改变时，词值也需要调整 */
             + ".Resource.SDKs.pkg");
 
         /// <summary>
         /// 确定路径
         /// </summary>
-        private static string sdk_disk_path = Documents.SDK.Root + "\\LOT_SDKs.pkg";
+        private static string sdk_disk_path = Documents.SDKs.SDKs_Root + "\\LOT_SDKs.pkg";
 
         /// <summary>
         /// 初始化释放 SDK 包
@@ -54,7 +54,7 @@ namespace LKY_OfficeTools.Lib
                 if (isToDisk)
                 {
                     //解压包
-                    ZipFile.ExtractToDirectory(sdk_disk_path, Documents.SDK.Root);
+                    ZipFile.ExtractToDirectory(sdk_disk_path, Documents.SDKs.SDKs_Root);
                 }
 
                 new Log($"     √ 已完成 {Console.Title} 组件配置。", ConsoleColor.DarkGreen);
@@ -104,12 +104,12 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //目录不存在时，自动返回为真
-                if (!Directory.Exists(Documents.SDK.Root))
+                if (!Directory.Exists(Documents.SDKs.SDKs_Root))
                 { 
                     return true;
                 }
 
-                Directory.Delete(Documents.SDK.Root, true);
+                Directory.Delete(Documents.SDKs.SDKs_Root, true);
 
                 return true;
             }

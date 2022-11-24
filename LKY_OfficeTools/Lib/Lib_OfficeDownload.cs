@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
@@ -60,7 +60,7 @@ namespace LKY_OfficeTools.Lib
                 ///当不存在 \Configuration\ 项 or 不存在 VersionToReport or 其版本与最新版不一致时，需要下载新文件。
 
                 //定义下载目标地
-                string save_to = AppPath.Execute + @"\Office\Data\";       //文件必须位于 \Office\Data\ 下，
+                string save_to = AppPath.ExecuteDir + @"\Office\Data\";       //文件必须位于 \Office\Data\ 下，
                                                                            //ODT安装必须在 Office 上一级目录上执行。
 
                 //计划保存的地址
@@ -91,7 +91,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //如果用户中断了下载，则直接跳出
-                    if (State.Current_StageType == State.ProcessStage.Interrupt)
+                    if (Lib_AppState.Current_StageType == Lib_AppState.ProcessStage.Interrupt)
                     {
                         return -1;
                     }

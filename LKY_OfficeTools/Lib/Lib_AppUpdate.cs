@@ -10,13 +10,12 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Reflection;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_FileOS;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -56,7 +55,7 @@ namespace LKY_OfficeTools.Lib
 
                 //当更新完成自重启时，自动删除 .old 的文件
                 ScanFiles oldFiles = new ScanFiles();
-                oldFiles.GetFilesByExtension(AppPath.Execute, ".old");
+                oldFiles.GetFilesByExtension(AppPath.ExecuteDir, ".old");
                 ///无 old 文件时，自动跳过
                 if (oldFiles.FilesList != null && oldFiles.FilesList.Count > 0)
                 {
@@ -84,14 +83,14 @@ namespace LKY_OfficeTools.Lib
 
                 new Log($"     √ 已完成 {Console.Title} v{latest_ver} 初始化检查。", ConsoleColor.DarkGreen);
 
-                string now_ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                string now_ver = AppAttribute.AppVersion;
                 if (new Version(latest_ver) > new Version(now_ver))
                 {
                     //发现新版本
                     new Log($"\n------> 正在更新 {Console.Title} ...", ConsoleColor.DarkCyan);
 
                     //下载文件
-                    string save_to = AppPath.Documents.Root + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
+                    string save_to = AppPath.Documents.Documents_Root + @"\Update\" + $"{Console.Title}_updateto_{latest_ver}.zip";
                     int down_result = Lib_Aria2c.DownFile(latest_down_url, save_to);
 
                     //下载不成功时，抛出
@@ -121,7 +120,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //获得自身主程序路径
-                    string self_RunPath = new FileInfo(Process.GetCurrentProcess().MainModule.FileName).FullName;
+                    string self_RunPath = AppPath.Executer;
 
                     //删除旧的文件
                     ScanFiles old_files = new ScanFiles();
@@ -151,7 +150,7 @@ namespace LKY_OfficeTools.Lib
                         //获得文件相对路径
                         string file_relative_path = now_file.Replace(extra_to, "\\");
                         //合成移动路径
-                        string move_to = AppPath.Execute + file_relative_path;
+                        string move_to = AppPath.ExecuteDir + file_relative_path;
                         //替换自身时，先move为别的文件，然后再替换
                         if (new FileInfo(move_to).FullName == self_RunPath)
                         {
@@ -178,8 +177,8 @@ namespace LKY_OfficeTools.Lib
 
                     //启动实例
                     Process p = new Process();
-                    p.StartInfo.FileName = Process.GetCurrentProcess().MainModule.FileName;             //需要启动的程序名       
-                    p.StartInfo.Arguments = "/none_welcome_confirm";                                            //启动参数
+                    p.StartInfo.FileName = AppPath.Executer;             //需要启动的程序名       
+                    p.StartInfo.Arguments = "/none_welcome_confirm";         //启动参数
                     p.Start();
                     //关闭当前实例
                     Process.GetCurrentProcess().Kill();

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
@@ -357,9 +357,9 @@ namespace LKY_OfficeTools.Lib
             {
                 try
                 {
-                    string cmd_switch_cd = $"pushd \"{Documents.SDK.Activate}\"";                  //切换至OSPP文件目录
+                    string cmd_switch_cd = $"pushd \"{Documents.SDKs.Activate}\"";                  //切换至OSPP文件目录
                     string cmd_installed_info = "cscript ospp.vbs /dstatus";                                //查看激活状态
-                    string detect_info = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
+                    string detect_info = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
 
                     //未安装key，直接返回null
                     if (detect_info.Contains("No installed product keys detected"))

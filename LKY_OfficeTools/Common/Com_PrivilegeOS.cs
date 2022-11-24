@@ -7,7 +7,7 @@
 
 using System;
 using System.Security.Principal;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.State;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;

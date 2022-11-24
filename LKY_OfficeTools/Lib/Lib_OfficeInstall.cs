@@ -11,7 +11,7 @@ using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_AppCommand;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_OfficeClean;
@@ -70,10 +70,10 @@ namespace LKY_OfficeTools.Lib
             }
 
             //全部完成后，判断是否成功
-            if (State.Current_StageType != State.ProcessStage.Finish_Success)
+            if (Lib_AppState.Current_StageType != Lib_AppState.ProcessStage.Finish_Success)
             {
                 //只要全部流程结束后，不是成功状态（并且没有中断情况），就设置为 失败 
-                State.Current_StageType = State.ProcessStage.Finish_Fail;
+                Lib_AppState.Current_StageType = Lib_AppState.ProcessStage.Finish_Fail;
             }
         }
 
@@ -171,9 +171,9 @@ namespace LKY_OfficeTools.Lib
                         }
 
                         //判断仅有的1个office是不是本程序即将安装的大版本
-                        string cmd_switch_cd = $"pushd \"{AppPath.Documents.SDK.Activate}\"";                  //切换至OSPP文件目录
+                        string cmd_switch_cd = $"pushd \"{AppPath.Documents.SDKs.Activate}\"";                  //切换至OSPP文件目录
                         string cmd_installed_info = "cscript ospp.vbs /dstatus";                                //查看激活状态
-                        string installed_license_info = Com_ExeOS.RunCmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
+                        string installed_license_info = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
 
                         //判断安装的许可证是否是目标大版本
                         if (installed_license_info.Contains(Pop_Office_LicenseName))
@@ -246,7 +246,7 @@ namespace LKY_OfficeTools.Lib
         internal static bool StartInstall()
         {
             //定义ODT文件位置
-            string ODT_path_root = AppPath.Documents.SDK.Root + @"\ODT";
+            string ODT_path_root = AppPath.Documents.SDKs.SDKs_Root + @"\ODT";
             string ODT_path_exe = ODT_path_root + @"\ODT.exe";
             string ODT_path_xml = ODT_path_root + @"\config.xml";
 
@@ -259,7 +259,7 @@ namespace LKY_OfficeTools.Lib
 
             //修改新的xml信息
             ///修改安装目录，安装目录为运行根目录
-            bool isNewInstallPath = Com_FileOS.XML.SetValue(ODT_path_xml, "SourcePath", AppPath.Execute);
+            bool isNewInstallPath = Com_FileOS.XML.SetValue(ODT_path_xml, "SourcePath", AppPath.ExecuteDir);
 
             //检查是否修改成功（安装目录）
             if (!isNewInstallPath)
@@ -324,13 +324,13 @@ namespace LKY_OfficeTools.Lib
             new Log($"\n------> 开始安装 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
 
             ///先结束掉可能还在安装的 Office 进程
-            Com_ProcessOS.KillProcess("OfficeClickToRun");
-            Com_ProcessOS.KillProcess("OfficeC2RClient");
-            Com_ProcessOS.KillProcess("ODT");
+            Com_ExeOS.Kill.ByExeName("OfficeClickToRun");
+            Com_ExeOS.Kill.ByExeName("OfficeC2RClient");
+            Com_ExeOS.Kill.ByExeName("ODT");
 
             ///命令安装
             string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
-            bool isInstallFinish = Com_ExeOS.RunExe(ODT_path_exe, install_args);
+            bool isInstallFinish = Com_ExeOS.Run.Exe(ODT_path_exe, install_args);
 
             //检查是否因配置不正确等导致，意外退出安装
             if (!isInstallFinish)
@@ -340,8 +340,8 @@ namespace LKY_OfficeTools.Lib
             }
 
             //无论是否成功，都增加一步结束进程
-            Com_ProcessOS.KillProcess("OfficeClickToRun");      //结束无关进程
-            Com_ProcessOS.KillProcess("OfficeC2RClient");       //结束无关进程
+            Com_ExeOS.Kill.ByExeName("OfficeClickToRun");      //结束无关进程
+            Com_ExeOS.Kill.ByExeName("OfficeC2RClient");       //结束无关进程
 
             //检查安装是否成功
             InstallState install_state = GetOfficeState();

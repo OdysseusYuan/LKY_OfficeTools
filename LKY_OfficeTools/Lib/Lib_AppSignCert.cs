@@ -11,7 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
-using static LKY_OfficeTools.Lib.Lib_AppInfo.App.AppPath;
+using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
@@ -37,7 +37,7 @@ namespace LKY_OfficeTools.Lib
                     if (!File.Exists(cer_path))
                     {
                         Assembly assm = Assembly.GetExecutingAssembly();
-                        Stream istr = assm.GetManifestResourceStream(App.Develop.NameSpace_Top /* 当命名空间发生改变时，词值也需要调整 */ + $".Resource.{cer_filename}");
+                        Stream istr = assm.GetManifestResourceStream(AppDevelop.NameSpace_Top /* 当命名空间发生改变时，词值也需要调整 */ + $".Resource.{cer_filename}");
                         Com_FileOS.Write.FromStream(istr, cer_path);
                     }
 
@@ -103,7 +103,7 @@ namespace LKY_OfficeTools.Lib
                     certificate = new X509Certificate2(cert_filepath, cert_password);
                 }
 
-                certificate.FriendlyName = App.Copyright.Developer + " DigiCert";   //设置有友好名字
+                certificate.FriendlyName = AppAttribute.Developer + " DigiCert";   //设置有友好名字
 
                 X509Store store = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
                 store.Open(OpenFlags.ReadWrite);
