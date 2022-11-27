@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
@@ -205,7 +206,7 @@ namespace LKY_OfficeTools.Common
         internal class Write
         {
             /// <summary>
-            /// 将文本以流的方式写出到文件（服务模式下也可用）。
+            /// 将文本以流的方式写出到文件。
             /// 默认为追加模式
             /// </summary>
             /// <param name="file_path"></param>
@@ -263,6 +264,57 @@ namespace LKY_OfficeTools.Common
                 {
                     new Log(Ex.ToString());
                     return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取文件相关信息的类库
+        /// </summary>
+        internal class Info
+        {
+            /// <summary>
+            /// 获取文件哈希值
+            /// </summary>
+            /// <param name="file_path"></param>
+            /// <returns></returns>
+            internal static string GetHash(string file_path)
+            {
+                try
+                {
+                    //文件不存在，返回null
+                    if (!File.Exists(file_path))
+                    {
+                        return null;
+                    }
+
+                    //为了防止文件被占用，无法校验，这里先拷贝一份副本，校验副本的值
+                    string file_copied = file_path + ".hash";
+                    File.Copy(file_path, file_copied);
+                    if (!File.Exists(file_copied))
+                    {
+                        return null;        //副本文件拷贝失败，返回null
+                    }
+
+                    //var hash = SHA256.Create();
+                    //var hash = MD5.Create();
+                    var hash = SHA1.Create();
+                    var stream = new FileStream(file_copied, FileMode.Open);
+                    byte[] hashByte = hash.ComputeHash(stream);
+                    stream.Close();
+
+                    //校验完成，删除副本
+                    if (File.Exists(file_copied))
+                    {
+                        File.Delete(file_copied);
+                    }
+
+                    return BitConverter.ToString(hashByte).Replace("-", "");
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return null;
                 }
             }
         }

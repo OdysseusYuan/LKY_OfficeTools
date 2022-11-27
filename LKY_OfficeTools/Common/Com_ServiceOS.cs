@@ -7,7 +7,7 @@
 
 using System;
 using System.ServiceProcess;
-using static LKY_OfficeTools.Common.Com_ServiceOS.Config;
+using System.Threading;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
@@ -18,110 +18,10 @@ namespace LKY_OfficeTools.Common
     internal class Com_ServiceOS
     {
         /// <summary>
-        /// 对服务进行相应行为的类库。
-        /// 主要用于启动、暂停、停止、重启服务。
+        /// 对服务进行查询
         /// </summary>
-        internal class Action
+        internal class Query
         {
-            /// <summary>
-            /// 启动一个服务
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns></returns>
-            internal static bool Start(string serv_name)
-            {
-                try
-                {
-                    //未创建服务，不启动！
-                    if (!IsCreated(serv_name))
-                    {
-                        throw new Exception($"启动服务 {serv_name} 时失败。未找到该服务！");
-                    }
-
-                    //已安装服务，开始启动
-                    using (var control = new ServiceController(serv_name))
-                    {
-                        //没有处于运行状态的服务，才运行。
-                        if (control.Status != ServiceControllerStatus.Running)
-                        {
-                            control.Start();
-                        }
-                    }
-                    return true;
-
-                }
-                catch (Exception Ex)
-                {
-                    new Log(Ex.ToString());
-                    return false;
-                }
-            }
-
-            /// <summary>
-            /// 停止一个服务
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns></returns>
-            internal static bool Stop(string serv_name)
-            {
-                try
-                {
-                    //未创建服务，不能停止！
-                    if (!IsCreated(serv_name))
-                    {
-                        throw new Exception($"停止服务 {serv_name} 时失败。未找到该服务！");
-                    }
-
-                    //已安装服务，开始停止
-                    using (var control = new ServiceController(serv_name))
-                    {
-                        //仅停止处于运行状态的服务
-                        if (control.Status == ServiceControllerStatus.Running)
-                        {
-                            control.Stop();
-                        }
-                    }
-                    return true;
-                }
-                catch (Exception Ex)
-                {
-                    new Log(Ex.ToString());
-                    return false;
-                }
-            }
-
-            /// <summary>
-            /// 重启一个服务
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns></returns>
-            internal static bool Restart(string serv_name)
-            {
-                try
-                {
-                    //未创建服务，不能停止！
-                    if (!IsCreated(serv_name))
-                    {
-                        throw new Exception($"重启服务 {serv_name} 时失败。未找到该服务！");
-                    }
-
-                    //已安装服务，开始重启
-                    using (var control = new ServiceController(serv_name))
-                    {
-                        if (control.Status == ServiceControllerStatus.Running)
-                        {
-                            control.Continue();
-                        }
-                    }
-                    return true;
-                }
-                catch (Exception Ex)
-                {
-                    new Log(Ex.ToString());
-                    return false;
-                }
-            }
-
             /// <summary>
             /// 查询一个服务的运行状态
             /// </summary>
@@ -140,6 +40,297 @@ namespace LKY_OfficeTools.Common
                 {
                     new Log(Ex.ToString());
                     return 0;
+                }
+            }
+
+            /// <summary>
+            /// 查询一个服务是否被创建（通过服务名称查询）
+            /// </summary>
+            /// <returns></returns>
+            internal static bool IsCreated(string serv_name)
+            {
+                try
+                {
+                    if (GetService(serv_name) != null)
+                    {
+                        //服务不为空，服务存在
+                        return true;
+                    }
+                    else
+                    {
+                        //服务为空，服务不存在
+                        return false;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 获得一个服务对象（通过服务名称）
+            /// </summary>
+            /// <param name="serv_name"></param>
+            /// <returns></returns>
+            internal static ServiceController GetService(string serv_name)
+            {
+                try
+                {
+                    ServiceController service_info = null;                                   //即将获得的服务对象
+                    ServiceController[] services_list = ServiceController.GetServices();     //获得所有服务
+                    foreach (var now_service in services_list)                               //遍历搜索服务
+                    {
+                        if (now_service.ServiceName.ToLower() == serv_name.ToLower())        //全部取小写，防止判断麻烦
+                        {
+                            service_info = now_service;
+                            break;
+                        }
+                    }
+
+                    return service_info;
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return null;
+                }
+            }
+
+            /// <summary>
+            /// 判断一个服务的可执行文件路径（含命令行）与给定值是否相等
+            /// </summary>
+            /// <param name="serv_name"></param>
+            /// <param name="compare_path"></param>
+            /// <returns></returns>
+            internal static bool CompareBinPath(string serv_name, string compare_path)
+            {
+                try
+                {
+                    //服务未创建，不相等
+                    if (!IsCreated(serv_name))
+                    {
+                        return false;
+                    }
+
+                    string cmd_query = $"sc qc {serv_name}";
+                    string query_result = Com_ExeOS.Run.Cmd(cmd_query);
+
+                    //返回值为空，不相等
+                    if (string.IsNullOrEmpty(query_result))
+                    {
+                        return false;
+                    }
+
+                    if (query_result.Replace(@"\\", @"\").Contains(compare_path.Replace(@"\\", @"\")))  //替换两个斜杠，为单斜杠之后在比对   
+                    {
+                        //包含指定路径（含命令行）
+                        return true;
+                    }
+                    else
+                    {
+                        //不包含指定路径（含命令行）
+                        return false;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 判断一个服务的描述信息与给定值是否相等。
+            /// 注意：这里只看目标描述是否在现有描述中包含来判断，如果二者存在子集关系，仍将返回 true。
+            /// </summary>
+            /// <param name="serv_name"></param>
+            /// <param name="compare_description"></param>
+            /// <returns></returns>
+            internal static bool CompareDescription(string serv_name, string compare_description)
+            {
+                try
+                {
+                    //服务未创建，不相等
+                    if (!IsCreated(serv_name))
+                    {
+                        return false;
+                    }
+
+                    string cmd_query = $"sc qdescription {serv_name}";
+                    string query_result = Com_ExeOS.Run.Cmd(cmd_query);
+
+                    //返回值为空，不相等
+                    if (string.IsNullOrEmpty(query_result))
+                    {
+                        return false;
+                    }
+
+                    if (query_result.Contains(compare_description))
+                    {
+                        //包含描述
+                        return true;
+                    }
+                    else
+                    {
+                        //不包含描述
+                        return false;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 对服务进行相应行为的类库。
+        /// 主要用于启动、暂停、停止、重启服务。
+        /// </summary>
+        internal class Action
+        {
+            /// <summary>
+            /// 启动一个服务
+            /// </summary>
+            /// <param name="serv_name"></param>
+            /// <returns></returns>
+            internal static bool Start(string serv_name)
+            {
+                try
+                {
+                    //未创建服务，不启动！
+                    if (!Query.IsCreated(serv_name))
+                    {
+                        throw new Exception($"启动服务 {serv_name} 时失败。未找到该服务！");
+                    }
+
+                    //已安装服务，开始启动
+                    using (var control = new ServiceController(serv_name))
+                    {
+                        //没有处于运行状态的服务，才运行。
+                        if (control.Status != ServiceControllerStatus.Running)
+                        {
+                            control.Start();
+                        }
+
+                        //判断状态，是否是开启了
+                        int wait_time = 0;                          //等待时间总计
+                        while (wait_time <= (10 * 1000))            //最多等待10秒
+                        {
+                            //获取服务状态
+                            if (Query.RunState(serv_name) == (int)ServiceControllerStatus.Running)
+                            {
+                                //已经处于运行状态
+                                return true;
+                            }
+                            else
+                            {
+                                //不是运行状态
+                                Thread.Sleep(1000);      //延迟 1s 后，再度查询
+                                wait_time += 1000;       //追加等待时间
+                                continue;
+                            }
+                        }
+
+                        //如果在轮询期间，没有返回true，那么最终返回false
+                        return false;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 停止一个服务
+            /// </summary>
+            /// <param name="serv_name"></param>
+            /// <returns></returns>
+            internal static bool Stop(string serv_name)
+            {
+                try
+                {
+                    //未创建服务，不能停止！
+                    if (!Query.IsCreated(serv_name))
+                    {
+                        throw new Exception($"停止服务 {serv_name} 时失败。未找到该服务！");
+                    }
+
+                    //已安装服务，开始停止
+                    using (var control = new ServiceController(serv_name))
+                    {
+                        //只要不是停止状态，就发送停止指令
+                        if (control.Status != ServiceControllerStatus.Stopped)
+                        {
+                            control.Stop();
+                        }
+
+                        //判断状态，是否是停止了
+                        int wait_time = 0;                          //等待时间总计
+                        while (wait_time <= (10 * 1000))            //最多等待10秒
+                        {
+                            //获取服务状态
+                            if (Query.RunState(serv_name) == (int)ServiceControllerStatus.Stopped)
+                            {
+                                //已经处于停止状态
+                                return true;
+                            }
+                            else
+                            {
+                                //不是停止状态
+                                Thread.Sleep(1000);      //延迟 1s 后，再度查询
+                                wait_time += 1000;       //追加等待时间
+                                continue;
+                            }
+                        }
+
+                        //如果在轮询期间，没有返回true，那么最终返回false
+                        return false;
+                    }
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// 重启一个服务（禁止用于重启自身服务）。
+            /// 重启自身服务时，存在无法再次启动的问题。因为关闭自身服务时，进程会被结束
+            /// </summary>
+            /// <param name="serv_name"></param>
+            /// <returns></returns>
+            internal static bool Restart(string serv_name)
+            {
+                try
+                {
+                    //未创建服务，不能停止！
+                    if (!Query.IsCreated(serv_name))
+                    {
+                        throw new Exception($"重启服务 {serv_name} 时失败。未找到该服务！");
+                    }
+
+                    //已安装服务，开始重启
+                    if (Stop(serv_name))
+                    {
+                        if (Start(serv_name))
+                        {
+                            return true;        //当且仅当停止成功，开启成功，返回true。除此之外，均为false
+                        }
+                    }
+
+                    return false;
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
                 }
             }
         }
@@ -162,7 +353,7 @@ namespace LKY_OfficeTools.Common
             {
                 try
                 {
-                    if (IsCreated(serv_name))
+                    if (Query.IsCreated(serv_name))
                     {
                         //已经创建服务，直接返回真
                         return true;
@@ -205,37 +396,12 @@ namespace LKY_OfficeTools.Common
             }
 
             /// <summary>
-            /// 查询一个服务是否被创建（通过服务名称查询）
-            /// </summary>
-            /// <returns></returns>
-            internal static bool IsCreated(string serv_name)
-            {
-                try
-                {
-                    ServiceController[] services = ServiceController.GetServices();
-                    foreach (ServiceController s in services)
-                    {
-                        if (s.ServiceName.ToLower() == serv_name.ToLower())
-                        {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                catch (Exception Ex)
-                {
-                    new Log(Ex.ToString());
-                    return false;
-                }
-            }
-
-            /// <summary>
             /// 删除一个服务
             /// </summary>
             /// <returns></returns>
             internal static bool Delete(string serv_name)
             {
-                if (IsCreated(serv_name))
+                if (Query.IsCreated(serv_name))
                 {
                     //已经创建服务，才能删除
 
@@ -276,6 +442,94 @@ namespace LKY_OfficeTools.Common
             internal class Modify
             {
                 /// <summary>
+                /// 修改一个服务的 BinPath 信息
+                /// </summary>
+                /// <param name="serv_name">服务名称。在服务详情中会展示</param>
+                /// <param name="serv_binpath">binpath 路径（含命令行）</param>
+                /// <returns></returns>
+                internal static bool BinPath(string serv_name, string serv_binpath)
+                {
+                    try
+                    {
+                        if (Query.IsCreated(serv_name))
+                        {
+                            //已经创建服务，才进行修改
+                            string cmd_modify_binpath = $"sc config \"{serv_name}\" binPath=\"{serv_binpath}\"";
+                            var modify_result = Com_ExeOS.Run.Cmd(cmd_modify_binpath);
+
+                            //非空判断，若返回值为空，则为假
+                            if (string.IsNullOrEmpty(modify_result))
+                            {
+                                throw new Exception($"执行修改 {serv_name} binPath 参数时，返回值为空！");
+                            }
+
+                            //判断是否修改 binPath 成功
+                            if (modify_result.Contains("成功") || modify_result.ToLower().Contains("success"))
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                throw new Exception($"修改服务 {serv_name} 的 binPath 信息为 {serv_binpath} 失败！");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception($"尝试修改服务 {serv_name} 的 binPath 信息为 {serv_binpath}，但该服务未安装！");
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        return false;
+                    }
+                }
+
+                /// <summary>
+                /// 修改一个服务的 DisplayName 信息
+                /// </summary>
+                /// <param name="serv_name">服务名称。在服务详情中会展示</param>
+                /// <param name="serv_displayname">新的 DisplayName 信息</param>
+                /// <returns></returns>
+                internal static bool DisplayName(string serv_name, string serv_displayname)
+                {
+                    try
+                    {
+                        if (Query.IsCreated(serv_name))
+                        {
+                            //已经创建服务，才进行修改
+                            string cmd_modify_displayname = $"sc config \"{serv_name}\" DisplayName=\"{serv_displayname}\"";
+                            var modify_result = Com_ExeOS.Run.Cmd(cmd_modify_displayname);
+
+                            //非空判断，若返回值为空，则为假
+                            if (string.IsNullOrEmpty(modify_result))
+                            {
+                                throw new Exception($"执行修改 {serv_name} DisplayName 参数时，返回值为空！");
+                            }
+
+                            //判断是否修改 DisplayName 成功
+                            if (modify_result.Contains("成功") || modify_result.ToLower().Contains("success"))
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                throw new Exception($"修改服务 {serv_name} 的 DisplayName 信息为 {serv_displayname} 失败！");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception($"尝试修改服务 {serv_name} 的 DisplayName 信息为 {serv_displayname}，但该服务未安装！");
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        return false;
+                    }
+                }
+
+                /// <summary>
                 /// 修改一个服务的描述信息
                 /// </summary>
                 /// <param name="serv_name">服务名称。在服务详情中会展示</param>
@@ -285,10 +539,10 @@ namespace LKY_OfficeTools.Common
                 {
                     try
                     {
-                        if (IsCreated(serv_name))
+                        if (Query.IsCreated(serv_name))
                         {
                             //已经创建服务，才进行修改
-                            string cmd_modify_desc = $"sc description \"{serv_name}\"  \"{serv_description}\"";
+                            string cmd_modify_desc = $"sc description \"{serv_name}\" \"{serv_description}\"";
                             var modify_result = Com_ExeOS.Run.Cmd(cmd_modify_desc);
 
                             //非空判断，若返回值为空，则为假
@@ -309,7 +563,7 @@ namespace LKY_OfficeTools.Common
                         }
                         else
                         {
-                            throw new Exception($"尝试修改服务 {serv_name} 的描述信息为 {serv_description}，但无法检测到该服务已被安装！");
+                            throw new Exception($"尝试修改服务 {serv_name} 的描述信息为 {serv_description}，但该服务未安装！");
                         }
                     }
                     catch (Exception Ex)

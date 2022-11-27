@@ -11,6 +11,8 @@ using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
+using LKY_OfficeTools.Lib;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 
 namespace LKY_OfficeTools.Common
 {
@@ -35,7 +37,7 @@ namespace LKY_OfficeTools.Common
         /// </summary>
         internal static void PrivilegeAttention()
         {
-            new Log($"\n------> 正在进行 权限检查 ...", ConsoleColor.DarkCyan);
+            new Log($"\n------> 正在进行 {AppAttribute.AppName} 权限检查 ...", ConsoleColor.DarkCyan);
 
             //提权检验，非提权，激活会出问题
             if (!IsRunByAdmin())
@@ -51,7 +53,7 @@ namespace LKY_OfficeTools.Common
                 Environment.Exit(-1);
             }
 
-            new Log($"     √ 权限检查通过。", ConsoleColor.DarkGreen);
+            new Log($"     √ 已通过 {AppAttribute.AppName} 权限检查。", ConsoleColor.DarkGreen);
         }
     }
 }

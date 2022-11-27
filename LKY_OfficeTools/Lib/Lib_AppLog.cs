@@ -102,12 +102,7 @@ namespace LKY_OfficeTools.Lib
                             Directory.CreateDirectory(new FileInfo(log_filepath).DirectoryName);
 
                             //文件不存在时创建&写入
-                            Com_FileOS.Write.TextToFile(log_filepath, $"{datatime_format}, {str}");
-
-                            /*
-                            StreamWriter file = new StreamWriter(log_filepath, append: true);
-                            file.WriteLine($"{datatime_format}, {str}");
-                            file.Close();*/
+                            File.AppendAllText(log_filepath, $"{datatime_format}, {str}\n");
                         }
 
 

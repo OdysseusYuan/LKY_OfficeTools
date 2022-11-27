@@ -16,6 +16,7 @@ using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
+using System.Threading;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -44,7 +45,9 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
-                new Log($"\n------> 正在处理 {Console.Title} 组件信息 ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 正在配置 {AppAttribute.AppName} 基础组件 ...", ConsoleColor.DarkCyan);
+                Thread.Sleep(1000);      //短暂间隔，提升下体验
+                new Log($"     >> 此过程会持续些许时间，这取决于您的电脑硬件配置，请耐心等待 ...", ConsoleColor.DarkYellow);
 
                 //初始化前先清理SDK目录，防止因为文件已经存在，引发解压的catch
                 Clean();
@@ -57,7 +60,7 @@ namespace LKY_OfficeTools.Lib
                     ZipFile.ExtractToDirectory(sdk_disk_path, Documents.SDKs.SDKs_Root);
                 }
 
-                new Log($"     √ 已完成 {Console.Title} 组件配置。", ConsoleColor.DarkGreen);
+                new Log($"     √ 已完成 {AppAttribute.AppName} 组件配置。", ConsoleColor.DarkGreen);
 
                 return true;
             }

@@ -60,40 +60,13 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 //点位标题
-                string title = null;
-                switch (point_type)
-                {
-                    case ProcessStage.Starting:
-                        {
-                            title = $"[{AppAttribute.AppName} 启动]";
-                            break;
-                        }
-                    case ProcessStage.Finish_Success:
-                        {
-                            title = $"[{AppAttribute.AppName} 完成]";    //当且仅当激活成功时，视为成功
-                            break;
-                        }
-                    case ProcessStage.Finish_Fail:
-                        {
-                            title = $"[{AppAttribute.AppName} 完成-有误]";
-                            break;
-                        }
-                    case ProcessStage.Interrupt:
-                        {
-                            title = $"[{AppAttribute.AppName} 结束-中断]";
-                            break;
-                        }
-                    default:
-                        {
-                            title = $"[{AppAttribute.AppName} {point_type}]";
-                            break;
-                        }
-                }
+                string title = $"{AppAttribute.AppName_Short}: {point_type} ({Current_RunMode})";
 
-                string run_mode;
+                //设置发布模式
+                string release_mode;
 #if DEBUG
-                run_mode = "Debug";
-                title += $"({run_mode})";
+                release_mode = "Debug";
+                title += $" [{release_mode}]";
 #else
                 run_mode = "Release";
 #endif
@@ -107,11 +80,11 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 string content =
-                    $"<font color = black>v{AppAttribute.AppVersion} 在 {Environment.MachineName} ({Environment.UserName}) 运行结束。<br /><br />" +
+                    $"<font color = black>v{AppAttribute.AppVersion} BY {Environment.MachineName} ({Environment.UserName}) {point_type}。<br /><br />" +
                     $"<font color=green><b>------------------------------ 【简述】 ------------------------------</b></font><br /><br />" +
                      $"<font color = purple><b>【发送时间】</b>：</font>{DateTime.Now}<br /><br />" +
-                     $"<font color = purple><b>【反馈类型】</b>：</font>{point_type}<br /><br />" +
-                     $"<font color = purple><b>【软件版本】</b>：</font>v{AppAttribute.AppVersion} ({run_mode})<br /><br />" +
+                     $"<font color = purple><b>【阶段类型】</b>：</font>{point_type}<br /><br />" +
+                     $"<font color = purple><b>【软件版本】</b>：</font>v{AppAttribute.AppVersion} ({release_mode})<br /><br />" +
                      $"<font color = purple><b>【运行模式】</b>：</font>{Current_RunMode}<br /><br />" +
                      $"<font color = purple><b>【启动路径】</b>：</font>{Executer}<br /><br />" +
                      $"<font color = purple><b>【系统环境】</b>：</font>{system_ver}<br /><br />" +
@@ -200,7 +173,7 @@ namespace LKY_OfficeTools.Lib
                 */
 
                 //开始回收
-                bool send_result = Com_EmailOS.Send_Account("LKY Software FeedBack", PostTo,
+                bool send_result = Com_EmailOS.Send_Account($"{AppAttribute.AppName} Report", PostTo,
                     title, content, file_list, SMTPHost, SMTPuser, SMTPpass, priority);
 
                 //判断是否发送成功

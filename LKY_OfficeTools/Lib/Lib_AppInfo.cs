@@ -27,6 +27,11 @@ namespace LKY_OfficeTools.Lib
             internal const string AppName = "LKY Office Tools";
 
             /// <summary>
+            /// APP 名称（简称）
+            /// </summary>
+            internal const string AppName_Short = "LOT";
+
+            /// <summary>
             /// APP 服务的名称（不含空格，避免后续麻烦）
             /// </summary>
             internal static readonly string ServiceName = ServiceDisplayName.Replace(" ", "");
@@ -37,9 +42,14 @@ namespace LKY_OfficeTools.Lib
             internal const string ServiceDisplayName = AppName + " Service";
 
             /// <summary>
+            /// APP 文件名
+            /// </summary>
+            internal const string AppFilename = "LKY_OfficeTools.exe";
+
+            /// <summary>
             /// APP 版本号
             /// </summary>
-            internal const string AppVersion = "1.1.0.21123";
+            internal const string AppVersion = "1.1.0.21126";
 
             /// <summary>
             /// 开发者拼音全拼
@@ -64,13 +74,15 @@ namespace LKY_OfficeTools.Lib
         internal class AppPath
         {
             /// <summary>
-            /// 程序运行的目录路径（不是工作目录，是路径的目录）
+            /// 程序运行的目录路径（不是工作目录，是路径的目录）。
+            /// 当程序自身被 move 到别的地方后，该值不会发生改变
             /// </summary>
             internal static string ExecuteDir
             {
                 get
                 {
-                    return AppDomain.CurrentDomain.BaseDirectory;
+                    //使用 BaseDirectory 获取路径时，结尾会多一个 \ 符号，为了替换之，先在结果处增加一个斜杠，变成 \\ 结尾，然后替换掉这个 双斜杠
+                    return (AppDomain.CurrentDomain.BaseDirectory + @"\").Replace(@"\\", @"");
                 }
             }
 
@@ -86,19 +98,51 @@ namespace LKY_OfficeTools.Lib
             }
 
             /// <summary>
-            /// APP 文档目录信息
+            /// APP 文档目录信息。
+            /// 系统级服务（LocalSystem）模式下，无法获取“我的文档”目录，故换用新目录 ProgramData
             /// </summary>
             internal class Documents
             {
                 /// <summary>
                 /// APP 文档根目录。
-                /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools
+                /// C:\ProgramData\LKY Office Tools
                 /// </summary>
                 internal static string Documents_Root
                 {
                     get
                     {
-                        return $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}\\{AppAttribute.AppName}";
+                        return $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\{AppAttribute.AppName}";     //ProgramData
+                        //return $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}\\{AppAttribute.AppName}";            //我的文档
+                    }
+                }
+
+                /// <summary>
+                /// APP Update 目录大类
+                /// </summary>
+                internal class Update
+                {
+                    /// <summary>
+                    /// 升级目录的根目录。
+                    /// C:\ProgramData\LKY Office Tools\Update
+                    /// </summary>
+                    internal static string Update_Root
+                    {
+                        get
+                        {
+                            return $"{Documents_Root}\\Update";
+                        }
+                    }
+
+                    /// <summary>
+                    /// 升级目录的回收站目录。
+                    /// C:\ProgramData\LKY Office Tools\Update\Trash
+                    /// </summary>
+                    internal static string UpdateTrash
+                    {
+                        get
+                        {
+                            return $"{Update_Root}\\Trash";
+                        }
                     }
                 }
 
@@ -109,7 +153,7 @@ namespace LKY_OfficeTools.Lib
                 {
                     /// <summary>
                     /// 服务目录的根目录。
-                    /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools\Services
+                    /// C:\ProgramData\LKY Office Tools\Services
                     /// </summary>
                     internal static string Services_Root
                     {
@@ -120,8 +164,46 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     /// <summary>
+                    /// 服务目录的回收站目录，用于存放丢弃的文件。
+                    /// C:\ProgramData\LKY Office Tools\Services\Trash
+                    /// </summary>
+                    internal static string ServicesTrash
+                    {
+                        get
+                        {
+                            return $"{Services_Root}\\Trash";
+                        }
+                    }
+
+                    /// <summary>
+                    /// 用于存放服务模式运行的文件所在目录。
+                    /// 此举的目的，是防止用户手动将当前文件删除，导致服务无法启动。
+                    /// C:\ProgramData\LKY Office Tools\Services\Autorun
+                    /// </summary>
+                    internal static string ServiceAutorun
+                    {
+                        get
+                        {
+                            return $"{Services_Root}\\Autorun";
+                        }
+                    }
+
+                    /// <summary>
+                    /// 用于服务模式运行的 exe 路径，文件与手动运行的一模一样，只是位置不同。
+                    /// 此举的目的，是防止用户手动将当前文件删除，导致服务无法启动。
+                    /// C:\ProgramData\LKY Office Tools\Services\Autorun\LKY_OfficeTools.exe
+                    /// </summary>
+                    internal static string ServiceAutorun_Exe
+                    {
+                        get
+                        {
+                            return $"{ServiceAutorun}\\{AppAttribute.AppFilename}";
+                        }
+                    }
+
+                    /// <summary>
                     /// 存储服务触发的 被动安装exe的进程信息。
-                    /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools\Services\PassiveProcess.info
+                    /// C:\ProgramData\LKY Office Tools\Services\PassiveProcess.info
                     /// </summary>
                     internal static string PassiveProcessInfo
                     {
@@ -134,7 +216,7 @@ namespace LKY_OfficeTools.Lib
 
                 /// <summary>
                 /// APP 日志存储目录。
-                /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools\Logs
+                /// C:\ProgramData\LKY Office Tools\Logs
                 /// </summary>
                 internal static string Logs
                 {
@@ -146,7 +228,7 @@ namespace LKY_OfficeTools.Lib
 
                 /// <summary>
                 /// APP 临时文件夹目录。
-                /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools\Temp
+                /// C:\ProgramData\LKY Office Tools\Temp
                 /// </summary>
                 internal static string Temp
                 {
@@ -163,7 +245,7 @@ namespace LKY_OfficeTools.Lib
                 {
                     /// <summary>
                     /// APP SDK文件夹目录。
-                    /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools\SDKs
+                    /// C:\ProgramData\LKY Office Tools\SDKs
                     /// </summary>
                     internal static string SDKs_Root
                     {
@@ -175,7 +257,7 @@ namespace LKY_OfficeTools.Lib
 
                     /// <summary>
                     /// Activate 激活文件目录。
-                    /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools\Activate
+                    /// C:\ProgramData\LKY Office Tools\Activate
                     /// </summary>
                     internal static string Activate
                     {
@@ -187,7 +269,7 @@ namespace LKY_OfficeTools.Lib
 
                     /// <summary>
                     /// OSPP 文件路径。
-                    /// C:\Users\Odysseus.Yuan\Documents\LKY Office Tools\Activate\OSPP.VBS
+                    /// C:\ProgramData\LKY Office Tools\Activate\OSPP.VBS
                     /// </summary>
                     internal static string Activate_OSPP
                     {

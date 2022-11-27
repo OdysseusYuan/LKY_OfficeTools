@@ -100,15 +100,22 @@ namespace LKY_OfficeTools
                 //部署成功时，提示是否配置为服务
                 if (Current_StageType == ProcessStage.Finish_Success)
                 {
-                    //添加服务
-                    Lib_AppServiceConfig.AddByUser();
+                    //配置服务
+                    Lib_AppServiceConfig.Setup();
 
-                    //回收
+                    //成功，配置后回收
                     Pointing(Current_StageType, true);
+
+                    //结论
+                    new Log($"\n     √ 您已成功完成 {AppAttribute.AppName} 所有流程，感谢您的使用。", ConsoleColor.DarkGreen);
                 }
                 //部署失败，提示错误信息
                 else if (Current_StageType == ProcessStage.Finish_Fail)
                 {
+                    //失败，先回收，再显示结论
+                    Pointing(Current_StageType, true);
+
+                    //结论
                     new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);
                 }
 

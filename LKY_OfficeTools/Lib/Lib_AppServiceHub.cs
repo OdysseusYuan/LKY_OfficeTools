@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
+using static LKY_OfficeTools.Common.Com_FileOS;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
@@ -30,6 +31,23 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
+                //每次启动服务时，自动删除 Services Trash 目录中的 .old 文件
+                ScanFiles oldFiles = new ScanFiles();
+                oldFiles.GetFilesByExtension(AppPath.Documents.Services.ServicesTrash, ".old");
+                ///无 old 文件时，自动跳过
+                if (oldFiles.FilesList != null && oldFiles.FilesList.Count > 0)
+                {
+                    foreach (var now_file in oldFiles.FilesList)
+                    {
+                        //使用 try catch 模式。以防异常。
+                        try
+                        {
+                            File.Delete(now_file);
+                        }
+                        catch { }
+                    }
+                }
+
                 //以无人值守的模式，隐式的运行本程序。
                 Process process_info = new Process();
                 Com_ExeOS.Run.Process(AppPath.Executer, "/passive", out process_info, false);      //异步运行
@@ -37,14 +55,9 @@ namespace LKY_OfficeTools.Lib
                 //保存进程信息
                 ///创建服务目录
                 Directory.CreateDirectory(AppPath.Documents.Services.Services_Root);
-                ///清空此前的进程信息文件
+                ///保存进程ID到文件（覆盖模式）
                 string info_file = AppPath.Documents.Services.PassiveProcessInfo;
-                if (File.Exists(info_file))
-                {
-                    File.Delete(info_file);
-                }
-                ///保存进程ID到文件
-                Com_FileOS.Write.TextToFile(info_file, process_info.Id.ToString());
+                File.WriteAllText(info_file, process_info.Id.ToString());
             }
             catch (Exception Ex)
             {
