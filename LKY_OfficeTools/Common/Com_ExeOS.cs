@@ -6,6 +6,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -530,6 +531,47 @@ namespace LKY_OfficeTools.Common
                 {
                     new Log(Ex.ToString());
                     return false;
+                }
+            }
+
+            /// <summary>
+            /// 通过进程窗口标题，获取符合条件的进程对象列表
+            /// </summary>
+            /// <param name="window_title"></param>
+            /// <param name="need_equal">如果为true，则需要标题严格与预期值相等。反之，窗口标题只需包含预期值即可。默认为 false。</param>
+            /// <returns></returns>
+            internal static List<Process> GetProcessByTitle(string window_title, bool need_equal = false)
+            {
+                try
+                {
+                    Process[] process_list = Process.GetProcesses();
+
+                    List<Process> result = new List<Process>();
+                    foreach (var now_p in process_list)
+                    {
+                        if (need_equal)
+                        {
+                            //严格相等
+                            if (now_p.MainWindowTitle == window_title)
+                            {
+                                result.Add(now_p);
+                            }
+                        }
+                        else
+                        {
+                            //包含即可
+                            if (now_p.MainWindowTitle.Contains(window_title))
+                            {
+                                result.Add(now_p);
+                            }
+                        }
+                    }
+                    return result;
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return null;
                 }
             }
         }

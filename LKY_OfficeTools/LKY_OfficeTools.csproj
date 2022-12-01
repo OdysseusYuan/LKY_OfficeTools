@@ -76,6 +76,7 @@
     <Compile Include="Common\Com_EmailOS.cs" />
     <Compile Include="Common\Com_ExeOS.cs" />
     <Compile Include="Common\Com_FileOS.cs" />
+    <Compile Include="Common\Com_InstallerOS.cs" />
     <Compile Include="Common\Com_NetworkOS.cs" />
     <Compile Include="Common\Com_PrivilegeOS.cs" />
     <Compile Include="Common\Com_ServiceOS.cs" />
@@ -125,6 +126,16 @@
     <Content Include="logo.ico" />
     <EmbeddedResource Include="Resource\SDK\SDK_Processes.list" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <COMReference Include="WindowsInstaller">
+      <Guid>{000C1092-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>1033</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
