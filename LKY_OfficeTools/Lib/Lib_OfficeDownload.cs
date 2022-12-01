@@ -52,12 +52,12 @@ namespace LKY_OfficeTools.Lib
 
                 //判断是否已经安装了当前版本
                 InstallState install_state = GetOfficeState();
-                if (install_state.HasFlag(InstallState.Correct))          //只要有标记为安装了最新版，无论是否存在多个版本，也无需下载
+                if (install_state==InstallState.Correct)                //已安装最新版，无需下载
                 {
-                    new Log($"\n      * 当前系统已经安装了最新版本，无需重复下载安装！", ConsoleColor.DarkMagenta);
+                    new Log($"\n      * 当前系统安装了最新 Office 版本，已跳过下载、安装流程。", ConsoleColor.DarkMagenta);
                     return 2;
                 }
-                ///当不存在 \Configuration\ 项 or 不存在 VersionToReport or 其版本与最新版不一致时，需要下载新文件。
+                ///当不存在 VersionToReport or 其版本与最新版不一致 or 产品ID不一致 or 安装位数与系统不一致时，需要下载新文件。
 
                 //定义下载目标地
                 string save_to = AppPath.ExecuteDir + @"\Office\Data\";       //文件必须位于 \Office\Data\ 下，
@@ -96,7 +96,7 @@ namespace LKY_OfficeTools.Lib
                         return -1;
                     }
 
-                    new Log($"     √ {new FileInfo(save_path).Name} 已下载。", ConsoleColor.DarkGreen);
+                    new Log($"     √ 已下载 {new FileInfo(save_path).Name} 文件。", ConsoleColor.DarkGreen);
                 }
 
                 new Log($"\n------> 正在检查 Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
@@ -108,7 +108,7 @@ namespace LKY_OfficeTools.Lib
                     //下载完成的标志：文件存在，且不存在临时文件
                     if (File.Exists(b) && !File.Exists(aria_tmp_file))
                     {
-                        new Log($"     >> 检查 {new FileInfo(b).Name} ...", ConsoleColor.DarkYellow);
+                        new Log($"     >> 检查 {new FileInfo(b).Name} 文件中 ...", ConsoleColor.DarkYellow);
                     }
                     else
                     {
@@ -117,7 +117,7 @@ namespace LKY_OfficeTools.Lib
                     }
                 }
 
-                new Log($"     √ Office v{OfficeNetVersion.latest_version} 下载完成。", ConsoleColor.DarkGreen);
+                new Log($"     √ 已完成 Office v{OfficeNetVersion.latest_version} 下载。", ConsoleColor.DarkGreen);
 
                 return 1;
             }

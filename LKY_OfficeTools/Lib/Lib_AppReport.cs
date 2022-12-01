@@ -73,7 +73,7 @@ namespace LKY_OfficeTools.Lib
 
                 //获取软件列表
                 string soft_info = null;
-                var soft_list = SoftWare.GetList();
+                var soft_list = SoftWare.InstalledList();
                 foreach (var now_soft in soft_list)
                 {
                     soft_info = $"{now_soft}<br /> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp {soft_info}";

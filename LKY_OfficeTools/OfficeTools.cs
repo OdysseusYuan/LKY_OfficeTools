@@ -9,12 +9,13 @@ using LKY_OfficeTools.Common;
 using LKY_OfficeTools.Lib;
 using System;
 using System.Text;
+using static LKY_OfficeTools.Lib.Lib_AppClosing;
 using static LKY_OfficeTools.Lib.Lib_AppCommand;
-using static LKY_OfficeTools.Lib.Lib_AppState;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools
 {
@@ -28,7 +29,7 @@ namespace LKY_OfficeTools
             Console.OutputEncoding = Encoding.GetEncoding("gbk");       //设定编码，解决英文系统乱码问题
 
             //中断检测
-            Close.SetConsoleCtrlHandler(Close.newDelegate, true);
+            CloseWindow.SetConsoleCtrlHandler(CloseWindow.newDelegate, true);
 
             //启动
             Entry();
@@ -89,7 +90,7 @@ namespace LKY_OfficeTools
                 Com_PrivilegeOS.PrivilegeAttention();
 
                 //SDK初始化
-                Lib_AppSdk.initial();
+                Lib_AppSdk.Initial();
 
                 //更新检查
                 Lib_AppUpdate.Check();

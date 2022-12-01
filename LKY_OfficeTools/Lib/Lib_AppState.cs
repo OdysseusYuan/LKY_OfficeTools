@@ -82,44 +82,5 @@ namespace LKY_OfficeTools.Lib
         /// APP 当前状态（初始值为 Process）
         /// </summary>
         internal static ProcessStage Current_StageType = ProcessStage.Process;
-
-        /// <summary>
-        /// 关闭的方式
-        /// </summary>
-        internal class Close
-        {
-            internal delegate bool ControlCtrlDelegate(int CtrlType);
-
-            [DllImport("kernel32.dll")]
-            internal static extern bool SetConsoleCtrlHandler(ControlCtrlDelegate HandlerRoutine, bool Add);
-
-            internal static ControlCtrlDelegate newDelegate = new ControlCtrlDelegate(HandlerRoutine);
-
-            /// <summary>
-            /// 提示用户非正常关闭
-            /// </summary>
-            /// <param name="CtrlType"></param>
-            /// <returns></returns>
-            internal static bool HandlerRoutine(int CtrlType)
-            {
-                //只要程序不是已完成（无论成功与否），手动关闭，就会显示文字并打点
-                if (Current_StageType != ProcessStage.Finish_Fail && Current_StageType != ProcessStage.Finish_Success)
-                {
-                    new Log($"\n     × 正在尝试 取消部署，请稍候 ...", ConsoleColor.Red);
-                    Console.ForegroundColor = ConsoleColor.Gray;     //重置颜色，如果第一次失败，颜色还是可以正常的
-
-                    //非完成情况下，关闭，属于 中断部署 状态，此处用于停止 下载 office 进程
-                    Current_StageType = ProcessStage.Interrupt;
-                    /*Pointing(ProcessStage.Interrupt); 暂停中断打点 */   //中断 点位。下载时触发该逻辑，打点会失败。
-                }
-                else
-                {
-                    //完成状态时，清理文件夹
-                    Lib_AppSdk.Clean();     //清理SDK目录
-                }
-
-                return false;
-            }
-        }
     }
 }

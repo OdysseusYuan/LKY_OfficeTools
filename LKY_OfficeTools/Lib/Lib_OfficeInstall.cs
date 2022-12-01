@@ -6,14 +6,15 @@
  */
 
 using LKY_OfficeTools.Common;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Threading;
+using static LKY_OfficeTools.Common.Com_ExeOS;
 using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
-using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_OfficeClean;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
@@ -79,7 +80,7 @@ namespace LKY_OfficeTools.Lib
 
         /// <summary>
         /// 冲突版本检查，卸载和主发行版本不一样的的 Office。
-        /// 有冲突，返回false，无冲突，返回true。
+        /// 无冲突 或 冲突已经解决返回 true，有冲突且无法解决返回 false。
         /// </summary>
         internal static bool ConflictCheck()
         {
@@ -100,15 +101,36 @@ namespace LKY_OfficeTools.Lib
                 var Current_Office_Dir = GetArchiDir();         //不能用 Full 函数判断是否 null，本字典始终有 key 的，所以恒不为 null
                 if (Current_Office_Dir != null && Current_Office_Dir.Count > 0)     //非空且为大于0时
                 {
-                    //注册表有值，且目录真实存在
+                    //注册表只有1个值，接下来判断这个值属于哪个架构
                     if (Current_Office_Dir.Count == 1)
                     {
-                        //判断仅有的1个office架构是不是odt架构
-                        if (GetArchiDirFull()[OfficeArchi.Office_ODT] != null)
+                        //判断仅有的1个office架构是不是odt架构（odt下面的 x32 x64 有1个不为空，则再判断是否符合 位数 和 发行ID）
+                        string odt_x32_reg = GetArchiDirFull()[OfficeArchi.Office_ODT_x32];
+                        string odt_x64_reg = GetArchiDirFull()[OfficeArchi.Office_ODT_x64];
+                        if (!string.IsNullOrEmpty(odt_x32_reg) || !string.IsNullOrEmpty(odt_x64_reg))
                         {
-                            //是odt架构
-                            ///获取其ID是否和当前的ID一致，不一致，则false
-                            string Current_Office_ID = Register.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+                            //64位系统额外增加位数判断
+                            if (Environment.Is64BitOperatingSystem)
+                            {
+                                if (!string.IsNullOrEmpty(odt_x32_reg))
+                                {
+                                    //x64系统，但是在注册表x32路径有值，冲突
+                                    regdir_pass = false;
+                                }
+                                else
+                                {
+                                    //x64系统，虽然在注册表x64路径有值了，但是还需判断是否 平台信息 一致
+                                    string platform = Register.Read.Value(RegistryHive.LocalMachine, RegistryView.Registry64, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "Platform");
+                                    if (string.IsNullOrWhiteSpace(platform) || platform == "x86")
+                                    {
+                                        regdir_pass = false;       //虽然出现在了与x64系统注册表匹配的路径，但是Office平台版本并非x64
+                                    }
+                                }
+                            }
+
+                            //odt位数与系统匹配，开始校验产品ID
+                            ///获取其ID是否和当前的ID一致，不一致，则false。根据系统位数来取，如果用户是x64系统，则取的是x64的software注册表。x32同理
+                            string Current_Office_ID = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
                             ///计划安装的ID
                             string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");                       //安装ID信息
@@ -140,6 +162,7 @@ namespace LKY_OfficeTools.Lib
                     else
                     {
                         //如果注册表值大于1个，也就是安装了多个office，直接设置为冲突，设为false
+                        //如果用户的注册表存在两个ODT同版本不同位的情况（x32、x64都有），则也视为有冲突。
                         regdir_pass = false;
                     }
                 }
@@ -210,19 +233,20 @@ namespace LKY_OfficeTools.Lib
                 }
                 else
                 {
-                    new Log($"     ☆ 发现冲突的 Office 版本，如需安装最新版，必须先卸载旧版。", ConsoleColor.Gray);
+                    new Log($"     ☆ 发现 {Current_Office_Dir.Count} 个冲突的 Office 版本，若要继续，必须先卸载旧版。", ConsoleColor.Gray);
 
                     //判断是否包含自动卸载标记
                     if (!AppCommandFlag.HasFlag(ArgsFlag.Auto_Remove_Conflict_Office))
                     {
                         if (Lib_AppMessage.KeyMsg.Confirm("确认安装新版 Word、PPT、Excel、Outlook、OneNote、Access 六件套，并卸载旧版本及其插件"))
                         {
-                            new Log($"\n     √ 您已主动确认 卸载 Office 所有旧版本。", ConsoleColor.DarkGreen);
+                            new Log($"     √ 您已主动确认 卸载 Office 所有旧版本。", ConsoleColor.DarkGreen);
+                            Thread.Sleep(500);     //基于体验，稍微停留下
                             return RemoveAllOffice();
                         }
                         else
                         {
-                            new Log($"\n     × 您已拒绝 卸载 Office 其他版本，新版本无法安装！", ConsoleColor.DarkRed);
+                            new Log($"     × 您已拒绝 卸载 Office 其他版本，新版本无法安装！", ConsoleColor.DarkRed);
                             return false;
                         }
                     }
@@ -321,16 +345,14 @@ namespace LKY_OfficeTools.Lib
             }
 
             //开始安装
-            new Log($"\n------> 开始安装 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
+            new Log($"\n------> 正在安装 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
 
-            ///先结束掉可能还在安装的 Office 进程
-            Com_ExeOS.Kill.ByExeName("OfficeClickToRun");
-            Com_ExeOS.Kill.ByExeName("OfficeC2RClient");
-            Com_ExeOS.Kill.ByExeName("ODT");
+            ///先结束掉可能还在安装的 Office 进程（强制结束，不等待）
+            Lib_AppSdk.KillAllSdkProcess(KillExe.KillMode.Only_Force);
 
             ///命令安装
             string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
-            bool isInstallFinish = Com_ExeOS.Run.Exe(ODT_path_exe, install_args);
+            bool isInstallFinish = Run.Exe(ODT_path_exe, install_args);
 
             //检查是否因配置不正确等导致，意外退出安装
             if (!isInstallFinish)
@@ -340,14 +362,14 @@ namespace LKY_OfficeTools.Lib
             }
 
             //无论是否成功，都增加一步结束进程
-            Com_ExeOS.Kill.ByExeName("OfficeClickToRun");      //结束无关进程
-            Com_ExeOS.Kill.ByExeName("OfficeC2RClient");       //结束无关进程
+            KillExe.ByExeName("OfficeClickToRun", KillExe.KillMode.Only_Force, true);      //结束无关进程
+            KillExe.ByExeName("OfficeC2RClient", KillExe.KillMode.Only_Force, true);       //结束无关进程
 
             //检查安装是否成功
             InstallState install_state = GetOfficeState();
 
             //未安装
-            if (install_state.HasFlag(InstallState.None))
+            if (install_state == InstallState.None)
             {
                 new Log($"     × 安装失败，未在当前系统检测到任何 Office 版本！", ConsoleColor.DarkRed);
                 new Log(install_state);     //打点失败注册表记录
@@ -355,31 +377,28 @@ namespace LKY_OfficeTools.Lib
             }
 
             //包含不同版本
-            if (install_state.HasFlag(InstallState.Diff))
+            if (install_state == InstallState.Diff)
             {
                 new Log($"     × 已安装的 Office 版本与预期的 v{OfficeNetVersion.latest_version} 版本不符！", ConsoleColor.DarkRed);
                 new Log(install_state);     //打点失败注册表记录
                 return false;
             }
 
-            //安装了最新版
-            if (install_state.HasFlag(InstallState.Correct))
+            //包含多个版本
+            if (install_state == InstallState.Multi)
             {
-                //包含多个版本
-                if (install_state.HasFlag(InstallState.Multi))
-                {
-                    //虽然安装成功，但是还有别的版本
-                    new Log($"     √ Office v{OfficeNetVersion.latest_version} 已安装完成。", ConsoleColor.DarkGreen);
-                    new Log($"     ☆ 但系统存在多个 Office 版本，若 Office 激活失败，请您卸载其它版本后，重新运行本软件。", ConsoleColor.Gray);
-                    new Log(install_state);     //打点失败注册表记录
-                    return true;
-                }
-                else
-                {
-                    //独占性安装成功
-                    new Log($"     √ Office v{OfficeNetVersion.latest_version} 已安装完成。", ConsoleColor.DarkGreen);
-                    return true;
-                }
+                //系统存在多个版本
+                new Log($"     × 安装异常，当前系统存在多个 Office 版本！", ConsoleColor.DarkRed);
+                new Log(install_state);     //打点失败注册表记录
+                return false;
+            }
+
+            //安装了最新版
+            if (install_state == InstallState.Correct)
+            {
+                //安装成功
+                new Log($"     √ 已完成 Office v{OfficeNetVersion.latest_version} 安装。", ConsoleColor.DarkGreen);
+                return true;
             }
 
             //其它未可知情况，视为失败

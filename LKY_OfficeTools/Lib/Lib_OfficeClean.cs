@@ -8,9 +8,7 @@
 using LKY_OfficeTools.Common;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
@@ -31,16 +29,31 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
+                //检查是否存在运行中的进程
+                var office_p_info = Lib_OfficeProcess.GetRuningProcess();
+                if (office_p_info != null && office_p_info.Count > 0)
+                {
+                    new Log($"\n------> 正在关闭 Office 组件（如果您有未保存的 Office 文档，请立即保存并关闭）...", ConsoleColor.DarkCyan);
+                    new Log($"        注意：如果您卡在上述流程达到 1 分钟以上，请您重启计算机，并再次运行本软件！", ConsoleColor.Gray);
+                    Lib_OfficeProcess.KillOffice.All();       //友好的结束进程
+                    new Log($"     √ 已完成 Office 进程处理。", ConsoleColor.DarkGreen);
+                }
+
                 //先使用 ODT 模式卸载，其只能卸载使用 ODT 安装的2016及其以上版本的 Office，但是其耗时短。
                 Uninstall.ByODT();
-                new Log($"\n     >> 第二阶段卸载正在进行，请稍候 ...", ConsoleColor.DarkYellow);
+                new Log($"\n     >> 卸载第II阶段正在进行 ...", ConsoleColor.DarkYellow);
                 //第二阶段使用 SaRA 模式，因为它可以尽可能卸载所有 Office 版本（非ODT），但是耗时长
                 Uninstall.BySaRA();
 
                 //无论哪种方式清理，都要再检查一遍是否卸载干净。如果 当前系统 Office 版本数量 > 0，启动强制模式
                 var installed_office = OfficeLocalInstall.GetArchiDir();
-                if (installed_office != null && installed_office.Count > 0)
+                var license_list = OfficeLocalInstall.LicenseInfo();
+                if (
+                    (installed_office != null && installed_office.Count > 0) ||     //存在残留的Office注册表/文件目录
+                    license_list != null && license_list.Count > 0                  //存在残留的许可证信息
+                    )                                                               //二者满足任意一个时，执行强行清理
                 {
+                    new Log($"\n     >> 卸载第III阶段正在进行 ...", ConsoleColor.DarkYellow);
                     Uninstall.ForceDelete();    //无论清除是否成功，都继续安装新 office
                 }
 
@@ -149,26 +162,48 @@ namespace LKY_OfficeTools.Lib
                         new Log(Ex.ToString());
                     }
 
-                    //清理注册表残余
+                    //清理注册表残余。Office 有些注册表是无法清理干净的，所以用try
                     try
                     {
-                        //Office 有些注册表是无法清理干净的，所以用try
-                        Register.DeleteItem(Registry.LocalMachine, @"SOFTWARE\Microsoft", "Office");
+                        //清理x32注册表
+                        Register.DeleteItem(RegistryHive.LocalMachine, RegistryView.Registry32, @"SOFTWARE\Microsoft", "Office");
+
+                        //清理x64注册表。当且仅当，系统是x64系统时，清理x64的注册表节点
+                        if (Environment.Is64BitOperatingSystem)
+                        {
+                            Register.DeleteItem(RegistryHive.LocalMachine, RegistryView.Registry64, @"SOFTWARE\Microsoft", "Office");
+                        }
                     }
                     catch {/*注册表 common 项目 铁定删不掉*/}
 
                     //清除开始菜单
-                    List<string> startmenu_list = new List<string>
+                    try
                     {
-                        $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu)}\Programs\Microsoft Office",   //公共目录
-                        $@"{Environment.GetFolderPath(Environment.SpecialFolder.StartMenu)}\Programs\Microsoft Office",         //当前账户下目录
-                    };
-                    foreach (var now_dir in startmenu_list)
-                    {
-                        if (Directory.Exists(now_dir))
+                        ///先删除 公共目录 下面所有以 Microsoft Office 开头的文件夹路径
+                        string root = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu)}\Programs";
+                        var root_dir = Directory.GetDirectories(root, "Microsoft Office*", SearchOption.TopDirectoryOnly);
+                        foreach (var now_dir in root_dir)
                         {
-                            Directory.Delete(now_dir, true);
+                            if (Directory.Exists(now_dir))
+                            {
+                                Directory.Delete(now_dir, true);
+                            }
                         }
+
+                        ///删除 账户 开始菜单下面所有以 Microsoft Office 开头的文件夹路径
+                        root = $@"{Environment.GetFolderPath(Environment.SpecialFolder.StartMenu)}\Programs";
+                        root_dir = Directory.GetDirectories(root, "Microsoft Office*", SearchOption.TopDirectoryOnly);
+                        foreach (var now_dir in root_dir)
+                        {
+                            if (Directory.Exists(now_dir))
+                            {
+                                Directory.Delete(now_dir, true);
+                            }
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
                     }
 
                     //复查是否干净了
@@ -199,7 +234,15 @@ namespace LKY_OfficeTools.Lib
                 try
                 {
                     new Log($"\n------> 正在卸载 Office 冗余版本 ...", ConsoleColor.DarkCyan);
-                    Thread.Sleep(1000);     //基于体验，延迟1s
+
+                    //获取目前存留的版本
+                    var install_list = OfficeLocalInstall.GetArchiDir();
+                    if (install_list == null || install_list.Count == 0)
+                    {
+                        //已经不存在残留版本时，直接返回卸载成功
+                        new Log($"      * 未发现 Office 冗余版本，已跳过此流程。", ConsoleColor.DarkMagenta);
+                        return true;
+                    }
 
                     //定义SaRA文件位置
                     string SaRA_path_root = Documents.SDKs.SDKs_Root + @"\SaRA";
@@ -212,7 +255,8 @@ namespace LKY_OfficeTools.Lib
                         return false;
                     }
 
-                    new Log($"     >> 此过程会持续较长时间，这取决于您电脑中 Office 已安装的数量，请耐心等待 ...", ConsoleColor.DarkYellow);
+                    //实际测试，平均卸载1个Office需要3分钟的时间，留出1.5倍时间。
+                    new Log($"     >> 此过程大约会在 {Math.Ceiling(install_list.Count * 3 * 1.5f)} 分钟内完成，实际用时取决于您的电脑配置，请耐心等待 ...", ConsoleColor.DarkYellow);
 
                     //执行卸载命令
                     string cmd_switch_cd = $"pushd \"{SaRA_path_root}\"";             //切换至SaRA文件目录
@@ -261,7 +305,15 @@ namespace LKY_OfficeTools.Lib
                 try
                 {
                     new Log($"\n------> 正在卸载 Office ODT 版本 ...", ConsoleColor.DarkCyan);
-                    Thread.Sleep(1000);     //基于体验，延迟1s
+
+                    //获取目前存留的 ODT 版本
+                    var install_list = Register.Read.AllValues(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+                    if (install_list == null || install_list.Count == 0)
+                    {
+                        //已经不存在残留 ODT 版本时，直接返回卸载成功
+                        new Log($"      * 未发现 Office ODT 版本，已跳过此流程。", ConsoleColor.DarkMagenta);
+                        return true;
+                    }
 
                     //定义ODT文件位置
                     string ODT_path_root = Documents.SDKs.SDKs_Root + @"\ODT";
@@ -279,7 +331,8 @@ namespace LKY_OfficeTools.Lib
                         return false;
                     }
 
-                    new Log($"     >> 此过程大约会持续短暂的几分钟时间，请耐心等待 ...", ConsoleColor.DarkYellow);
+                    //测试表明，卸载1个ODT版本大约需要2分钟时间，留出2倍的富余
+                    new Log($"     >> 此过程大约会在 {Math.Ceiling(install_list.Count * 2 * 2.0f)} 分钟内完成，具体时间取决于您的电脑配置，请稍候 ...", ConsoleColor.DarkYellow);
 
                     //移除所有激活信息
                     if (!Activate.Delete())
@@ -292,10 +345,10 @@ namespace LKY_OfficeTools.Lib
                     string uninstall_args = $"/configure \"{ODT_path_xml}\"";
                     bool isUninstall = Com_ExeOS.Run.Exe(ODT_path_exe, uninstall_args);      //卸载
 
-                    var reg_info = Register.GetValue(@"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+                    var reg_info = Register.Read.AllValues(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
-                    //未正常结束卸载 OR 注册表键值不为空 时，视为卸载失败
-                    if (!isUninstall || !string.IsNullOrEmpty(reg_info))
+                    //未正常结束卸载 OR 注册表ODT至少存在1个版本时，视为卸载失败
+                    if (!isUninstall || (reg_info != null && reg_info.Count > 0))
                     {
                         new Log($"     × 卸载 Office ODT 版本失败！", ConsoleColor.DarkRed);
                         return false;

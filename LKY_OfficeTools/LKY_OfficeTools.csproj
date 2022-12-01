@@ -82,6 +82,7 @@
     <Compile Include="Common\Com_SystemOS.cs" />
     <Compile Include="Common\Com_TextOS.cs" />
     <Compile Include="Common\Com_WebOS.cs" />
+    <Compile Include="Lib\Lib_AppClosing.cs" />
     <Compile Include="Lib\Lib_AppCommand.cs" />
     <Compile Include="Lib\Lib_AppState.cs" />
     <Compile Include="Lib\Lib_AppInfo.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Lib\Lib_AppLog.cs" />
     <Compile Include="Lib\Lib_AppUpdate.cs" />
     <Compile Include="Lib\Lib_OfficeClean.cs" />
+    <Compile Include="Lib\Lib_OfficeProcess.cs" />
     <Compile Include="OfficeTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Lib\Lib_Aria2c.cs" />
@@ -112,11 +114,16 @@
     <None Include="Example\LKY_OfficeTools_AppInfo.json" />
     <None Include="Example\office_channels.json" />
     <None Include="Properties\app.manifest" />
-    <EmbeddedResource Include="Resource\SDKs.pkg" />
     <EmbeddedResource Include="Resource\LKY_Cert.cer" />
+    <EmbeddedResource Include="Resource\Office_Processes.list" />
+    <EmbeddedResource Include="Resource\SDK\Activate.lotp" />
+    <EmbeddedResource Include="Resource\SDK\Aria2c.lotp" />
+    <EmbeddedResource Include="Resource\SDK\ODT.lotp" />
+    <EmbeddedResource Include="Resource\SDK\SaRA.lotp" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />
+    <EmbeddedResource Include="Resource\SDK\SDK_Processes.list" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

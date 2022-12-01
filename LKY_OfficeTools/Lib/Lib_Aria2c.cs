@@ -20,7 +20,7 @@ namespace LKY_OfficeTools.Lib
     {
         /// <summary>
         /// 使用 Aria2c 下载单个文件。
-        /// 返回值：1~下载完成；0~因aria2c.exe丢失导致无法下载；-1~因为非已知的原因下载失败。
+        /// 返回值：1~下载完成；0~因lot_aria2c.exe丢失导致无法下载；-1~因为非已知的原因下载失败。
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="save_to"></param>
@@ -30,7 +30,7 @@ namespace LKY_OfficeTools.Lib
             try
             {
                 //指定路径
-                string aria2c_path = Documents.SDKs.SDKs_Root + @"\Aria2c\aria2c.exe";
+                string aria2c_path = Documents.SDKs.SDKs_Root + @"\Aria2c\lot_aria2c.exe";
 
                 if (!File.Exists(aria2c_path))
                 {

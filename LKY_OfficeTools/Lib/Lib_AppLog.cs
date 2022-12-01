@@ -8,8 +8,6 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.IO;
-using System.Runtime.Remoting.Contexts;
-using System.Windows.Shapes;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
 
@@ -181,25 +179,25 @@ namespace LKY_OfficeTools.Lib
                     string reg_filename = "error";
 
                     //包含未安装标记
-                    if (install_error.HasFlag(InstallState.None))
+                    if (install_error == InstallState.None)
                     {
                         reg_filename += "_none";
                     }
 
                     //包含不同版本标记
-                    if (install_error.HasFlag(InstallState.Diff))
+                    if (install_error == InstallState.Diff)
                     {
                         reg_filename += "_diff";
                     }
 
                     //包含多版本标记
-                    if (install_error.HasFlag(InstallState.Multi))
+                    if (install_error == InstallState.Multi)
                     {
                         reg_filename += "_multi";
                     }
 
                     //包含安装正确标记
-                    if (install_error.HasFlag(InstallState.Correct))
+                    if (install_error == InstallState.Correct)
                     {
                         reg_filename += "_correct";
                     }

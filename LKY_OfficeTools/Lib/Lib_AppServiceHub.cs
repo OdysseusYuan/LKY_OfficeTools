@@ -85,7 +85,7 @@ namespace LKY_OfficeTools.Lib
                     if (!string.IsNullOrWhiteSpace(info))
                     {
                         ///不为空时，尝试结束进程
-                        Com_ExeOS.Kill.ByProcessID(int.Parse(info));
+                        Com_ExeOS.KillExe.ByProcessID(int.Parse(info), Com_ExeOS.KillExe.KillMode.Try_Friendly, true);       //尝试友好的结束进程
                     }
 
                     ///完成后，删除文件

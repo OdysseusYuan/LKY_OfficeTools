@@ -12,7 +12,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Windows.Forms;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
@@ -106,7 +106,7 @@ namespace LKY_OfficeTools.Common
                     else if (ver.Major == 10 && ver.Minor == 0)     //正确获取win10版本号，需要在exe里面加入app.manifest
                     {
                         //检查注册表，因为win10和11的主版本号都为10，只能用buildID来判断了
-                        string curr_ver = Register.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
+                        string curr_ver = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
 
                         if (!string.IsNullOrEmpty(curr_ver) && int.Parse(curr_ver) < 22000)       //Win11目前内部版本号
                         {
@@ -138,7 +138,7 @@ namespace LKY_OfficeTools.Common
                 try
                 {
                     //检查注册表
-                    string curr_mode = Register.GetValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
+                    string curr_mode = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CurrentBuild");
 
                     //为空返回未知
                     if (string.IsNullOrEmpty(curr_mode))
@@ -170,43 +170,124 @@ namespace LKY_OfficeTools.Common
         internal class Register
         {
             /// <summary>
-            /// 获取指定路径下的注册表键值。
-            /// 默认注册表根部项为 HKLM
+            /// 读取注册表值
             /// </summary>
-            /// <returns></returns>
-            internal static string GetValue(string path, string key, RegistryHive root = RegistryHive.LocalMachine)
+            internal class Read
             {
-                try
+                /// <summary>
+                /// 获取指定路径下的注册表键值。
+                /// </summary>
+                /// <param name="reg_root">根节点</param>
+                /// <param name="reg_view">
+                /// 使用该函数访问 Software 目录时：
+                /// <para>x32 系统：无论选择 reg32 还是 reg64，都将只读取 Software 目录，不会读取 WOW6432Node 目录。</para>
+                /// <para>x64 系统：reg32 将读取 WOW6432Node 目录，reg64 将读取 Software 目录。</para>
+                /// </param>
+                /// <param name="path"></param>
+                /// <param name="key"></param>
+                /// <returns></returns>
+                internal static string Value(RegistryHive reg_root, RegistryView reg_view, string path, string key)
                 {
-                    RegistryKey HK_Root = RegistryKey.OpenBaseKey(root,
-                        Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32);      //判断操作系统版本（64位\32位）打开注册表项，不然 x86编译的本程序 读取 x64的程序会出现无法读取 已经存在于注册表 中的数据
-
-                    RegistryKey path_reg = HK_Root.OpenSubKey(path);    //先获取路径
-
-                    if (path_reg == null)
+                    try
                     {
-                        //找不到注册表路径
-                        return null;
-                    }
-                    else
-                    {
-                        object value = path_reg.GetValue(key);
-                        if (value != null)      //必须先判断不为null，否则会抛出异常
+                        RegistryKey HK_Root = RegistryKey.OpenBaseKey(reg_root, reg_view);
+
+                        RegistryKey path_reg = HK_Root.OpenSubKey(path);    //先获取路径
+
+                        if (path_reg == null)
                         {
-                            //一切正常
-                            return value.ToString();
+                            //找不到注册表路径
+                            return null;
                         }
                         else
                         {
-                            //Key不存在或值为空
-                            return null;
+                            object value = path_reg.GetValue(key);
+                            if (value != null)      //必须先判断不为null，否则会抛出异常
+                            {
+                                //一切正常
+                                return value.ToString();
+                            }
+                            else
+                            {
+                                //Key不存在或值为空
+                                return null;
+                            }
                         }
                     }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        return null;
+                    }
                 }
-                catch (Exception Ex)
+
+                /// <summary>
+                /// 获取指定路径下的注册表键值（若访问 Software 目录，函数将根据系统位数自动选择 Software 对应的的节点）。
+                /// </summary>
+                /// <param name="reg_root">根节点</param>
+                /// <param name="path"></param>
+                /// <param name="key"></param>
+                /// <returns></returns>
+                internal static string ValueBySystem(RegistryHive reg_root, string path, string key)
                 {
-                    new Log(Ex.ToString());
-                    return null;
+                    try
+                    {
+                        if (Environment.Is64BitOperatingSystem)
+                        {
+                            //x64系统，访问x64注册表
+                            return Value(reg_root, RegistryView.Registry64, path, key);
+                        }
+                        else
+                        {
+                            //x32系统，访问x32注册表
+                            return Value(reg_root, RegistryView.Registry32, path, key);
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        return null;
+                    }
+                }
+
+                /// <summary>
+                /// 获取注册表指定目录下的所有注册表键值。若为 Software 目录，将会获取x32、x64节点下对应的值。
+                /// <para>注意：如果计算机为 x32 系统，本函数将只返回 1 条 x32 节点的信息，因为 x32 不可能存在 x64 注册表节点。</para>
+                /// </summary>
+                /// <param name="reg_root">根节点</param>
+                /// <param name="path"></param>
+                /// <param name="key"></param>
+                /// <returns></returns>
+                internal static List<string> AllValues(RegistryHive reg_root, string path, string key)
+                {
+                    try
+                    {
+                        List<string> result = new List<string>();
+
+                        //获取x32的结构值
+                        string value_x32 = Value(reg_root, RegistryView.Registry32, path, key);
+                        if (!string.IsNullOrWhiteSpace(value_x32))
+                        {
+                            result.Add(value_x32);
+                        }
+
+                        //获取x64的结构值（仅在当前计算机为 x64 系统时，才获取）
+                        if (Environment.Is64BitOperatingSystem)
+                        {
+                            string value_x64 = Value(reg_root, RegistryView.Registry64, path, key);
+                            if (!string.IsNullOrWhiteSpace(value_x64))
+                            {
+                                result.Add(value_x64);
+                            }
+                        }
+
+                        return result;
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        return null;
+                    }
                 }
             }
 
@@ -214,16 +295,23 @@ namespace LKY_OfficeTools.Common
             /// 删除注册表 项下面一切东西
             /// </summary>
             /// <param name="registry">根项</param>
-            /// <param name="reg_path">路径</param>
-            /// <param name="reg_item">最终从哪一项开始删除</param>
+            /// <param name="path">路径</param>
+            /// <param name="item">最终从哪一项开始删除</param>
             /// <returns></returns>
-            internal static bool DeleteItem(RegistryKey registry, string reg_path, string reg_item)
+            internal static bool DeleteItem(RegistryHive reg_root, RegistryView reg_view, string path, string item)
             {
                 try
                 {
-                    RegistryKey key = Registry.LocalMachine;
-                    RegistryKey software = key.OpenSubKey(reg_path, true);
-                    software.DeleteSubKeyTree(reg_item, false);
+                    RegistryKey HK_Root = RegistryKey.OpenBaseKey(reg_root, reg_view);
+                    RegistryKey path_reg = HK_Root.OpenSubKey(path, true);              //先获取路径，启动可写模式
+
+                    //找不到注册表路径，默认已删除，返回true
+                    if (path_reg == null)
+                    {
+                        return true;
+                    }
+
+                    path_reg.DeleteSubKeyTree(item, false);
 
                     return true;
                 }
@@ -280,36 +368,67 @@ namespace LKY_OfficeTools.Common
             /// 获取已安装软件列表
             /// </summary>
             /// <returns></returns>
-            public static List<string> GetList()
+            public static List<string> InstalledList()
             {
                 try
                 {
                     //从注册表中获取控制面板“卸载程序”中的程序和功能列表
-                    RegistryKey Key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
-                        "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
-                    if (Key != null) //如果系统禁止访问则返回null
+                    RegistryKey HK_Root_x32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);    //打开x32系统键
+                    RegistryKey HK_Root_x64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);    //打开x64系统键
+
+                    string soft_path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+                    RegistryKey software_x32_list = HK_Root_x32.OpenSubKey(soft_path);              //x32软件列表
+                    RegistryKey software_x64_list = null;                                           //x64软件列表。x32系统该值将始终为null
+
+                    //获取x64软件列表（仅在用户系统是x64的情况下获取）
+                    if (Environment.Is64BitOperatingSystem)
+                    {
+                        software_x64_list = HK_Root_x64.OpenSubKey(soft_path);
+                    }
+
+                    //整合键位
+                    List<RegistryKey> software_key = new List<RegistryKey>();
+                    if (software_x32_list != null && software_x32_list.SubKeyCount > 0)
+                    {
+                        software_key.Add(software_x32_list);
+                    }
+                    if (software_x64_list != null && software_x64_list.SubKeyCount > 0)
+                    {
+                        software_key.Add(software_x64_list);
+                    }
+
+                    //开始获取
+                    if (software_key != null && software_key.Count > 0)
                     {
                         List<string> software_info = new List<string>();
 
-                        foreach (string SubKeyName in Key.GetSubKeyNames())
+                        foreach (var now_bit in software_key)                               //遍历2个系统位数的注册表
                         {
-                            //打开对应的软件名称
-                            RegistryKey SubKey = Key.OpenSubKey(SubKeyName);
-                            if (SubKey != null)
+                            foreach (string now_subkeyname in now_bit.GetSubKeyNames())     //遍历每个位数下面，对应的软件列表
                             {
-                                string DisplayName = SubKey.GetValue("DisplayName", "NONE").ToString();
-
-                                //过滤条件
-                                if (DisplayName != "NONE" && !DisplayName.Contains("vs") && !DisplayName.Contains("Visual C++") &&
-                                    !DisplayName.Contains(".NET"))
+                                //打开对应的软件名称
+                                RegistryKey SubKey = now_bit.OpenSubKey(now_subkeyname);
+                                if (SubKey != null)
                                 {
-                                    software_info.Add(DisplayName);
+                                    string DisplayName = SubKey.GetValue("DisplayName", "NONE").ToString();
+
+                                    //过滤条件
+                                    if (DisplayName != "NONE" && !DisplayName.Contains("vs") && !DisplayName.Contains("Visual C++") &&
+                                        !DisplayName.Contains(".NET"))
+                                    {
+                                        software_info.Add(DisplayName);
+                                    }
                                 }
                             }
                         }
 
-                        return software_info;
+                        //元素去重
+                        if (software_info != null && software_info.Count > 0)
+                        { 
+                            return software_info.Distinct().ToList();
+                        }
                     }
+
                     return null;
                 }
                 catch (Exception Ex)

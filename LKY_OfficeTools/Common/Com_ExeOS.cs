@@ -353,44 +353,49 @@ namespace LKY_OfficeTools.Common
         /// <summary>
         /// 结束运行 exe 类库
         /// </summary>
-        internal class Kill
+        internal class KillExe
         {
+            /// <summary>
+            /// 结束进程的模式
+            /// </summary>
+            internal enum KillMode
+            {
+                /// <summary>
+                /// 尝试使用优雅的方式结束，如果失败，使用强制结束
+                /// </summary>
+                Try_Friendly = 1,
+
+                /// <summary>
+                /// 只使用优雅的方式结束，若失败，将不再尝试其他方式结束
+                /// </summary>
+                Only_Friendly = 2,
+
+                /// <summary>
+                /// 只使用强制模式结束进程。
+                /// </summary>
+                Only_Force = 4,
+            }
+
             /// <summary>
             /// 通过 进程的名称 结束指定的进程
             /// </summary>
             /// <param name="exe_name">不要扩展名，例如：abc.exe，此处应填写abc</param>
-            /// <param name="forceClose">是否强制关闭</param>
+            /// <param name="kill_mode"></param>
+            /// <param name="isWait">是否等待进程结束？</param>
             /// <returns></returns>
-            internal static bool ByExeName(string exe_name, bool forceClose = true)
+            internal static bool ByExeName(string exe_name, KillMode kill_mode, bool isWait)
             {
                 try
                 {
                     //先判断是否存在进程
                     if (Info.IsRun(exe_name))
                     {
-                        try
+                        Process[] p = Process.GetProcessesByName(exe_name);
+                        foreach (Process now_p in p)
                         {
-                            Process[] p = Process.GetProcessesByName(exe_name);
-                            foreach (Process now_p in p)
-                            {
-                                if (forceClose)
-                                {
-                                    //强制结束
-                                    now_p.Kill();
-                                }
-                                else
-                                {
-                                    //友好关闭
-                                    now_p.CloseMainWindow();
-                                }
-                            }
-                            return true;
+                            ByProcessID(now_p.Id, kill_mode, isWait);
                         }
-                        catch (Exception Ex)
-                        {
-                            new Log(Ex.ToString());
-                            return false;
-                        }
+                        return true;
                     }
                     else
                     {
@@ -409,35 +414,53 @@ namespace LKY_OfficeTools.Common
             /// 通过 进程ID 结束指定的进程
             /// </summary>
             /// <param name="exe_id"></param>
-            /// <param name="forceClose"></param>
+            /// <param name="kill_mode"></param>
+            /// <param name="isWait">是否等待进程结束？</param>
             /// <returns></returns>
-            internal static bool ByProcessID(int exe_id, bool forceClose = true)
+            internal static bool ByProcessID(int exe_id, KillMode kill_mode, bool isWait)
             {
                 try
                 {
                     //先判断是否存在进程
                     if (Info.IsRun(exe_id))
                     {
-                        try
+                        //进程存在，获取对象
+                        Process now_p = Process.GetProcessById(exe_id);
+
+                        switch (kill_mode)
                         {
-                            Process p = Process.GetProcessById(exe_id);
-                            if (forceClose)
-                            {
-                                //强制结束
-                                p.Kill();
-                            }
-                            else
-                            {
-                                //友好关闭
-                                p.CloseMainWindow();
-                            }
-                            return true;
+                            case KillMode.Try_Friendly:
+                                {
+                                    //先尝试友好关闭
+                                    if (!now_p.CloseMainWindow())
+                                    {
+                                        //有好关闭失败时，启用强制结束
+                                        now_p.Kill();
+                                    }
+                                    break;
+                                }
+                            case KillMode.Only_Friendly:
+                                {
+                                    //只友好关闭
+                                    now_p.CloseMainWindow();
+                                    break;
+                                }
+                            case KillMode.Only_Force:
+                                {
+                                    //只强制结束
+                                    now_p.Kill();
+                                    break;
+                                }
                         }
-                        catch (Exception Ex)
+
+                        //判断是否等待进程结束
+                        if (isWait)
                         {
-                            new Log(Ex.ToString());
-                            return false;
+                            //等待进程被结束
+                            while (!now_p.HasExited) { }
                         }
+
+                        return true;    //如果不是等待结束进程，中途未出现catch时，也返回true
                     }
                     else
                     {
