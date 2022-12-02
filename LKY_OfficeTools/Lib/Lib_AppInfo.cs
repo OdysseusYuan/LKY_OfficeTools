@@ -5,9 +5,11 @@
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
  */
 
+using LKY_OfficeTools.Common;
 using System;
 using System.Diagnostics;
 using System.IO;
+using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -49,12 +51,63 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// APP 版本号
             /// </summary>
-            internal const string AppVersion = "1.1.0.21201";
+            internal const string AppVersion = "1.1.0.21202";
 
             /// <summary>
             /// 开发者拼音全拼
             /// </summary>
             internal const string Developer = "LiuKaiyuan";
+        }
+
+        /// <summary>
+        /// Json 信息
+        /// </summary>
+        internal class AppJson
+        {
+            /// <summary>
+            /// AppJson.Info 的私有变量。
+            /// 用于寄存其公有变量的首次赋值信息，以免每次访问公有变量时，都要重新读取网页，达到节省资源目的。
+            /// </summary>
+            private static string AppJsonInfo = null;
+
+            /// <summary>
+            /// 获取 LKY_OfficeTools_AppInfo.json 的信息
+            /// </summary>
+            internal static string Info
+            {
+                get
+                {
+                    try
+                    {
+                        //内部变量非空时，直接返回其值
+                        if (!string.IsNullOrEmpty(AppJsonInfo))
+                        {
+                            return AppJsonInfo;
+                        }
+
+#if (!DEBUG)
+                        //release模式地址
+                        string json_url = $"https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/download/AppInfo/LKY_OfficeTools_AppInfo.json";
+#else
+                        //debug模式地址
+                        string json_url = $"https://gitee.com/OdysseusYuan/LOT_OnlyTest/releases/download/AppInfo_Test/test.json";
+#endif
+
+                        //获取 Json 信息
+                        string result = Com_WebOS.Visit_WebClient(json_url);
+
+                        AppJsonInfo = result;
+                        return AppJsonInfo;
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        //new Log($"     × 获取 AppJson 信息失败！", ConsoleColor.DarkRed);
+                        new Log($"获取 AppJson 信息失败！");
+                        return null;
+                    }
+                }
+            }
         }
 
         /// <summary>

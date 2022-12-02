@@ -40,7 +40,7 @@ namespace LKY_OfficeTools.Lib
                 //只要程序不是已完成（无论成功与否），手动关闭，就会显示文字并打点
                 if (Current_StageType != ProcessStage.Finish_Fail && Current_StageType != ProcessStage.Finish_Success)
                 {
-                    new Log($"\n     × 正在尝试 取消部署，请稍候 ...", ConsoleColor.Red);
+                    new Log($"\n     × 正在尝试 取消部署，请稍候 ...", ConsoleColor.DarkRed);
 
                     Current_StageType = ProcessStage.Interrupt;         //设置中断状态。非完成情况下，关闭，属于 中断部署 状态，此处用于停止 下载 office 进程
                     Console.ForegroundColor = ConsoleColor.Gray;        //重置颜色，如果第一次失败，颜色还是可以正常的

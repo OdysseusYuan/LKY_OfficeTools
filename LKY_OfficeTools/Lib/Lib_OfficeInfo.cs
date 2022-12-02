@@ -10,8 +10,10 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
@@ -80,9 +82,10 @@ namespace LKY_OfficeTools.Lib
             /// </summary>
             internal static Version latest_version = null;
 
-            private const string office_info_url = "https://config.office.com/api/filelist/channels";
-
-            public static string office_file_root_url;
+            /// <summary>
+            /// 要下载的 Office 文件的根网址
+            /// </summary>
+            internal static string office_file_root_url;
 
             /// <summary>
             /// 获取最新版本的 Office 函数
@@ -94,26 +97,53 @@ namespace LKY_OfficeTools.Lib
                 {
                     new Log("\n------> 正在获取 最新可用 Office 版本 ...", ConsoleColor.DarkCyan);
 
-                    //获取频道信息       
-                    string office_info = Com_WebOS.Visit_WebClient(office_info_url);
-
-                    if (!string.IsNullOrEmpty(office_info))
+                    //获取频道信息，得到可用 Url 列表
+                    string channel_info = Com_TextOS.GetCenterText(AppJson.Info, "\"OfficeChannels_Url\": \"", "\"");
+                    if (string.IsNullOrEmpty(channel_info))
                     {
-                        //获取版本信息
-                        string latest_info = Com_TextOS.GetCenterText(office_info, "\"PerpetualVL2021\",", "name");     //获取 2021 LTSC
-                        latest_version = new Version(Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\"},"));              //获取版本号
-
-                        //赋值对应的下载地址
-                        office_file_root_url = Com_TextOS.GetCenterText(latest_info, "baseUrl\":\"", "\"");              //获取url
-
-                        //new Log(office_file_root_url);
-
-                        return latest_version;
+                        throw new Exception("OfficeChannels_Url 信息获取失败！");
                     }
-                    else
-                    { return null; }
-                }
+                    List<string> channel_list = channel_info.Split(';').ToList();
 
+                    //遍历获取有效地址，并下载channel信息
+                    string office_info = null;
+                    int try_times = 1;                                                          //尝试获取次数，初始值为1
+                    foreach (var now_url in channel_list)
+                    {
+                        office_info = Com_WebOS.Visit_WebClient(now_url.Replace(" ", ""));      //替换网址空格，并获得当前网址的访问信息
+                        if (!string.IsNullOrEmpty(office_info))
+                        {
+                            //info有值，开始截取字段
+
+                            //获取版本信息
+                            string latest_info = Com_TextOS.GetCenterText(office_info, "\"PerpetualVL2021\",", "name");                     //获取 2021 LTSC
+                            if (!string.IsNullOrEmpty(latest_info))
+                            {
+                                //获取版本号
+                                latest_version = new Version(Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\""));      //官方Json取值，格式和自己的不一样，千万注意
+                                
+                                //获取office下载地址
+                                office_file_root_url = Com_TextOS.GetCenterText(latest_info, "baseUrl\":\"", "\"");                         //官方Json取值，格式和自己的不一样，千万注意
+                                
+                                //版本信息不为空，下载地址不为空时，返回
+                                if ((latest_version != null) && (!string.IsNullOrEmpty(office_file_root_url)))
+                                {
+                                    return latest_version;
+                                }
+                            }
+                        }
+
+                        //访问当前网址返回数据为空，或者无法截取获得有效字段时，遍历。
+                        if (try_times < channel_list.Count)
+                        {
+                            new Log($"     >> 尝试使用 {++try_times} 号服务器获取中 ...", ConsoleColor.DarkYellow);
+                            continue;
+                        }
+                    }
+
+                    //全部遍历完，依旧没返回，就说明全部失败，返回null。
+                    return null;
+                }
                 catch (Exception Ex)
                 {
                     new Log(Ex.ToString());
@@ -269,14 +299,8 @@ namespace LKY_OfficeTools.Lib
                                 //只安装了1个ODT版本
                                 foreach (var now_dir in office_reg_ver_list)
                                 {
-                                    //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-                                    string info = Lib_AppUpdate.latest_info;
-                                    if (string.IsNullOrEmpty(info))
-                                    {
-                                        info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
-                                    }
                                     //获取目标ID
-                                    string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");
+                                    string Pop_Office_ID = Com_TextOS.GetCenterText(AppJson.Info, "\"Pop_Office_ID\": \"", "\"");
                                     //获取失败时，默认使用 ProPlus2021Volume 版
                                     if (string.IsNullOrEmpty(Pop_Office_ID))
                                     {

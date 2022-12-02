@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
@@ -86,15 +87,8 @@ namespace LKY_OfficeTools.Common
             {
                 try
                 {
-                    //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-                    string info = Lib_AppUpdate.latest_info;
-                    if (string.IsNullOrEmpty(info))
-                    {
-                        info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
-                    }
-
                     //截取服务器列表
-                    string ip_server_info = Com_TextOS.GetCenterText(info, "\"IP_Check_Url_List\": \"", "\"");
+                    string ip_server_info = Com_TextOS.GetCenterText(AppJson.Info, "\"IP_Check_Url_List\": \"", "\"");
 
                     //遍历获取ip
                     if (!string.IsNullOrEmpty(ip_server_info))

@@ -24,25 +24,6 @@ namespace LKY_OfficeTools.Lib
     /// </summary>
     internal class Lib_AppUpdate
     {
-#if (!DEBUG)
-        //release模式地址
-        /// <summary>
-        /// 获取更新info时的访问地址
-        /// </summary>
-        internal const string update_json_url = "https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/download/AppInfo/LKY_OfficeTools_AppInfo.json";
-#else
-        //debug模式地址，test.json
-        /// <summary>
-        /// 获取更新info时的访问地址
-        /// </summary>
-        internal const string update_json_url = "https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/download/AppInfo/test.json";
-#endif
-
-        /// <summary>
-        /// 获取到的最新信息
-        /// </summary>
-        internal static string latest_info { get; set; }
-
         /// <summary>
         /// 检查自身最新版本
         /// </summary>
@@ -72,12 +53,9 @@ namespace LKY_OfficeTools.Lib
 
                 new Log($"     >> 初始化完成 {new Random().Next(1, 10)}% ...", ConsoleColor.DarkYellow);
 
-                //获取版本信息
-                latest_info = Com_WebOS.Visit_WebClient(update_json_url);
-
                 //截取获得最新版本和下载地址
-                string latest_ver = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version\": \"", "\"");
-                string latest_down_url = Com_TextOS.GetCenterText(latest_info, "\"Latest_Version_Update_Url\": \"", "\"");
+                string latest_ver = Com_TextOS.GetCenterText(AppJson.Info, "\"Latest_Version\": \"", "\"");
+                string latest_down_url = Com_TextOS.GetCenterText(AppJson.Info, "\"Latest_Version_Update_Url\": \"", "\"");
 
                 new Log($"     >> 初始化完成 {new Random().Next(11, 30)}% ...", ConsoleColor.DarkYellow);
 

@@ -289,8 +289,8 @@ namespace LKY_OfficeTools.Common
                     }
 
                     //为了防止文件被占用，无法校验，这里先拷贝一份副本，校验副本的值
-                    string file_copied = file_path + ".hash";
-                    File.Copy(file_path, file_copied);
+                    string file_copied = DateTime.Now.ToFileTime().ToString() + ".hash";
+                    File.Copy(file_path, file_copied, true);
                     if (!File.Exists(file_copied))
                     {
                         return null;        //副本文件拷贝失败，返回null

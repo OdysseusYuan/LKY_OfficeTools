@@ -79,7 +79,7 @@ namespace LKY_OfficeTools.Lib
             /// </summary>
             internal static bool Choose(string todo_thing)
             {
-                new Log($"\n     ☆ {todo_thing}", ConsoleColor.DarkYellow);
+                new Log($"\n     ★ {todo_thing}", ConsoleColor.Gray);
 
                 Console.ForegroundColor = ConsoleColor.Gray;
                 string msg = $"        按 回车键 确认执行上述操作，按 其它键 跳过此环节 ...";

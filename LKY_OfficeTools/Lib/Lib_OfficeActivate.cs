@@ -9,6 +9,7 @@ using LKY_OfficeTools.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
@@ -39,14 +40,7 @@ namespace LKY_OfficeTools.Lib
         /// </summary>
         internal static void Activating()
         {
-            //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-            string info = Lib_AppUpdate.latest_info;
-            if (string.IsNullOrEmpty(info))
-            {
-                info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
-            }
-
-            string KMS_info = Com_TextOS.GetCenterText(info, "\"KMS_List\": \"", "\"");
+            string KMS_info = Com_TextOS.GetCenterText(AppJson.Info, "\"KMS_List\": \"", "\"");
 
             //为空抛出异常
             if (!string.IsNullOrEmpty(KMS_info))
@@ -105,7 +99,7 @@ namespace LKY_OfficeTools.Lib
                 new Log($"\n------> 正在激活 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
 
                 //执行：安装序列号
-                new Log($"\n     >> 安装 Office 序列号 ...", ConsoleColor.DarkYellow);
+                new Log($"     >> 安装 Office 序列号 ...", ConsoleColor.DarkYellow);
                 string log_install_key = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_install_key})");
                 if (!log_install_key.ToLower().Contains("successful"))
                 {

@@ -45,12 +45,10 @@ namespace LKY_OfficeTools.Lib
                 //先使用 ODT 模式卸载，其只能卸载使用 ODT 安装的2016及其以上版本的 Office，但是其耗时短。
                 Uninstall.ByODT();
 
-                new Log($"\n     >> 卸载第II阶段正在进行 ...", ConsoleColor.DarkYellow);
-                //第二阶段使用 卸载早期版本 模式，可帮助后面 SaRA 模式省时间。
+                //再使用 卸载早期版本 模式，可帮助后面 SaRA 模式省时间。
                 Uninstall.RemovePreviousVersion();
 
-                new Log($"\n     >> 卸载第III阶段正在进行 ...", ConsoleColor.DarkYellow);
-                //第三阶段使用 SaRA 模式，因为它可以尽可能卸载所有 Office 版本（非ODT），但是耗时长
+                //然后使用 SaRA 模式，因为它可以尽可能卸载所有 Office 版本（非ODT），但是耗时长
                 Uninstall.BySaRA();
 
                 //无论哪种方式清理，都要再检查一遍是否卸载干净。如果 当前系统 Office 版本数量 > 0，启动强制模式
@@ -61,7 +59,6 @@ namespace LKY_OfficeTools.Lib
                     license_list != null && license_list.Count > 0                  //存在残留的许可证信息
                     )                                                               //二者满足任意一个时，执行强行清理
                 {
-                    new Log($"\n     >> 卸载第IV阶段正在进行 ...", ConsoleColor.DarkYellow);
                     Uninstall.ForceDelete();    //无论清除是否成功，都继续安装新 office
                 }
 
@@ -259,11 +256,11 @@ namespace LKY_OfficeTools.Lib
                     //非空判断
                     if (msi_files == null)
                     {
-                        new Log($"      * 未发现 Office 早期版本，已跳过此流程。", ConsoleColor.DarkMagenta);
+                        new Log($"      * 未发现 Office 早期版本的维护信息，已跳过此流程。", ConsoleColor.DarkMagenta);
                         return true;
                     }
 
-                    new Log($"     >> 进行 Office 卸载环境及安装概要筛查 ...", ConsoleColor.DarkYellow);
+                    new Log($"     >> 启动 Office 早期版本筛查 ...", ConsoleColor.DarkYellow);
 
                     //找出符合条件的 Office MSI 文件，并添加至字典
                     foreach (var now_msi in msi_files)
@@ -298,15 +295,19 @@ namespace LKY_OfficeTools.Lib
                         new Log($"      * 未发现 Office 早期版本，已跳过此流程。", ConsoleColor.DarkMagenta);
                         return true;
                     }
+                    else
+                    {
+                        new Log($"     √ 已完成 Office 早期版本筛查。", ConsoleColor.DarkGreen);
+                    }
 
                     //逐一卸载 Office
                     foreach (var now_id_cmd in msi_id_cmd_dic)
                     {
                         string product_name = msi_id_name_dic[now_id_cmd.Key];      //完整的产品名
-                        new Log($"     >> 开始移除 {product_name} 及其相关组件 ...", ConsoleColor.DarkYellow);
+                        new Log($"\n     >> 开始移除 {product_name} 及其组件 ...", ConsoleColor.DarkYellow);
                         Com_ExeOS.Run.Exe("msiexec.exe", now_id_cmd.Value);
 
-                        new Log($"        在 {new Random().Next(6, 9) * 10} 秒内，若未出现 {product_name.Replace("Microsoft Office ", "")} 卸载界面，您可在: 控制面板 -> 程序和功能 列表中手动卸载。", ConsoleColor.Gray);
+                        new Log($"        若长时间无 {product_name.Replace("Microsoft Office ", "")} 卸载界面，您可到: 控制面板 -> 程序和功能 列表中手动卸载。", ConsoleColor.Gray);
 
                         //循环等待结束
                         while (true)
@@ -327,9 +328,13 @@ namespace LKY_OfficeTools.Lib
 
                             Thread.Sleep(3000);     //延迟，防止轮询资源占用过大
                         }
+
+                        new Log($"     √ 已完成 {product_name} 组件移除。", ConsoleColor.DarkGreen);
                     }
 
-                    new Log($"     √ 已完成 Office 早期版本卸载。", ConsoleColor.DarkGreen);
+                    Thread.Sleep(1000);     //基于体验短暂延迟
+
+                    new Log($"\n     √ 已完成 所有 Office 早期版本卸载。", ConsoleColor.DarkGreen);
 
                     return true;
                 }

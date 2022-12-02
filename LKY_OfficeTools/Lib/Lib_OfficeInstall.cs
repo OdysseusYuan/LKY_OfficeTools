@@ -88,13 +88,6 @@ namespace LKY_OfficeTools.Lib
             {
                 new Log($"\n------> 正在检查 Office 安装环境 ...", ConsoleColor.DarkCyan);
 
-                //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-                string info = Lib_AppUpdate.latest_info;
-                if (string.IsNullOrEmpty(info))
-                {
-                    info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
-                }
-
                 //--------------------------------------------- 先检查注册表 ---------------------------------------------
                 bool regdir_pass = false;      //默认是冲突的
 
@@ -133,7 +126,7 @@ namespace LKY_OfficeTools.Lib
                             string Current_Office_ID = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
                             ///计划安装的ID
-                            string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");                       //安装ID信息
+                            string Pop_Office_ID = Com_TextOS.GetCenterText(AppJson.Info, "\"Pop_Office_ID\": \"", "\"");                       //安装ID信息
 
                             ///获取失败时，默认使用 ProPlus2021Volume 版
                             if (string.IsNullOrEmpty(Pop_Office_ID))
@@ -186,7 +179,7 @@ namespace LKY_OfficeTools.Lib
                     //判断值的数量
                     if (installed_key.Count == 1)
                     {
-                        string Pop_Office_LicenseName = Com_TextOS.GetCenterText(info, "\"Pop_Office_LicenseName\": \"", "\"");     //许可证信息
+                        string Pop_Office_LicenseName = Com_TextOS.GetCenterText(AppJson.Info, "\"Pop_Office_LicenseName\": \"", "\"");     //许可证信息
                         ///获取失败时，默认使用 ProPlus2021VL 版
                         if (string.IsNullOrEmpty(Pop_Office_LicenseName))
                         {
@@ -233,7 +226,7 @@ namespace LKY_OfficeTools.Lib
                 }
                 else
                 {
-                    new Log($"     ☆ 发现 {Current_Office_Dir.Count} 个冲突的 Office 版本，若要继续，必须先卸载旧版。", ConsoleColor.Gray);
+                    new Log($"     ★ 发现 {Current_Office_Dir.Count} 个冲突的 Office 版本，若要继续，必须先卸载旧版。", ConsoleColor.Gray);
 
                     //判断是否包含自动卸载标记
                     if (!AppCommandFlag.HasFlag(ArgsFlag.Auto_Remove_Conflict_Office))
@@ -253,6 +246,7 @@ namespace LKY_OfficeTools.Lib
                     else
                     {
                         //有自动卸载的标记，直接开始卸载
+                        new Log($"      * 自动卸载冲突 Office 模式下，自动确认并开始 ...", ConsoleColor.DarkMagenta);
                         return RemoveAllOffice();
                     }
                 }
@@ -323,13 +317,7 @@ namespace LKY_OfficeTools.Lib
             }
 
             ///修改 Product ID
-            ///先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-            string info = Lib_AppUpdate.latest_info;
-            if (string.IsNullOrEmpty(info))
-            {
-                info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
-            }
-            string Pop_Office_ID = Com_TextOS.GetCenterText(info, "\"Pop_Office_ID\": \"", "\"");
+            string Pop_Office_ID = Com_TextOS.GetCenterText(AppJson.Info, "\"Pop_Office_ID\": \"", "\"");
             ///获取失败时，默认使用 2021VOL 版
             if (string.IsNullOrEmpty(Pop_Office_ID))
             {

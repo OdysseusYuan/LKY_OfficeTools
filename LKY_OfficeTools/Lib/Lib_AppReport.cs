@@ -68,7 +68,7 @@ namespace LKY_OfficeTools.Lib
                 release_mode = "Debug";
                 title += $" [{release_mode}]";
 #else
-                run_mode = "Release";
+                release_mode = "Release";
 #endif
 
                 //获取软件列表
@@ -99,18 +99,11 @@ namespace LKY_OfficeTools.Lib
                      $"<font color = black>{Log.log_info}</font><br />" + "";
                 }
 
-                //先从Update里面获取信息，如果已经访问过json，则直接用，否则重新访问
-                string info = Lib_AppUpdate.latest_info;
-                if (string.IsNullOrEmpty(info))
-                {
-                    info = Com_WebOS.Visit_WebClient(Lib_AppUpdate.update_json_url);
-                }
-
-                string PostTo = Com_TextOS.GetCenterText(info, "\"Count_Feedback_To\": \"", "\"");
+                string PostTo = Com_TextOS.GetCenterText(AppJson.Info, "\"Count_Feedback_To\": \"", "\"");
                 //smtp
                 string SMTPHost = "smtp.qq.com";
-                string SMTPuser = Com_TextOS.GetCenterText(info, "\"Count_Feedback_From\": \"", "\"");
-                string SMTPpass = Com_TextOS.GetCenterText(info, "\"Count_Feedback_Pwd\": \"", "\"");
+                string SMTPuser = Com_TextOS.GetCenterText(AppJson.Info, "\"Count_Feedback_From\": \"", "\"");
+                string SMTPpass = Com_TextOS.GetCenterText(AppJson.Info, "\"Count_Feedback_Pwd\": \"", "\"");
 
                 //为空抛出异常
                 if (string.IsNullOrEmpty(PostTo) || string.IsNullOrEmpty(SMTPuser) || string.IsNullOrEmpty(SMTPpass))
