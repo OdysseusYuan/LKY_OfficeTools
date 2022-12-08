@@ -292,6 +292,36 @@ namespace LKY_OfficeTools.Common
             }
 
             /// <summary>
+            /// 判断一个项是否存在
+            /// </summary>
+            /// <param name="reg_root"></param>
+            /// <param name="reg_view"></param>
+            /// <param name="item_path"></param>
+            /// <returns></returns>
+            internal static bool ExistItem(RegistryHive reg_root, RegistryView reg_view, string item_path)
+            {
+                try
+                {
+                    RegistryKey reg = RegistryKey.OpenBaseKey(reg_root, reg_view);
+                    var result = reg.OpenSubKey(item_path);
+
+                    if (result != null)
+                    {
+                        return true;
+                    }
+
+                    result.Close();
+
+                    return false;
+                }
+                catch (Exception Ex)
+                {
+                    new Log(Ex.ToString());
+                    return false;
+                }
+            }
+
+            /// <summary>
             /// 删除注册表 项下面一切东西
             /// </summary>
             /// <param name="registry">根项</param>
@@ -424,7 +454,7 @@ namespace LKY_OfficeTools.Common
 
                         //元素去重
                         if (software_info != null && software_info.Count > 0)
-                        { 
+                        {
                             return software_info.Distinct().ToList();
                         }
                     }

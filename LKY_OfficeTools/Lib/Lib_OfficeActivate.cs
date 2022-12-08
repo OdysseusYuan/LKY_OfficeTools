@@ -6,9 +6,11 @@
  */
 
 using LKY_OfficeTools.Common;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
@@ -126,8 +128,86 @@ namespace LKY_OfficeTools.Lib
                 string log_activate = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_activate})");
                 if (!log_activate.ToLower().Contains("successful"))
                 {
-                    new Log(log_activate);    //保存错误原因
-                    new Log($"     × 无法执行激活，激活停止。", ConsoleColor.DarkRed);
+                    //继续判断失败原因，并给出方案
+
+                    //0x80080005
+                    if (log_activate.Contains("0x80080005"))
+                    {
+                        //0x80080005错误：劫持问题，自动修复
+                        new Log($"     >> 尝试修复 0x80080005 问题中 ...", ConsoleColor.DarkYellow);
+                        string base_reg = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options";
+                        string spp_reg = "SppExtComObj.exe";
+
+                        //清除x32劫持
+                        var x32_spp = Register.ExistItem(RegistryHive.LocalMachine, RegistryView.Registry32, $@"{base_reg}\{spp_reg}");
+                        if (x32_spp)
+                        {
+                            Register.DeleteItem(RegistryHive.LocalMachine, RegistryView.Registry32, base_reg, spp_reg);
+                        }
+
+                        //清除x64劫持
+                        var x64_spp = Register.ExistItem(RegistryHive.LocalMachine, RegistryView.Registry64, $@"{base_reg}\{spp_reg}");
+                        if (x64_spp)
+                        {
+                            Register.DeleteItem(RegistryHive.LocalMachine, RegistryView.Registry64, base_reg, spp_reg);
+                        }
+
+                        new Log($"     √ 已完成 0x80080005 修复，稍后将自动重试激活。", ConsoleColor.DarkGreen);
+                    }
+                    //0x8007000D
+                    else if (log_activate.Contains("0x8007000D"))
+                    {
+                        //0x8007000D错误：软件保护、日期时间问题，自动修复
+                        new Log($"     >> 尝试修复 0x8007000D 问题中，请同时确保您的计算机 日期/时间 正确 ...", ConsoleColor.DarkYellow);
+
+                        //--------------------------------------- 软件保护修复 ---------------------------------------
+                        //先停止软件保护服务（sppsvc）
+                        Com_ServiceOS.Action.Stop("sppsvc");    //无论是否成功都继续
+
+                        //准备清除注册表路径
+                        string base_reg = @"SOFTWARE\Microsoft";
+                        string sub_reg = "OfficeSoftwareProtectionPlatform";
+
+                        //清除x32
+                        var x32_spp = Register.ExistItem(RegistryHive.LocalMachine, RegistryView.Registry32, $@"{base_reg}\{sub_reg}");
+                        if (x32_spp)
+                        {
+                            Register.DeleteItem(RegistryHive.LocalMachine, RegistryView.Registry32, base_reg, sub_reg);
+                        }
+
+                        //清除x64
+                        var x64_spp = Register.ExistItem(RegistryHive.LocalMachine, RegistryView.Registry64, $@"{base_reg}\{sub_reg}");
+                        if (x64_spp)
+                        {
+                            Register.DeleteItem(RegistryHive.LocalMachine, RegistryView.Registry64, base_reg, sub_reg);
+                        }
+
+                        //再次启动软件保护服务（sppsvc）
+                        Com_ServiceOS.Action.Start("sppsvc");   //无论是否成功都继续
+
+                        //--------------------------------------- 软件保护修复（完成） ---------------------------------------
+
+
+                        //--------------------------------------- 系统日期/时间/时区修复 ---------------------------------------
+
+                        //--------------------------------------- 系统日期/时间/时区修复（完成） ---------------------------------------
+
+                        new Log($"     √ 已完成 0x8007000D 修复，稍后将自动重试激活。", ConsoleColor.DarkGreen);
+                    }
+                    //0x80040154
+                    else if (log_activate.Contains("0x80040154"))
+                    {
+                        //0x80040154错误：没有注册类
+                        new Log($"     × 系统可能存在损坏，建议您重新安装操作系统后重试！", ConsoleColor.DarkRed);
+                        return -101;    //返回无限小，不再重试
+                    }
+                    else
+                    {
+                        //非已知问题
+                        new Log(log_activate);    //保存错误原因
+                        new Log($"     × 无法执行激活，激活中断。", ConsoleColor.DarkRed);
+                    }
+
                     return -1;
                 }
 

@@ -157,7 +157,16 @@ namespace LKY_OfficeTools.Lib
             catch (Exception Ex)
             {
                 new Log(Ex.ToString());
-                new Log($"     × 软件 SDK 文件丢失，无法继续，请重新下载本软件或联系开发者！", ConsoleColor.DarkRed);
+                if (Ex.ToString().Contains("UnauthorizedAccessException"))
+                {
+                    //因权限问题失败
+                    new Log($"     × 配置 {AppAttribute.AppName} 基础组件失败！请确保您具备 {Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)} 目录的读、写权限！", ConsoleColor.DarkRed);
+                }
+                else
+                {
+                    //其它未知问题
+                    new Log($"     × 配置 {AppAttribute.AppName} 基础组件失败，无法继续！请重新下载本软件或联系开发者。", ConsoleColor.DarkRed);
+                }
 
                 //清理SDK缓存
                 Clean();
@@ -186,7 +195,7 @@ namespace LKY_OfficeTools.Lib
                         catch (Exception Ex)
                         {
                             new Log(Ex.ToString());
-                            new Log($"     × 清理 SDK 的 {now_path} 文件失败！");
+                            new Log($"清理 SDK 的 {now_path} 文件失败！");
                         }
                     }
                 }
@@ -214,7 +223,7 @@ namespace LKY_OfficeTools.Lib
             catch (Exception Ex)
             {
                 new Log(Ex.ToString());
-                new Log($"     × 清理SDK目录失败！");
+                new Log($"清理 SDK 目录失败！");
                 return false;
             }
         }

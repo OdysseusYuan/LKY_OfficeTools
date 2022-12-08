@@ -433,10 +433,10 @@ namespace LKY_OfficeTools.Lib
                     //先获取完整信息
                     var office_installed_dir_full = GetArchiDirFull();
 
-                    //无目录返回null
+                    //无目录返回 0 个
                     if (office_installed_dir_full == null)
                     {
-                        return null;
+                        return new List<string>();
                     }
 
                     //遍历所有目录，验证有效性
@@ -458,7 +458,7 @@ namespace LKY_OfficeTools.Lib
                 catch (Exception Ex)
                 {
                     new Log(Ex.ToString());
-                    return null;
+                    return new List<string>();
                 }
             }
 
@@ -474,17 +474,17 @@ namespace LKY_OfficeTools.Lib
                     string cmd_installed_info = "cscript ospp.vbs /dstatus";                                //查看激活状态
                     string detect_info = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_installed_info})");     //查看所有版本激活情况
 
-                    //未安装key，直接返回null
+                    //未安装key，直接返回 0 个
                     if (detect_info.Contains("No installed product keys detected"))
                     {
-                        return null;
+                        return new List<string>();
                     }
 
                     string[] info = detect_info.Split('\n');
                     List<string> key_list = new List<string>();
                     if (info.Length == 0)
                     {
-                        return null;
+                        return new List<string>();
                     }
                     else
                     {
@@ -502,7 +502,7 @@ namespace LKY_OfficeTools.Lib
                 catch (Exception Ex)
                 {
                     new Log(Ex.ToString());
-                    return null;
+                    return new List<string>();
                 }
             }
         }

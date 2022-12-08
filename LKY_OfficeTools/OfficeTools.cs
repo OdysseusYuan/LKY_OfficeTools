@@ -23,11 +23,12 @@ namespace LKY_OfficeTools
     {
         static void Main(string[] args)
         {
+            //设定编码，解决英文系统乱码问题
+            Console.OutputEncoding = Encoding.Unicode;
+
             //命令行检测
             new Lib_AppCommand(args);
-
-            Console.OutputEncoding = Encoding.GetEncoding("gbk");       //设定编码，解决英文系统乱码问题
-
+            
             //中断检测
             CloseWindow.SetConsoleCtrlHandler(CloseWindow.newDelegate, true);
 

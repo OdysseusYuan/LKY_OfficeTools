@@ -226,7 +226,7 @@ namespace LKY_OfficeTools.Lib
                 }
                 else
                 {
-                    new Log($"     ★ 发现 {Current_Office_Dir.Count} 个冲突的 Office 版本，若要继续，必须先卸载旧版。", ConsoleColor.Gray);
+                    new Log($"     ★ 发现 {Current_Office_Dir.Count + installed_key.Count} 个冲突的 Office 版本，若要继续，必须先卸载旧版。", ConsoleColor.Gray);
 
                     //判断是否包含自动卸载标记
                     if (!AppCommandFlag.HasFlag(ArgsFlag.Auto_Remove_Conflict_Office))
