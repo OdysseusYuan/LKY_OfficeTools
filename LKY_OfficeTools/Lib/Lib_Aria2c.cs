@@ -45,7 +45,11 @@ namespace LKY_OfficeTools.Lib
                 string aria2c_params = $"{uri} --dir=\"{file_path}\" --out=\"{filename}\" --continue=true --max-connection-per-server=5 --check-integrity=true --file-allocation=none";
                 //new Log(aria2c_params);
 
-                Com_ExeOS.Run.Exe(aria2c_path, aria2c_params);
+                var down_result = Com_ExeOS.Run.Exe(aria2c_path, aria2c_params);
+                if (down_result == -920921)
+                {
+                    throw new Exception();
+                }
 
                 return 1;
             }

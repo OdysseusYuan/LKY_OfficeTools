@@ -305,7 +305,13 @@ namespace LKY_OfficeTools.Lib
                     {
                         string product_name = msi_id_name_dic[now_id_cmd.Key];      //完整的产品名
                         new Log($"\n     >> 开始移除 {product_name} 及其组件 ...", ConsoleColor.DarkYellow);
-                        Com_ExeOS.Run.Exe("msiexec.exe", now_id_cmd.Value);
+
+                        //运行卸载
+                        var msi_result = Com_ExeOS.Run.Exe("msiexec.exe", now_id_cmd.Value);
+                        if (msi_result == -920921)
+                        {
+                            throw new Exception();
+                        }
 
                         new Log($"        若长时间无 {product_name.Replace("Microsoft Office ", "")} 卸载界面，您可到: 控制面板 -> 程序和功能 列表中手动卸载。", ConsoleColor.Gray);
 
@@ -341,7 +347,7 @@ namespace LKY_OfficeTools.Lib
                 catch (Exception Ex)
                 {
                     new Log(Ex.ToString());
-                    new Log($"     × 卸载 Office 早期版本失败！", ConsoleColor.DarkRed);
+                    new Log($"     × 卸载 Office 早期版本出现意外！", ConsoleColor.DarkRed);
                     return false;
                 }
             }
@@ -413,6 +419,7 @@ namespace LKY_OfficeTools.Lib
                 catch (Exception Ex)
                 {
                     new Log(Ex.ToString());
+                    new Log($"     × 卸载 Office 冗余版本出现异常！", ConsoleColor.DarkRed);
                     return false;
                 }
             }
@@ -465,14 +472,21 @@ namespace LKY_OfficeTools.Lib
                     new Log($"     >> 卸载仍在继续，请等待其自动完成 ...", ConsoleColor.DarkYellow);
                     //执行卸载命令
                     string uninstall_args = $"/configure \"{ODT_path_xml}\"";
-                    bool isUninstall = Com_ExeOS.Run.Exe(ODT_path_exe, uninstall_args);      //卸载
+                    var uninstall_code = Com_ExeOS.Run.Exe(ODT_path_exe, uninstall_args);      //卸载
 
                     var reg_info = Register.Read.AllValues(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
-                    //未正常结束卸载 OR 注册表ODT至少存在1个版本时，视为卸载失败
-                    if (!isUninstall || (reg_info != null && reg_info.Count > 0))
+                    //未正常结束卸载，视为卸载失败
+                    if (uninstall_code == -920921)
                     {
-                        new Log($"     × 卸载 Office ODT 版本失败！", ConsoleColor.DarkRed);
+                        new Log($"     × 无法卸载 Office ODT 版本！", ConsoleColor.DarkRed);
+                        return false;
+                    }
+
+                    //注册表ODT至少存在1个版本时，视为卸载失败
+                    if (reg_info != null && reg_info.Count > 0)
+                    {
+                        new Log($"     × 已尝试卸载 Office ODT 版本，但系统仍存在 {reg_info.Count} 个无法卸载的版本！", ConsoleColor.DarkRed);
                         return false;
                     }
 
@@ -483,6 +497,7 @@ namespace LKY_OfficeTools.Lib
                 catch (Exception Ex)
                 {
                     new Log(Ex.ToString());
+                    new Log($"     × 卸载 Office ODT 版本出现异常！", ConsoleColor.DarkRed);
                     return false;
                 }
             }

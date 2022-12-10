@@ -24,7 +24,7 @@ namespace LKY_OfficeTools
         static void Main(string[] args)
         {
             //设定编码，解决英文系统乱码问题
-            Console.OutputEncoding = Encoding.Unicode;
+            Console.OutputEncoding = Encoding.UTF8;
 
             //命令行检测
             new Lib_AppCommand(args);

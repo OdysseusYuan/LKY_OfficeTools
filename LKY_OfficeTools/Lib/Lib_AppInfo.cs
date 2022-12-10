@@ -51,7 +51,7 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// APP 版本号
             /// </summary>
-            internal const string AppVersion = "1.1.1.1207";
+            internal const string AppVersion = "1.1.1.1209";
 
             /// <summary>
             /// 开发者拼音全拼

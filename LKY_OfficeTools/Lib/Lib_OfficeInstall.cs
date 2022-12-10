@@ -340,10 +340,10 @@ namespace LKY_OfficeTools.Lib
 
             ///命令安装
             string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
-            bool isInstallFinish = Run.Exe(ODT_path_exe, install_args);
+            var install_code = Run.Exe(ODT_path_exe, install_args);
 
             //检查是否因配置不正确等导致，意外退出安装
-            if (!isInstallFinish)
+            if (install_code == -920921)
             {
                 new Log($"     × Office v{OfficeNetVersion.latest_version} 安装意外结束！", ConsoleColor.DarkRed);
                 return false;
@@ -356,31 +356,6 @@ namespace LKY_OfficeTools.Lib
             //检查安装是否成功
             InstallState install_state = GetOfficeState();
 
-            //未安装
-            if (install_state == InstallState.None)
-            {
-                new Log($"     × 安装失败，未在当前系统检测到任何 Office 版本！", ConsoleColor.DarkRed);
-                new Log(install_state);     //打点失败注册表记录
-                return false;
-            }
-
-            //包含不同版本
-            if (install_state == InstallState.Diff)
-            {
-                new Log($"     × 已安装的 Office 版本与预期的 v{OfficeNetVersion.latest_version} 版本不符！", ConsoleColor.DarkRed);
-                new Log(install_state);     //打点失败注册表记录
-                return false;
-            }
-
-            //包含多个版本
-            if (install_state == InstallState.Multi)
-            {
-                //系统存在多个版本
-                new Log($"     × 安装异常，当前系统存在多个 Office 版本！", ConsoleColor.DarkRed);
-                new Log(install_state);     //打点失败注册表记录
-                return false;
-            }
-
             //安装了最新版
             if (install_state == InstallState.Correct)
             {
@@ -388,9 +363,39 @@ namespace LKY_OfficeTools.Lib
                 new Log($"     √ 已完成 Office v{OfficeNetVersion.latest_version} 安装。", ConsoleColor.DarkGreen);
                 return true;
             }
+            else
+            {
+                //安装存在问题
+                new Log($"Installing Exception, ExitCode: {install_code}");         //回调错误码
 
-            //其它未可知情况，视为失败
-            return false;
+                //未安装
+                if (install_state == InstallState.None)
+                {
+                    new Log($"     × 安装失败，未在当前系统检测到任何 Office 版本！", ConsoleColor.DarkRed);
+                    new Log(install_state);     //打点失败注册表记录
+                    return false;
+                }
+
+                //包含不同版本
+                if (install_state == InstallState.Diff)
+                {
+                    new Log($"     × 已安装的 Office 版本与预期的 v{OfficeNetVersion.latest_version} 版本不符！", ConsoleColor.DarkRed);
+                    new Log(install_state);     //打点失败注册表记录
+                    return false;
+                }
+
+                //包含多个版本
+                if (install_state == InstallState.Multi)
+                {
+                    //系统存在多个版本
+                    new Log($"     × 安装异常，当前系统存在多个 Office 版本！", ConsoleColor.DarkRed);
+                    new Log(install_state);     //打点失败注册表记录
+                    return false;
+                }
+
+                //其它未可知情况，视为失败
+                return false;
+            }
         }
     }
 }
