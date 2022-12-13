@@ -201,6 +201,12 @@ namespace LKY_OfficeTools.Lib
                         new Log($"     × 系统可能存在损坏，建议您重新安装操作系统后重试！", ConsoleColor.DarkRed);
                         return -101;    //返回无限小，不再重试
                     }
+                    //0xC004F074
+                    else if (log_activate.Contains("0xC004F074"))
+                    {
+                        //0xC004F074错误：与KMS服务器通讯失败
+                        new Log($"     × 激活失败！若此消息频频复现，强烈建议您重置网卡设置 或 重新安装操作系统！", ConsoleColor.DarkRed);
+                    }
                     else
                     {
                         //非已知问题

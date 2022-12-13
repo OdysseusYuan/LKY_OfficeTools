@@ -108,7 +108,7 @@ namespace LKY_OfficeTools.Lib
 
                         //逐一卸载后，若都为 success，则再执行一次检查
                         office_installed_key = OfficeLocalInstall.LicenseInfo();   //再度获取list
-                        if (office_installed_key == null)   //为空，视为成功
+                        if (office_installed_key.Count == 0)   //为0，视为成功
                         {
                             return true;
                         }
@@ -387,11 +387,11 @@ namespace LKY_OfficeTools.Lib
 
                     //执行卸载命令
                     string cmd_switch_cd = $"pushd \"{SaRA_path_root}\"";             //切换至SaRA文件目录
-                    string cmd_unstall = $"SaRACmd.exe -S OfficeScrubScenario -AcceptEula -Officeversion All";
-                    string uninstall_result = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_unstall})");
+                    string cmd_uninstall = $"SaRACmd.exe -S OfficeScrubScenario -AcceptEula -Officeversion All";
+                    string uninstall_result = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_uninstall})");
                     if (!uninstall_result.ToLower().Contains("successful"))
                     {
-                        new Log(uninstall_result);
+                        new Log($"SaRA Exception: \n{uninstall_result}");
                         new Log($"     × 卸载 Office 冗余版本失败！", ConsoleColor.DarkRed);
                         return false;
                     }
@@ -462,11 +462,10 @@ namespace LKY_OfficeTools.Lib
                     //测试表明，卸载1个ODT版本大约需要2分钟时间，留出2倍的富余
                     new Log($"     >> 此过程大约会在 {Math.Ceiling(install_list.Count * 2 * 2.0f)} 分钟内完成，具体时间取决于您的电脑配置，请稍候 ...", ConsoleColor.DarkYellow);
 
-                    //移除所有激活信息
+                    //移除所有激活信息，即使有错误也继续执行后续卸载。
                     if (!Activate.Delete())
                     {
-                        new Log("     × 移除激活信息失败！");
-                        return false;
+                        new Log("移除激活信息失败！");    //纯打点
                     }
 
                     new Log($"     >> 卸载仍在继续，请等待其自动完成 ...", ConsoleColor.DarkYellow);
@@ -486,6 +485,7 @@ namespace LKY_OfficeTools.Lib
                     //注册表ODT至少存在1个版本时，视为卸载失败
                     if (reg_info != null && reg_info.Count > 0)
                     {
+                        new Log($"ODT UnInstalling Exception ExitCode: {uninstall_code}");
                         new Log($"     × 已尝试卸载 Office ODT 版本，但系统仍存在 {reg_info.Count} 个无法卸载的版本！", ConsoleColor.DarkRed);
                         return false;
                     }

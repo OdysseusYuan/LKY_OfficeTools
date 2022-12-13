@@ -11,7 +11,8 @@
 - 当系统中存在多个冗余 Office 版本时，本工具在用户同意的情况下，可实现自动升级。
 
 ## 使用方法
-- 解压形如：LKY_OfficeTools_v*.zip 的文件，运行解压后目录下的 LKY_OfficeTools.exe 文件即可完成部署。
+- 下载形如：LKY_OfficeTools_v*.zip 的压缩包，地址：https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/latest
+- 解压下载好的 zip 压缩包，运行解压后目录下的 LKY_OfficeTools.exe 文件即可完成部署。
 
 ## 测试环境
 - 目前已经在 Windows 10(1703) 及以上版本进行了测试，均可在其 x86、x64 完美安装正版 Office 并激活。
