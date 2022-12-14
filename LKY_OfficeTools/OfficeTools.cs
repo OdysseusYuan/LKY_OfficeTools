@@ -23,12 +23,12 @@ namespace LKY_OfficeTools
     {
         static void Main(string[] args)
         {
-            //设定编码，解决英文系统乱码问题
-            Console.OutputEncoding = Encoding.GetEncoding("gbk");
-
             //命令行检测
             new Lib_AppCommand(args);
-            
+
+            //设定编码，解决英文系统乱码问题
+            Console.OutputEncoding = Encoding.GetEncoding("gbk");       //必须在启动模式判断之后再进行本函数执行。否则服务模式将引发 1053 错误！
+
             //中断检测
             CloseWindow.SetConsoleCtrlHandler(CloseWindow.newDelegate, true);
 
