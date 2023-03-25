@@ -29,6 +29,9 @@
 - 该软件任何人、企业、机构等，不得使用任何直接或间接的方式将其商业化，否则本仓库及其所属人将不承担任何后果。
 - 当前工具将持续进行迭代更新和维护，迭代过程中不排除在各种因素综合下，可能产生计算机运行的各种情况。
 
+## 版权保护
+- 软件已获多项著作权（含修改保护）：软著登字第10549507号、软著登字第10895737号、软著登字第10850084号等。
+
 ## 关于
 - 如有建议、疑惑等，大家可以发邮件至 [liukaiyuan@sjtu.edu.cn](mailto:liukaiyuan@sjtu.edu.cn) 交流探讨。
-- © 2022 LiuKaiyuan (Odysseus.Yuan). All Rights Reserved.
+- © 2022 - 2023 LiuKaiyuan (Odysseus.Yuan). All Rights Reserved.

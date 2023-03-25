@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/LKY_OfficeTools/Resource/Json/LKY_OfficeTools_AppInfo.json
