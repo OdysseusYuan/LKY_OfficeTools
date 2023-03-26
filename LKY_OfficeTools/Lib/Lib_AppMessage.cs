@@ -1,11 +1,13 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Lib_AppMessage.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
  */
 
 using System;
+using System.Threading;
+using static LKY_OfficeTools.Common.Com_Timer;
 using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
@@ -71,6 +73,40 @@ namespace LKY_OfficeTools.Lib
                     Console.WriteLine();    //增加一个空白行
                     return false;
                 }
+            }
+
+            /// <summary>
+            /// 完成一件事情，并给一个倒计时
+            /// </summary>
+            /// <param name="msg_str"></param>
+            /// <param name="countdown_time">倒计时时间（秒）</param>
+            /// <returns></returns>
+            internal static void DoByTime(string msg_str, int countdown_time)
+            {
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine();    //插入一个空白行
+
+                //设置一个倒计时组件
+                Countdown_Timer timer = new Countdown_Timer();
+                timer.Start(countdown_time);
+
+                //循环输出
+                while (timer.isRun)
+                {
+                    string msg = $"{msg_str}将在 {timer.Remaining_Time} 秒内开始 ...";
+                    new Log(msg, ConsoleColor.Gray, Log.Output_Type.Write);     //写入日志
+                    Thread.Sleep(100);
+
+                    //输出消息倒计时
+                    Console.Write($"\r{msg}");
+                }
+
+                //倒计时结束后，告知开始
+                Console.Write($"\r{msg_str}启动 ...                ");
+
+                //完成等待
+                Console.WriteLine();    //增加一个空白行
+                return;
             }
 
             /// <summary>

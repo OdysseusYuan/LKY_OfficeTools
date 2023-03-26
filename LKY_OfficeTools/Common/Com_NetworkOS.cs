@@ -135,7 +135,7 @@ namespace LKY_OfficeTools.Common
             {
                 try
                 {
-                    string req_url = "https://2022.ip138.com";
+                    string req_url = $"https://{DateTime.UtcNow.Year}.ip138.com";
 
                     //访问页面
                     string ip_page = Com_WebOS.Visit_WebClient(req_url);

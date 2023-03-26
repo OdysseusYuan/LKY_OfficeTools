@@ -82,6 +82,7 @@
     <Compile Include="Common\Com_ServiceOS.cs" />
     <Compile Include="Common\Com_SystemOS.cs" />
     <Compile Include="Common\Com_TextOS.cs" />
+    <Compile Include="Common\Com_Timer.cs" />
     <Compile Include="Common\Com_WebOS.cs" />
     <Compile Include="Lib\Lib_AppClosing.cs" />
     <Compile Include="Lib\Lib_AppCommand.cs" />

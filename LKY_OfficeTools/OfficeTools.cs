@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : OfficeTools.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -78,58 +78,49 @@ namespace LKY_OfficeTools
                 return;
             }
 
-            //根据命令行判断是否等待用户，没有标记时，需要人工来决定
-            bool isContinue = true;
+            //根据命令行判断是否等待用户，没有标记时，执行倒计时等待
             if (!AppCommandFlag.HasFlag(ArgsFlag.None_Welcome_Confirm))
             {
-                isContinue = (KeyMsg.Confirm());
+                KeyMsg.DoByTime($"部署", 5);
             }
 
-            if (isContinue)
+            //权限检查
+            Com_PrivilegeOS.PrivilegeAttention();
+
+            //SDK初始化
+            Lib_AppSdk.Initial();
+
+            //更新检查
+            Lib_AppUpdate.Check();
+
+            //继续
+            new Lib_OfficeInstall();
+
+            //部署成功时，提示是否配置为服务
+            if (Current_StageType == ProcessStage.Finish_Success)
             {
-                //权限检查
-                Com_PrivilegeOS.PrivilegeAttention();
+                //配置服务
+                Lib_AppServiceConfig.Setup();
 
-                //SDK初始化
-                Lib_AppSdk.Initial();
+                //成功，配置后回收
+                Pointing(Current_StageType, true);
 
-                //更新检查
-                Lib_AppUpdate.Check();
-
-                //继续
-                new Lib_OfficeInstall();
-
-                //部署成功时，提示是否配置为服务
-                if (Current_StageType == ProcessStage.Finish_Success)
-                {
-                    //配置服务
-                    Lib_AppServiceConfig.Setup();
-
-                    //成功，配置后回收
-                    Pointing(Current_StageType, true);
-
-                    //结论
-                    new Log($"\n     √ 您已成功完成 {AppAttribute.AppName} 所有流程，感谢您的使用。", ConsoleColor.DarkGreen);
-                }
-                //部署失败，提示错误信息
-                else if (Current_StageType == ProcessStage.Finish_Fail)
-                {
-                    //失败，先回收，再显示结论
-                    Pointing(Current_StageType, true);
-
-                    //结论
-                    new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);
-                }
-
-                //退出提示
-                KeyMsg.Quit();
+                //结论
+                new Log($"\n     √ 您已成功完成 {AppAttribute.AppName} 所有流程，感谢您的使用。", ConsoleColor.DarkGreen);
             }
-            else
+            //部署失败，提示错误信息
+            else if (Current_StageType == ProcessStage.Finish_Fail)
             {
-                new Log($"\n     × 您未按 回车键，软件已停止部署！", ConsoleColor.DarkRed);
-                Pointing(ProcessStage.Finish_Fail);  //回收
-                return;
+                //失败，先回收，再显示结论
+                Pointing(Current_StageType, true);
+
+                //结论
+                new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);
             }
+
+            //退出提示
+            KeyMsg.Quit();
+
         }
 
 
