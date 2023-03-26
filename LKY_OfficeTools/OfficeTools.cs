@@ -99,8 +99,12 @@ namespace LKY_OfficeTools
             //部署成功时，提示是否配置为服务
             if (Current_StageType == ProcessStage.Finish_Success)
             {
-                //配置服务
-                Lib_AppServiceConfig.Setup();
+                //被强制使用“我的文档”目录时，往往因为权限问题才使用，此时禁用服务配置
+                if (!Must_Use_PersonalDir)
+                {
+                    //配置服务
+                    Lib_AppServiceConfig.Setup();
+                }
 
                 //成功，配置后回收
                 Pointing(Current_StageType, true);

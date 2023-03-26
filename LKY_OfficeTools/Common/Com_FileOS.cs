@@ -217,6 +217,9 @@ namespace LKY_OfficeTools.Common
             {
                 try
                 {
+                    // 创建文件所在目录
+                    Directory.CreateDirectory(new FileInfo(file_path).DirectoryName);
+
                     //非追加模式，并且已经存在目标文件，则先删除原有文件
                     if (!is_append && File.Exists(file_path))
                     {

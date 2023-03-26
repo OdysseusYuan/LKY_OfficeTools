@@ -5,10 +5,6 @@
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
  */
 
-using System;
-using System.Runtime.InteropServices;
-using static LKY_OfficeTools.Lib.Lib_AppLog;
-
 namespace LKY_OfficeTools.Lib
 {
     /// <summary>
@@ -82,5 +78,15 @@ namespace LKY_OfficeTools.Lib
         /// APP 当前状态（初始值为 Process）
         /// </summary>
         internal static ProcessStage Current_StageType = ProcessStage.Process;
+
+        /// <summary>
+        /// 是否必须使用个人文档目录？
+        /// 通常情况，为False，使用CommonApplicationData，用于方便部署服务。
+        /// 但有些电脑因权限问题，无法使用该目录，设置为true后，AppInfo的Documents_Root将变成个人目录。
+        /// </summary>
+        internal static bool Must_Use_PersonalDir
+        {
+            get; set;
+        }
     }
 }

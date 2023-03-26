@@ -158,14 +158,21 @@ namespace LKY_OfficeTools.Lib
             {
                 /// <summary>
                 /// APP 文档根目录。
-                /// C:\ProgramData\LKY Office Tools
+                /// 默认使用：C:\ProgramData\LKY Office Tools
+                /// 若 Must_Use_PersonalDir 为true，则自动使用 我的文档\LKY Office Tools 目录
                 /// </summary>
                 internal static string Documents_Root
                 {
                     get
                     {
-                        return $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\{AppAttribute.AppName}";     //ProgramData
-                        //return $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}\\{AppAttribute.AppName}";            //我的文档
+                        if (Lib_AppState.Must_Use_PersonalDir)
+                        {
+                            return $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}\\{AppAttribute.AppName}";            //我的文档
+                        }
+                        else
+                        {
+                            return $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)}\\{AppAttribute.AppName}";     //ProgramData
+                        }
                     }
                 }
 
