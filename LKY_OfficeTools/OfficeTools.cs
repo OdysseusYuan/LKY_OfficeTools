@@ -62,7 +62,7 @@ namespace LKY_OfficeTools
                 new Log($"\n     × 请将当前操作系统升级至 Windows 10 (1703) 或其以上版本，否则 Office 无法进行正版激活！", ConsoleColor.DarkRed);
 
                 //退出提示
-                KeyMsg.Quit();
+                KeyMsg.Quit(-4);
 
                 return;
             }
@@ -73,7 +73,7 @@ namespace LKY_OfficeTools
                 new Log($"\n     × 请确保当前电脑可正常访问互联网！", ConsoleColor.DarkRed);
 
                 //退出提示
-                KeyMsg.Quit();
+                KeyMsg.Quit(-5);
 
                 return;
             }
@@ -123,7 +123,7 @@ namespace LKY_OfficeTools
             }
 
             //退出提示
-            KeyMsg.Quit();
+            KeyMsg.Quit(0);
 
         }
 

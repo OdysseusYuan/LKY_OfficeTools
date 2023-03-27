@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Lib_SelfUpdate.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -12,8 +12,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_FileOS;
+using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_AppState;
 
@@ -24,6 +26,18 @@ namespace LKY_OfficeTools.Lib
     /// </summary>
     internal class Lib_AppUpdate
     {
+        /// <summary>
+        /// 最新的版本
+        /// </summary>
+        internal static string Latest_Version
+        { get; set; }
+
+        /// <summary>
+        /// 最新版本对应的下载地址
+        /// </summary>
+        internal static string Latest_Url
+        { get; set; }
+
         /// <summary>
         /// 检查自身最新版本
         /// </summary>
@@ -54,8 +68,8 @@ namespace LKY_OfficeTools.Lib
                 new Log($"     >> 初始化完成 {new Random().Next(1, 10)}% ...", ConsoleColor.DarkYellow);
 
                 //截取获得最新版本和下载地址
-                string latest_ver = Com_TextOS.GetCenterText(AppJson.Info, "\"Latest_Version\": \"", "\"");
-                string latest_down_url = Com_TextOS.GetCenterText(AppJson.Info, "\"Latest_Version_Update_Url\": \"", "\"");
+                Latest_Version = Com_TextOS.GetCenterText(AppJson.Info, "\"Latest_Version\": \"", "\"");
+                Latest_Url = Com_TextOS.GetCenterText(AppJson.Info, "\"Latest_Version_Update_Url\": \"", "\"");
 
                 new Log($"     >> 初始化完成 {new Random().Next(11, 30)}% ...", ConsoleColor.DarkYellow);
 
@@ -67,22 +81,22 @@ namespace LKY_OfficeTools.Lib
                 new Log($"     √ 已完成 {AppAttribute.AppName} 初始化检查。", ConsoleColor.DarkGreen);
 
                 string now_ver = AppAttribute.AppVersion;
-                if (new Version(latest_ver) > new Version(now_ver))
+                if (new Version(Latest_Version) > new Version(now_ver))
                 {
                     //发现新版本
-                    new Log($"\n------> 正在更新 {AppAttribute.AppName} 至 v{latest_ver} 版本 ...", ConsoleColor.DarkCyan);
-                                       
-                    new Log($"\n     >> 下载 v{latest_ver} 更新包中 ...", ConsoleColor.DarkYellow);
+                    new Log($"\n------> 正在更新 {AppAttribute.AppName} 至 v{Latest_Version} 版本 ...", ConsoleColor.DarkCyan);
+
+                    new Log($"\n     >> 下载 v{Latest_Version} 更新包中 ...", ConsoleColor.DarkYellow);
 
                     //下载文件
-                    string save_to = AppPath.Documents.Update.Update_Root + $"\\v{latest_ver}.zip";
+                    string save_to = AppPath.Documents.Update.Update_Root + $"\\v{Latest_Version}.zip";
 
                     //下载前先删除旧的文件（禁止续传），否则一旦意外中断，再次启动下载将出现异常
                     try
                     {
                         //删除主体文件
                         if (File.Exists(save_to))
-                        { 
+                        {
                             File.Delete(save_to);
                         }
 
@@ -93,14 +107,14 @@ namespace LKY_OfficeTools.Lib
                             File.Delete(des_file);
                         }
                     }
-                    catch 
-                    { 
+                    catch
+                    {
                         //仅用于日志记录
-                        new Log($"清理冗余更新包文件失败，后续下载可能会出现异常！"); 
+                        new Log($"清理冗余更新包文件失败，后续下载可能会出现异常！");
                     }
 
                     //开始下载
-                    int down_result = Lib_Aria2c.DownFile(latest_down_url, save_to);
+                    int down_result = Lib_Aria2c.DownFile(Latest_Url, save_to);
 
                     //下载不成功时，抛出
                     if (down_result != 1)
@@ -108,10 +122,10 @@ namespace LKY_OfficeTools.Lib
                         throw new Exception();
                     }
 
-                    new Log($"\n     >> 更新 v{latest_ver} 文件中 ...", ConsoleColor.DarkYellow);
+                    new Log($"\n     >> 更新 v{Latest_Version} 文件中 ...", ConsoleColor.DarkYellow);
 
                     //解压文件
-                    string extra_to = Path.GetDirectoryName(save_to) + "\\" + $"v{latest_ver}";
+                    string extra_to = Path.GetDirectoryName(save_to) + "\\" + $"v{Latest_Version}";
                     ///如果目录存在，先清空下目标文件夹，删除子目录、子文件等
                     if (Directory.Exists(extra_to))
                     {
@@ -196,7 +210,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //重启自身完成更新
-                    new Log($"\n     √ 已更新至 {AppAttribute.AppName} v{latest_ver} 版本，程序即将自动重启，请稍候。", ConsoleColor.DarkGreen);
+                    new Log($"\n     √ 已更新至 {AppAttribute.AppName} v{Latest_Version} 版本，程序即将自动重启，请稍候。", ConsoleColor.DarkGreen);
                     Thread.Sleep(5000);
 
                     //重启进程
@@ -209,9 +223,47 @@ namespace LKY_OfficeTools.Lib
             {
                 new Log(Ex.ToString());
                 new Log($"      * 暂时跳过更新检查！", ConsoleColor.DarkMagenta);
+
+                //没有忽略手动更新的标记时，提示手动升级。
+                if (!AppCommandFlag.HasFlag(ArgsFlag.Ignore_Manual_Update_Msg))
+                {
+                    ManualUpdate();
+                }
+
                 return false;
             }
 
+        }
+
+        /// <summary>
+        /// 手动下载升级
+        /// </summary>
+        static void ManualUpdate()
+        {
+            try
+            {
+                //当获取Latest_Url失败时，不提示。
+                if (!string.IsNullOrEmpty(Latest_Url))
+                {
+                    if (KeyMsg.Choose($"自动更新异常，是否手动下载 v{Latest_Version}（最新版）{AppAttribute.AppName} 软件？"))
+                    {
+                        //确认后，打开浏览器下载。否则跳过更新使用旧版本。
+                        Process.Start(Latest_Url);
+
+                        //设置结果模式
+                        Current_StageType = ProcessStage.Interrupt;     //设置为中断模式
+                        Pointing(ProcessStage.Interrupt, true);         //回收
+
+                        KeyMsg.Quit(-20);
+                    }
+                }
+            }
+            catch (Exception Ex)
+            {
+                new Log(Ex.ToString());
+                new Log($"Exception: 手动更新异常！");
+                return;
+            }
         }
 
         /// <summary>

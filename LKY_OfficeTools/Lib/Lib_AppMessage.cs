@@ -26,7 +26,7 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// 按键退出 & 完成善后
             /// </summary>
-            internal static void Quit()
+            internal static void Quit(int exit_code)
             {
                 //清理SDK缓存
                 Lib_AppSdk.Clean();
@@ -38,6 +38,8 @@ namespace LKY_OfficeTools.Lib
                     Console.ForegroundColor = ConsoleColor.Gray;
                     Console.Write("\n请按 任意键 退出 ...");
                     Console.ReadKey();
+
+                    Environment.Exit(exit_code);
                 }
             }
 

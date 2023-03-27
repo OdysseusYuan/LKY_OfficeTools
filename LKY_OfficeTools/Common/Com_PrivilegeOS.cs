@@ -77,9 +77,7 @@ namespace LKY_OfficeTools.Common
                 Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
-                KeyMsg.Quit();
-
-                Environment.Exit(-1);
+                KeyMsg.Quit(-1);
             }
 
             //ProgramData目录权限检查

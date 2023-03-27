@@ -168,9 +168,8 @@ namespace LKY_OfficeTools.Lib
                 Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
-                KeyMsg.Quit();
+                KeyMsg.Quit(-2);
 
-                Environment.Exit(-2);
                 return false;
             }
             catch (UnauthorizedAccessException Au_Ex)
@@ -187,9 +186,8 @@ namespace LKY_OfficeTools.Lib
                 Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
-                KeyMsg.Quit();
+                KeyMsg.Quit(-2);
 
-                Environment.Exit(-2);
                 return false;
             }
             catch (Exception Ex)
@@ -206,9 +204,8 @@ namespace LKY_OfficeTools.Lib
                 Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
-                KeyMsg.Quit();
+                KeyMsg.Quit(-10);
 
-                Environment.Exit(-2);
                 return false;
             }
             finally
