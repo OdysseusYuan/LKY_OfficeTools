@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Lib_AppSdk.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -143,7 +143,7 @@ namespace LKY_OfficeTools.Lib
                     if (!isToDisk)
                     {
                         //写出异常，抛出
-                        throw new Exception($"无法写出 SDK 文件 {pkg_path} 到硬盘！");
+                        throw new IOException($"无法写出 SDK 文件 {pkg_path} 到硬盘！");
                     }
 
                     //无异常，解压包
@@ -154,19 +154,50 @@ namespace LKY_OfficeTools.Lib
 
                 return true;
             }
+            catch (IOException IO_Ex)
+            {
+                new Log(IO_Ex.ToString());
+
+                //读写出现意外
+                new Log($"     × 配置 {AppAttribute.AppName} 基础组件失败。请确保您的系统盘具备足够的可写空间！", ConsoleColor.DarkRed);
+
+                //清理SDK缓存
+                Clean();
+
+                Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
+                Pointing(ProcessStage.Finish_Fail);  //回收
+
+                //退出提示
+                KeyMsg.Quit();
+
+                Environment.Exit(-2);
+                return false;
+            }
+            catch (UnauthorizedAccessException Au_Ex)
+            {
+                new Log(Au_Ex.ToString());
+
+                //不具备读写权限
+                new Log($"     × 配置 {AppAttribute.AppName} 基础组件失败。请确保您具备对 {Documents.SDKs.SDKs_Root} 目录的写入权限！", ConsoleColor.DarkRed);
+
+                //清理SDK缓存
+                Clean();
+
+                Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
+                Pointing(ProcessStage.Finish_Fail);  //回收
+
+                //退出提示
+                KeyMsg.Quit();
+
+                Environment.Exit(-2);
+                return false;
+            }
             catch (Exception Ex)
             {
                 new Log(Ex.ToString());
-                if (Ex.ToString().Contains("UnauthorizedAccessException"))
-                {
-                    //因权限问题失败
-                    new Log($"     × 配置 {AppAttribute.AppName} 基础组件失败！请确保您具备 {Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)} 目录的读、写权限！", ConsoleColor.DarkRed);
-                }
-                else
-                {
-                    //其它未知问题
-                    new Log($"     × 配置 {AppAttribute.AppName} 基础组件失败，无法继续！请重新下载本软件或联系开发者。", ConsoleColor.DarkRed);
-                }
+
+                //其它未知问题
+                new Log($"     × 配置 {AppAttribute.AppName} 基础组件失败，无法继续。请重新下载本软件或联系开发者！", ConsoleColor.DarkRed);
 
                 //清理SDK缓存
                 Clean();
@@ -195,7 +226,7 @@ namespace LKY_OfficeTools.Lib
                         catch (Exception Ex)
                         {
                             new Log(Ex.ToString());
-                            new Log($"清理 SDK 的 {now_path} 文件失败！");
+                            new Log($"Exception: 清理 SDK 的 {now_path} 文件失败！");
                         }
                     }
                 }
