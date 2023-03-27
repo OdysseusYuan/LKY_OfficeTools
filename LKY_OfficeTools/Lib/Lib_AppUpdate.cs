@@ -248,13 +248,24 @@ namespace LKY_OfficeTools.Lib
                     if (KeyMsg.Choose($"自动更新异常，是否手动下载 v{Latest_Version}（最新版）{AppAttribute.AppName} 软件？"))
                     {
                         //确认后，打开浏览器下载。否则跳过更新使用旧版本。
-                        Process.Start(Latest_Url);
+                        new Log($"     >> 等待 系统默认浏览器 运行 ...", ConsoleColor.DarkYellow);
+                        var p = Process.Start(Latest_Url);
+
+                        //等待启动
+                        while (string.IsNullOrEmpty(p.ProcessName)) { }
+
+                        new Log($"     √ 已启动 您的默认浏览器（{p.ProcessName}），以下载 {AppAttribute.AppName} v{Latest_Version}。", ConsoleColor.DarkGreen);
 
                         //设置结果模式
                         Current_StageType = ProcessStage.Interrupt;     //设置为中断模式
                         Pointing(ProcessStage.Interrupt, true);         //回收
 
                         KeyMsg.Quit(-20);
+                    }
+                    else
+                    {
+                        new Log($"     × 您已拒绝下载最新版 {AppAttribute.AppName}。如需下载最新版，您可重新运行本软件。", ConsoleColor.DarkRed);
+                        Thread.Sleep(1000);     //延迟1s
                     }
                 }
             }
