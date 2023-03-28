@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Lib_AppCommand.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)

@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Lib_OfficeClean.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -266,6 +266,14 @@ namespace LKY_OfficeTools.Lib
                     foreach (var now_msi in msi_files)
                     {
                         var now_msi_name = GetProductInfo(now_msi, MsiInfoType.ProductName);
+
+                        //非空判断
+                        if (string.IsNullOrEmpty(now_msi_name))
+                        {
+                            new Log($"     × 无法获取 Office 早期版本信息！", ConsoleColor.DarkRed);
+                            return false;
+                        }
+
                         if (
                             now_msi_name.Contains("Microsoft Office") &&                        //只查找 Office MSI
                             (now_msi_name.Contains("2003") || now_msi_name.Contains("2007")) && //只查找03、07版本。2010版本（含）以上无法使用本方法卸载

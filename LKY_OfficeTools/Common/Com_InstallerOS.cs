@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Com_InstallerOS.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -49,15 +49,40 @@ namespace LKY_OfficeTools.Common
             try
             {
                 Type oType = Type.GetTypeFromProgID("WindowsInstaller.Installer");
+                if(oType == null) 
+                {
+                return null;
+                }
+
                 Installer inst = Activator.CreateInstance(oType) as Installer;
+                if (inst == null)
+                {
+                    return null;
+                }
+
                 Database DB = inst.OpenDatabase(msi_path, MsiOpenDatabaseMode.msiOpenDatabaseModeReadOnly);
+                if (DB == null)
+                {
+                    return null;
+                }
 
                 //生成要查询的内容
                 string str = $" SELECT * FROM Property WHERE Property = '{msi_info}' ";
 
                 View thisView = DB.OpenView(str);
+                if (thisView == null)
+                {
+                    return null;
+                }
+
                 thisView.Execute();
+
                 Record thisRecord = thisView.Fetch();
+                if (thisRecord == null)
+                {
+                    return null;
+                }
+
                 string result = thisRecord.get_StringData(2);
 
                 return result;
