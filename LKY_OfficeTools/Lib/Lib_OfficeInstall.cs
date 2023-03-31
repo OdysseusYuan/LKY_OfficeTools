@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Lib_OfficeInstall.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
@@ -8,6 +8,7 @@
 using LKY_OfficeTools.Common;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_ExeOS;
@@ -366,7 +367,18 @@ namespace LKY_OfficeTools.Lib
             else
             {
                 //安装存在问题
-                new Log($"Installing Exception, ExitCode: {install_code}");         //回调错误码
+                string err_msg = $"ODT Installing Exception, ExitCode: {install_code}";
+                if (install_code > 0)
+                {
+                    //只解析错误码大于0的情况
+                    string err_string = string.Empty;
+                    if (ODT_Error.TryGetValue(((uint)install_code), out err_string))
+                    {
+                        err_msg += $"{err_string}";
+                    }
+                }
+
+                new Log(err_msg);         //回调错误码
 
                 //未安装
                 if (install_state == InstallState.None)
@@ -395,6 +407,46 @@ namespace LKY_OfficeTools.Lib
 
                 //其它未可知情况，视为失败
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// ODT工具常见错误码。
+        /// https://learn.microsoft.com/zh-cn/windows/client-management/mdm/office-csp
+        /// </summary>
+        internal static Dictionary<uint, string> ODT_Error
+        {
+            get
+            {
+                Dictionary<uint, string> res = new Dictionary<uint, string>();
+                res[0] = "安装成功。";
+                res[997] = "安装正在进行中。";
+                res[13] = "无法验证下载的 Office 部署工具 (ODT) 的签名。";
+                res[1460] = "下载 ODT 超时。";
+                res[1602] = "用户已取消运行。";
+                res[1603] = "未通过任何预检检查。安装 2016 MSI 时尝试安装 SxS。" +
+                    "当前安装的 Office 与尝试安装的 Office 之间的位不匹配 (例如，在当前安装 64 位版本时尝试安装 32 位版本时。)";
+                res[17000] = "未能启动 C2RClient。";
+                res[17001] = "未能在 C2RClient 中排队安装方案。";
+                res[17002] = "未能完成该过程。可能的原因：" +
+                    "（1）用户已取消安装" +
+                    "（2）安装已由另一个安装取消" +
+                    "（3）安装期间磁盘空间不足" +
+                    "（4）未知语言 ID";
+                res[17003] = "另一个方案正在运行。";
+                res[17004] = "无法完成需要的清理。可能的原因：" +
+                    "（1）未知 SKU" +
+                    "（2）CDN 上不存在内容。例如，尝试安装不受支持的 LAP，例如 zh-sg" +
+                    "（3）内容不可用的 CDN 问题" +
+                    "（4）签名检查问题，例如 Office 内容的签名检查失败" +
+                    "（5）用户已取消";
+                res[17005] = "ERROR！SCENARIO CANCELLED AS PLANNED。";
+                res[17006] = "通过运行应用阻止更新。";
+                res[17007] = "客户端在“删除安装”方案中请求客户端清理。";
+                res[17100] = "C2RClient 命令行错误。";
+                res[0x80004005] = "ODT 不能用于安装批量许可证。";
+                res[0x8000ffff] = "尝试在计算机上没有 C2R Office 时卸载。";
+                return res;
             }
         }
     }

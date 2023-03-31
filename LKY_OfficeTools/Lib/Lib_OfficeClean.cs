@@ -9,6 +9,7 @@ using LKY_OfficeTools.Common;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_InstallerOS;
@@ -493,7 +494,20 @@ namespace LKY_OfficeTools.Lib
                     //注册表ODT至少存在1个版本时，视为卸载失败
                     if (reg_info != null && reg_info.Count > 0)
                     {
-                        new Log($"ODT UnInstalling Exception ExitCode: {uninstall_code}");
+                        //卸载存在问题
+                        string err_msg = $"ODT UnInstalling Exception, ExitCode: {uninstall_code}";
+                        if (uninstall_code > 0)
+                        {
+                            //只解析错误码大于0的情况
+                            string err_string = string.Empty;
+                            if (Lib_OfficeInstall.ODT_Error.TryGetValue(((uint)uninstall_code), out err_string))
+                            {
+                                err_msg += $"{err_string}";
+                            }
+                        }
+
+                        new Log(err_msg);         //回调错误码
+
                         new Log($"     × 已尝试卸载 Office ODT 版本，但系统仍存在 {reg_info.Count} 个无法卸载的版本！", ConsoleColor.DarkRed);
                         return false;
                     }
