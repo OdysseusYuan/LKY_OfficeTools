@@ -5,7 +5,6 @@
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
  */
 
-using LKY_OfficeTools.Lib;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;

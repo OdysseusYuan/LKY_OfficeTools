@@ -1,19 +1,18 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
  *      
  *      FileName : Com_PrivilegeOS.cs
  *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
  */
 
 using System;
+using System.IO;
 using System.Security.Principal;
-using static LKY_OfficeTools.Lib.Lib_AppState;
+using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
 using static LKY_OfficeTools.Lib.Lib_AppReport;
-using LKY_OfficeTools.Lib;
-using static LKY_OfficeTools.Lib.Lib_AppInfo;
-using System.IO;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Common
 {

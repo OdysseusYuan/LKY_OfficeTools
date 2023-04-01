@@ -49,9 +49,9 @@ namespace LKY_OfficeTools.Common
             try
             {
                 Type oType = Type.GetTypeFromProgID("WindowsInstaller.Installer");
-                if(oType == null) 
+                if (oType == null)
                 {
-                return null;
+                    return null;
                 }
 
                 Installer inst = Activator.CreateInstance(oType) as Installer;
