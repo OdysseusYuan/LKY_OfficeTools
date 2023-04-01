@@ -59,19 +59,29 @@ namespace LKY_OfficeTools.Lib
             Process = 4,
 
             /// <summary>
+            /// 升级成功
+            /// </summary>
+            Update_Success = 8, 
+            
+            /// <summary>
+            /// 升级失败
+            /// </summary>
+            Update_Fail = 16,
+
+            /// <summary>
             /// 强制结束，中断运行
             /// </summary>
-            Interrupt = 8,
+            Interrupt = 32,
 
             /// <summary>
             /// 已结束，且运行成功。即使存在等待用户输入，但程序自身已经完成
             /// </summary>
-            Finish_Success = 16,
+            Finish_Success = 64,
 
             /// <summary>
             /// 已结束，运行有严重错误。导致失败。即使存在等待用户输入，但程序自身已经完成
             /// </summary>
-            Finish_Fail = 32,
+            Finish_Fail = 128,
         }
 
         /// <summary>

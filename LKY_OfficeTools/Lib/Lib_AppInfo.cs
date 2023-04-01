@@ -51,7 +51,7 @@ namespace LKY_OfficeTools.Lib
             /// <summary>
             /// APP 版本号
             /// </summary>
-            internal const string AppVersion = "1.1.1.1214";
+            internal const string AppVersion = "1.1.2.401";
 
             /// <summary>
             /// 开发者拼音全拼
@@ -195,13 +195,26 @@ namespace LKY_OfficeTools.Lib
 
                     /// <summary>
                     /// 升级目录的回收站目录。
-                    /// C:\ProgramData\LKY Office Tools\Update\Trash
+                    /// 如果 文件运行路径盘符 和 程序文档所在盘符 相同。则使用 程序文档 Trash 目录。
+                    /// 即：C:\ProgramData\LKY Office Tools\Update\Trash
+                    /// 若盘符不同，则使用 文件运行所在路径的子目录。
+                    /// 即：XXX:\yy\Trash
+                    /// 因为 File.Move() 在移动占用中的文件时，仅对同盘符的操作起效。不同盘符效果则等同 File.Copy()。
                     /// </summary>
                     internal static string UpdateTrash
                     {
                         get
                         {
-                            return $"{Update_Root}\\Trash";
+                            if (Path.GetPathRoot(Executer) == Path.GetPathRoot(Documents_Root))
+                            {
+                                //相同盘符，使用默认回收站目录
+                                return $"{Update_Root}\\Trash";
+                            }
+                            else
+                            {
+                                //不同盘符，使用子目录
+                                return $"{ExecuteDir}\\Trash";
+                            }
                         }
                     }
                 }
@@ -226,6 +239,7 @@ namespace LKY_OfficeTools.Lib
                     /// <summary>
                     /// 服务目录的回收站目录，用于存放丢弃的文件。
                     /// C:\ProgramData\LKY Office Tools\Services\Trash
+                    /// 因为服务的盘符设定于系统盘之下，所以，不存在 File.Move() 跨盘符的情况。
                     /// </summary>
                     internal static string ServicesTrash
                     {

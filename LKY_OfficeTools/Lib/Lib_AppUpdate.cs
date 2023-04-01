@@ -7,6 +7,7 @@
 
 using LKY_OfficeTools.Common;
 using System;
+using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -61,7 +62,30 @@ namespace LKY_OfficeTools.Lib
                         {
                             File.Delete(now_file);
                         }
-                        catch { }
+                        catch (Exception Ex)
+                        {
+                            new Log(Ex.ToString());
+                            new Log($"Exception: 无法删除 {now_file} 文件！");
+                        }
+                    }
+                }
+
+                //当Trash目录是 运行目录的子目录 时（Trash运行盘符 != 程序文档的盘符时），需要回收Trash目录，否则体验不好。
+                string trash_dir = AppPath.Documents.Update.UpdateTrash;
+                if (Path.GetPathRoot(trash_dir) != Path.GetPathRoot(AppPath.Documents.Documents_Root))
+                {
+                    try
+                    {
+                        //文件夹存在时删除
+                        if (Directory.Exists(trash_dir))
+                        {
+                            Directory.Delete(trash_dir, true);
+                        }
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        new Log($"Exception: 无法删除 {AppPath.Documents.Update.UpdateTrash} 目录！");
                     }
                 }
 
@@ -147,30 +171,6 @@ namespace LKY_OfficeTools.Lib
                     //获得自身主程序路径
                     string self_RunPath = AppPath.Executer;
 
-                    /* ---------> 暂停删除旧文件。当用户把本文件放在 桌面 或有其他文件的 文件夹中时，会导致资料连带删除！
-                    //删除旧的文件
-                    ScanFiles old_files = new ScanFiles();
-                    old_files.GetFilesByExtension(AppPath.ExecuteDir);
-                    if (old_files.FilesList != null && old_files.FilesList.Count > 0)
-                    {
-                        foreach (var now_file in old_files.FilesList)
-                        {
-                            //除了自身exe外，删除全部旧的文件
-                            if (now_file != self_RunPath)
-                            {
-                                try
-                                {
-                                    File.Delete(now_file);
-                                }
-                                catch (Exception Ex)
-                                {
-                                    new Log(Ex.ToString());
-                                }
-                            }
-                        }
-                    }
-                    */
-
                     //复制新文件
                     foreach (var now_file in new_files.FilesList)
                     {
@@ -211,7 +211,13 @@ namespace LKY_OfficeTools.Lib
 
                     //重启自身完成更新
                     new Log($"\n     √ 已更新至 {AppAttribute.AppName} v{Latest_Version} 版本，程序即将自动重启，请稍候。", ConsoleColor.DarkGreen);
-                    Thread.Sleep(5000);
+
+                    //升级成功打点
+                    Current_StageType = ProcessStage.Update_Success;
+                    Pointing(Current_StageType);
+
+                    //延迟稍许
+                    Thread.Sleep(2000);
 
                     //重启进程
                     RestartProcess();
@@ -256,9 +262,9 @@ namespace LKY_OfficeTools.Lib
 
                         new Log($"     √ 已启动 您的默认浏览器（{p.ProcessName}），以下载 {AppAttribute.AppName} v{Latest_Version}。", ConsoleColor.DarkGreen);
 
-                        //设置结果模式
-                        Current_StageType = ProcessStage.Interrupt;     //设置为中断模式
-                        Pointing(ProcessStage.Interrupt, true);         //回收
+                        //自动升级失败
+                        Current_StageType = ProcessStage.Update_Fail;     //设置为失败
+                        Pointing(Current_StageType, true);                //回收
 
                         KeyMsg.Quit(-20);
                     }
