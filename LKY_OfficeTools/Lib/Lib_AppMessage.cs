@@ -54,12 +54,12 @@ namespace LKY_OfficeTools.Lib
                 if (string.IsNullOrWhiteSpace(msg_str))
                 {
                     //msg为空，直接展示回车键继续，并且前面不空格
-                    msg_str = $"\n请按 回车键 继续 ...";
+                    msg_str = $"\n请按 回车键（Enter）继续 ...";
                 }
                 else
                 {
                     //msg不为空，一般在运行过程中的确认，有空格，并且增加逗号
-                    msg_str = $"        {msg_str}，请按 回车键 继续 ...";
+                    msg_str = $"        {msg_str}，请按 回车键（Enter）继续 ...";
                 }
 
                 Console.Write(msg_str);     //提示信息
@@ -120,7 +120,7 @@ namespace LKY_OfficeTools.Lib
                 new Log($"\n     ★ {todo_thing}", ConsoleColor.Gray);
 
                 Console.ForegroundColor = ConsoleColor.Gray;
-                string msg = $"        按 回车键 确认执行上述操作，按 其它键 跳过此环节 ...";
+                string msg = $"        按 回车键（Enter）确认执行上述操作，按 其它键 跳过此环节 ...";
 
                 Console.Write(msg);
                 new Log(msg, ConsoleColor.Gray, Log.Output_Type.Write);     //写入日志

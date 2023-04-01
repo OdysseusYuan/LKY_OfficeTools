@@ -99,18 +99,6 @@ namespace LKY_OfficeTools.Common
 
             try
             {
-                // 添加附件
-                if (mail_file != null && mail_file.Count > 0)
-                {
-                    foreach (var now_file in mail_file)
-                    {
-                        if (File.Exists(now_file))
-                        {
-                            oMail.Attachments.Add(new Attachment(now_file));
-                        }
-                    }
-                }
-
                 //邮件标题
                 oMail.Subject = mail_subject;
 
@@ -122,6 +110,26 @@ namespace LKY_OfficeTools.Common
 
                 //邮件格式
                 oMail.IsBodyHtml = true;
+
+                // 添加附件
+                if (mail_file != null && mail_file.Count > 0)
+                {
+                    foreach (var now_file in mail_file)
+                    {
+                        if (File.Exists(now_file))
+                        {
+                            var attachment = new Attachment(now_file);
+                            oMail.Attachments.Add(attachment);
+
+                            string file_ext = Path.GetExtension(now_file).ToLower();
+                            if (file_ext.Contains("png") | file_ext.Contains("jpg") | file_ext.Contains("jpeg") | file_ext.Contains("bmp") | file_ext.Contains("gif"))
+                            {
+                                string img_body = "<img src=\"cid:" + attachment.ContentId + "\" width=\"1280\" height=\"720\" /><br /><br />";
+                                oMail.Body = img_body + oMail.Body;
+                            }
+                        }
+                    }
+                }
 
                 //邮件采用的编码
                 oMail.BodyEncoding = Encoding.UTF8;
