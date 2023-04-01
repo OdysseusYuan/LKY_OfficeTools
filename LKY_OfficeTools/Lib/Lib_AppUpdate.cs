@@ -7,7 +7,6 @@
 
 using LKY_OfficeTools.Common;
 using System;
-using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -196,7 +195,7 @@ namespace LKY_OfficeTools.Lib
 
                     //若旧的 exe 文件名和默认 exe 文件名不一致时，将自身 exe 文件 move 到 Trash 目录。
                     //解决用户修改旧 exe 文件名，复制新文件后，会出现两个 exe 的情况。
-                    if (AppPath.Executer != (AppPath.ExecuteDir + $"\\{AppAttribute.AppFilename}"))
+                    if (Path.GetFileName(AppPath.Executer) != AppAttribute.AppFilename)
                     {
                         string exe_moveto = AppPath.Documents.Update.UpdateTrash + $"\\{DateTime.Now.ToFileTime()}.old";
                         Directory.CreateDirectory(Path.GetDirectoryName(exe_moveto));        //创建目录
