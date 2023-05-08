@@ -14,10 +14,10 @@
 - 下载形如：LKY_OfficeTools_v*.zip 的压缩包，地址：https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/latest
 - 解压下载好的 zip 压缩包，运行解压后目录下的 LKY_OfficeTools.exe 文件即可完成部署。
 
-## 测试环境
+## 运行环境
 - 目前已经在 Windows 10(1703) 及以上版本进行了测试，均可在其 x86、x64 完美安装正版 Office 并激活。
 - 应 Office 官方要求，系统中只能部署唯一架构类型，故本工具部署时，会征求用户同意，由其自行决定是否卸载其它架构。
-- 2016年7月及其之前发布的 Windows 系统，因其架构过于陈旧，其已经不再支持安装最新的正版 Office。
+- 2016年7月及其之前发布的 Windows 系统（即：Windows 10(1703) 之前的系统），因其架构过于陈旧，其已经不再支持安装最新的正版 Office。
 
 ## Q&A相关
 - 中国大陆用户：https://gitee.com/OdysseusYuan/LKY_OfficeTools/wikis
