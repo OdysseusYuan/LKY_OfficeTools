@@ -96,5 +96,31 @@ namespace LKY_OfficeTools.Common
             t2 = t2.Replace("-", "");
             return t2.ToLower();
         }
+
+        /// <summary>
+        /// 搜索一串字符中，某个字符出现的次数
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="scan_str"></param>
+        /// <returns></returns>
+        internal static int GetStringTimes(string str, string scan_str)
+        {
+            try
+            {
+                int index = 0;
+                int count = 0;
+                while ((index = str.IndexOf(scan_str, index)) != -1)
+                {
+                    count++;
+                    index += scan_str.Length;
+                }
+                return count;
+            }
+            catch (Exception Ex)
+            {
+                new Log(Ex.ToString());
+                return 0;
+            }
+        }
     }
 }

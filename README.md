@@ -5,13 +5,13 @@
 
 目前包含的功能：
 - 一键快速下载、安装、激活最新版 Microsoft Office 全套流程。
-- 程序默认安装 Word、PPT、Excel、Outlook、OneNote、Access 六件套。
+- 程序默认安装 Word、PPT、Excel 三件套，用户可自选安装其它九大组件。
 - 工具可自动识别不同的操作系统架构，自动下载适配版本的 Office。
 - 本工具激活 Office 的方式为正版激活模式，不会篡改任何系统文件。
 - 当系统中存在多个冗余 Office 版本时，本工具在用户同意的情况下，可实现自动升级。
 
 ## 使用方法
-- 下载形如：LKY_OfficeTools_v*.zip 的压缩包，地址：https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/latest
+- 下载形如：LKY_OfficeTools_v*.zip 的压缩包，最新版地址：https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/latest
 - 解压下载好的 zip 压缩包，运行解压后目录下的 LKY_OfficeTools.exe 文件即可完成部署。
 
 ## 运行环境

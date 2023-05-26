@@ -44,34 +44,34 @@ namespace LKY_OfficeTools.Lib
         internal enum ProcessStage
         {
             /// <summary>
-            /// 等待用户输入（程序未完成情况下）
-            /// </summary>
-            WaitInput = 1,
-
-            /// <summary>
             /// 程序正在初始化阶段
             /// </summary>
-            Starting = 2,
+            Starting = 1,
 
             /// <summary>
             /// 系统运行中
             /// </summary>
-            Process = 4,
+            Process = 2,
 
             /// <summary>
             /// 升级成功
             /// </summary>
-            Update_Success = 8, 
+            Update_Success = 4, 
             
             /// <summary>
             /// 升级失败
             /// </summary>
-            Update_Fail = 16,
+            Update_Fail = 8,
 
             /// <summary>
             /// 强制结束，中断运行
             /// </summary>
-            Interrupt = 32,
+            Interrupt = 16,
+
+            /// <summary>
+            /// 重启电脑后运行（程序未完成情况下）
+            /// </summary>
+            RestartPC = 32,
 
             /// <summary>
             /// 已结束，且运行成功。即使存在等待用户输入，但程序自身已经完成

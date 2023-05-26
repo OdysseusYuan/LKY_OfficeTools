@@ -258,7 +258,7 @@ namespace LKY_OfficeTools.Common
                         if (isWait)
                         {
                             //等待进程被结束
-                            while (!now_p.HasExited) { }
+                            now_p.WaitForExit();
                         }
 
                         return true;    //如果不是等待结束进程，中途未出现catch时，也返回true

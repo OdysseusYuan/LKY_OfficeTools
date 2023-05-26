@@ -94,22 +94,10 @@ namespace LKY_OfficeTools.Lib
 
                 //只要安装了 Office 新版本，就用KMS开始激活
                 string cmd_switch_cd = $"pushd \"{Documents.SDKs.Activate}\"";          //切换至OSPP文件目录
-                string cmd_install_key = "cscript ospp.vbs /inpkey:FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH";          //安装序列号，默认是 ProPlus2021VL 的
                 string cmd_kms_url = $"cscript ospp.vbs /sethst:{kms_server}";                          //设置激活KMS地址
                 string cmd_activate = "cscript ospp.vbs /act";                                              //开始激活
 
                 new Log($"\n------> 正在激活 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
-
-                //执行：安装序列号
-                new Log($"     >> 安装 Office 序列号 ...", ConsoleColor.DarkYellow);
-                string log_install_key = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_install_key})");
-                if (!log_install_key.ToLower().Contains("successful"))
-                {
-                    new Log(log_install_key);    //保存错误原因
-                    new Log($"     × 安装序列号失败，激活停止。", ConsoleColor.DarkRed);
-                    return -3;
-                }
-                new Log($"     √ 已完成 Office 序列号安装。", ConsoleColor.DarkGreen);
 
                 //执行：设置激活KMS地址
                 string kms_flag = kms_server.Replace("kms.", "");
@@ -126,7 +114,27 @@ namespace LKY_OfficeTools.Lib
                 //执行：开始激活
                 new Log($"\n     >> 执行 Office 激活 ...", ConsoleColor.DarkYellow);
                 string log_activate = Com_ExeOS.Run.Cmd($"({cmd_switch_cd})&({cmd_activate})");
-                if (!log_activate.ToLower().Contains("successful"))
+
+                //先判断是几个SKU项目，以及成功数量
+                int sku_count = Com_TextOS.GetStringTimes(log_activate.ToLower(), "sku id");
+                //获取成功的数量
+                int success_count = Com_TextOS.GetStringTimes(log_activate.ToLower(), "successful");
+
+                bool activate_success;      //激活成功标志
+                if (success_count > 0 & sku_count == success_count)
+                {
+                    //全部激活成功
+                    activate_success = true;
+                }
+                else
+                {
+                    //至少有1个激活失败
+                    activate_success = false;
+                    new Log($"     × 有 {sku_count - success_count} 个（共 {sku_count} 个）产品架构未能成功激活。", ConsoleColor.DarkRed);
+                }
+
+                //判断原因
+                if (!activate_success)
                 {
                     //继续判断失败原因，并给出方案
 
@@ -211,7 +219,7 @@ namespace LKY_OfficeTools.Lib
                     {
                         //非已知问题
                         new Log(log_activate);    //保存错误原因
-                        new Log($"     × 无法执行激活，激活中断。", ConsoleColor.DarkRed);
+                        new Log($"     × 意外的错误导致激活失败！", ConsoleColor.DarkRed);
                     }
 
                     return -1;

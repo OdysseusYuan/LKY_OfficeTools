@@ -8,16 +8,14 @@
 using LKY_OfficeTools.Common;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Mail;
-using System.Reflection;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
-using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
+using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -37,6 +35,12 @@ namespace LKY_OfficeTools.Lib
         {
             try
             {
+                //Passive不打点
+                if (Current_RunMode == RunMode.Passive)
+                {
+                    return true;
+                }
+
                 if (show_info && point_type != ProcessStage.Starting)
                 {
                     new Log($"\n------> 正在清理 冗余数据，请勿关闭或重启电脑 ...", ConsoleColor.DarkCyan);

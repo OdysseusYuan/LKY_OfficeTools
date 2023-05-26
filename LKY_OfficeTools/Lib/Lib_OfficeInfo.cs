@@ -121,10 +121,10 @@ namespace LKY_OfficeTools.Lib
                             {
                                 //获取版本号
                                 latest_version = new Version(Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\""));      //官方Json取值，格式和自己的不一样，千万注意
-                                
+
                                 //获取office下载地址
                                 office_file_root_url = Com_TextOS.GetCenterText(latest_info, "baseUrl\":\"", "\"");                         //官方Json取值，格式和自己的不一样，千万注意
-                                
+
                                 //版本信息不为空，下载地址不为空时，返回
                                 if ((latest_version != null) && (!string.IsNullOrEmpty(office_file_root_url)))
                                 {
@@ -297,24 +297,32 @@ namespace LKY_OfficeTools.Lib
                             if (office_reg_ver_list.Count == 1)
                             {
                                 //只安装了1个ODT版本
-                                foreach (var now_dir in office_reg_ver_list)
+                                foreach (var now_ver in office_reg_ver_list)
                                 {
                                     //获取目标ID
-                                    string Pop_Office_ID = Com_TextOS.GetCenterText(AppJson.Info, "\"Pop_Office_ID\": \"", "\"");
-                                    //获取失败时，默认使用 ProPlus2021Volume 版
-                                    if (string.IsNullOrEmpty(Pop_Office_ID))
-                                    {
-                                        Pop_Office_ID = "ProPlus2021Volume";
-                                    }
+                                    string Pop_Office_ID = "2021Volume";
 
                                     //获取本机已经安装的ID（如果x64系统，安装了x32的 Office 在 WOW6432Node 目录，该值将为null）
                                     string Current_Office_ID = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
+                                    //ODT 只安装了1个版本，但 now_ver 为空，视为版本不同
+                                    if (string.IsNullOrEmpty(Current_Office_ID))
+                                    {
+                                        return InstallState.Diff;
+                                    }
+
+                                    //替换支持的版本ID。如果用户还安装了其它架构，进行替换后，该值不是空
+                                    var diff_products = Current_Office_ID
+                                        .Replace($"ProjectPro{Pop_Office_ID}", "")
+                                        .Replace($"ProPlus{Pop_Office_ID}", "")
+                                        .Replace($"VisioPro{Pop_Office_ID}", "")
+                                        .Replace(",", "");
+
                                     if (
-                                        (now_dir != null && now_dir == OfficeNetVersion.latest_version.ToString())          //版本号一致
+                                        (now_ver != null && now_ver == OfficeNetVersion.latest_version.ToString())          //版本号一致
                                         &&
-                                        (!string.IsNullOrEmpty(Current_Office_ID) && Current_Office_ID == Pop_Office_ID)    //产品ID一致
-                                        )      //必须先判断不为null，否则会抛出异常
+                                        string.IsNullOrWhiteSpace(diff_products)    //是否还安装了其它ID
+                                        )
                                     {
                                         //x64系统还得校验下 Office 注册表的 平台信息 是否一致
                                         if (Environment.Is64BitOperatingSystem)
@@ -338,7 +346,8 @@ namespace LKY_OfficeTools.Lib
                                     }
                                 }
 
-                                //ODT 只安装了1个版本，但版本号和预期版本号不一致，或者 now_dir 为空，视为版本不同
+                                //ODT 只安装了1个版本，但版本号和预期版本号不一致，或者还安装了其它版本，
+                                //如：ProPlus2016Volume，视为版本不同
                                 return InstallState.Diff;
                             }
                             else
