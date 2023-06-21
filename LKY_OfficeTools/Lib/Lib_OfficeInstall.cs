@@ -21,7 +21,7 @@ using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_OfficeClean;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInfo;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -35,58 +35,96 @@ namespace LKY_OfficeTools.Lib
         /// </summary>
         internal Lib_OfficeInstall()
         {
-            //被动模式下，不安装，只激活
-            if (Current_RunMode == RunMode.Passive)
-            {
-                new Log($"\n      * 当前处于被动模式，已跳过 Office 安装流程，直接激活。", ConsoleColor.DarkMagenta);
-                new Lib_OfficeActivate();
-                return;
-            }
 
-            //下载后，开始安装
-            int DownCode = Lib_OfficeDownload.FilesDownload();
-
-            //判断下载情况
-            switch (DownCode)
+            try
             {
-                case 2:
-                    //已安装最新版，无需下载安装，直接进入激活模块
-                    new Lib_OfficeActivate();
-                    break;
-                case 1:
-                    if (ConflictCheck())        //冲突检查
+                //版本获取成功时，执行后续操作。
+                if (OfficeNetInfo.OfficeLatestVersion != null)
+                {
+                    //判断是否已经安装了当前版本
+                    InstallState install_state = GetOfficeState();
+                    if (install_state == InstallState.Correct)                //已安装最新版，无需下载
                     {
-                        //通过进入安装，不通过直接返回false
-                        if (StartInstall())
-                        {
-                            //安装成功，进入激活程序
-                            new Lib_OfficeActivate();
-                        }
-                        else
-                        {
-                            new Log($"\n     × 因 Office 安装失败，已跳过激活流程！", ConsoleColor.DarkRed);
-                            break;
-                        }
+                        new Log($"\n      * 当前系统安装了最新 Office 版本，已跳过下载、安装流程。", ConsoleColor.DarkMagenta);
+
+                        //开始激活
+                        Lib_OfficeActivate.Activating();
                     }
+
+                    //当不存在 VersionToReport or 其版本与最新版不一致 or 产品ID不一致 or 安装位数与系统不一致时，需要下载新文件。
                     else
                     {
-                        new Log($"\n     × 无法完成 Office 冲突性检查，已跳过安装流程！", ConsoleColor.DarkRed);
-                        break;
-                    }
-                    break;
-                case 0:
-                    new Log($"\n     × 未能找到可用的 Office 安装文件，已跳过安装流程！", ConsoleColor.DarkRed);
-                    break;
-                case -1:
-                    //用户中止了下载，不执行附加内容
-                    return;
-            }
+                        //被动模式下，如果版本不正确，不会重新安装，因为用户可能已经卸载。
+                        if (Current_RunMode == RunMode.Passive)
+                        {
+                            new Log($"\n     × 当前系统未安装最新版本的 Office，激活停止！", ConsoleColor.DarkRed);
+                            return;
+                        }
 
-            //全部完成后，判断是否成功
-            if (Lib_AppState.Current_StageType != Lib_AppState.ProcessStage.Finish_Success)
+                        //如果是主动模式，则下载并安装最新版
+                        else if (Current_RunMode == RunMode.Manual)
+                        {
+                            //开始下载，并获得下载结果
+                            int DownCode = Lib_OfficeDownload.StartDownload();
+
+                            //判断下载情况
+                            switch (DownCode)
+                            {
+                                //下载成功，开始安装
+                                case 1:
+                                    //冲突检查
+                                    if (ConflictCheck())
+                                    {
+                                        //通过进入安装，不通过直接返回false
+                                        if (StartInstall())
+                                        {
+                                            //安装成功，进入激活程序
+                                            Lib_OfficeActivate.Activating();
+                                        }
+                                        else
+                                        {
+                                            new Log($"\n     × 因 Office 安装失败，已跳过激活流程！", ConsoleColor.DarkRed);
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        new Log($"\n     × 无法完成 Office 冲突性检查，已跳过安装流程！", ConsoleColor.DarkRed);
+                                        break;
+                                    }
+                                    break;
+                                case 0:
+                                    new Log($"\n     × 未能找到可用的 Office 安装文件，已跳过安装流程！", ConsoleColor.DarkRed);
+                                    break;
+                                case -1:
+                                    //用户中止了下载
+                                    new Log($"\n     × 用户取消了下载 Office 安装文件，已跳过安装流程！", ConsoleColor.DarkRed);
+                                    return;
+                            }
+                        }
+
+                        //其他模式跳出
+                        else
+                        {
+                            new Log($"{Current_RunMode} 模式下，暂不支持下载、安装、激活操作。");
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception Ex)
             {
-                //只要全部流程结束后，不是成功状态（并且没有中断情况），就设置为 失败 
-                Lib_AppState.Current_StageType = Lib_AppState.ProcessStage.Finish_Fail;
+                new Log($"\n     × Office 安装过程中发生异常，已跳过安装流程！", ConsoleColor.DarkRed);
+                new Log(Ex.ToString());
+            }
+            finally
+            {
+                //全部完成后，判断是否成功
+                if (Current_StageType != ProcessStage.Finish_Success)
+                {
+                    //只要全部流程结束后，不是成功状态（并且没有中断情况），就设置为 失败 
+                    Current_StageType = ProcessStage.Finish_Fail;
+                }
             }
         }
 
@@ -361,7 +399,7 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 ///修改为新版本号
-                bool isNewVersion = Com_FileOS.XML.SetValue(ODT_path_xml, "Version", OfficeNetVersion.latest_version.ToString());
+                bool isNewVersion = Com_FileOS.XML.SetValue(ODT_path_xml, "Version", OfficeNetInfo.OfficeLatestVersion.ToString());
 
                 //检查是否修改成功（版本号）
                 if (!isNewVersion)
@@ -550,7 +588,7 @@ namespace LKY_OfficeTools.Lib
                 File.WriteAllText(ODT_path_xml, config);
 
                 //开始安装
-                new Log($"\n------> 正在安装 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 正在安装 Office v{OfficeNetInfo.OfficeLatestVersion} ...", ConsoleColor.DarkCyan);
 
                 ///先结束掉可能还在安装的 Office 进程（强制结束，不等待）
                 Lib_AppSdk.KillAllSdkProcess(KillExe.KillMode.Only_Force);
@@ -562,7 +600,7 @@ namespace LKY_OfficeTools.Lib
                 //检查是否因配置不正确等导致，意外退出安装
                 if (install_code == -920921)
                 {
-                    new Log($"     × Office v{OfficeNetVersion.latest_version} 安装意外结束！", ConsoleColor.DarkRed);
+                    new Log($"     × Office v{OfficeNetInfo.OfficeLatestVersion} 安装意外结束！", ConsoleColor.DarkRed);
                     return false;
                 }
 
@@ -577,7 +615,7 @@ namespace LKY_OfficeTools.Lib
                 if (install_state == InstallState.Correct)
                 {
                     //安装成功
-                    new Log($"     √ 已完成 Office v{OfficeNetVersion.latest_version} 安装。", ConsoleColor.DarkGreen);
+                    new Log($"     √ 已完成 Office v{OfficeNetInfo.OfficeLatestVersion} 安装。", ConsoleColor.DarkGreen);
                     return true;
                 }
                 else
@@ -607,7 +645,7 @@ namespace LKY_OfficeTools.Lib
                     //包含不同版本
                     if (install_state == InstallState.Diff)
                     {
-                        new Log($"     × 已安装的 Office 版本与预期的 v{OfficeNetVersion.latest_version} 版本不符！", ConsoleColor.DarkRed);
+                        new Log($"     × 已安装的 Office 版本与预期的 v{OfficeNetInfo.OfficeLatestVersion} 版本不符！", ConsoleColor.DarkRed);
                         new Log(install_state);     //打点失败注册表记录
                         return false;
                     }
@@ -640,34 +678,36 @@ namespace LKY_OfficeTools.Lib
         {
             get
             {
-                Dictionary<uint, string> res = new Dictionary<uint, string>();
-                res[0] = "安装成功。";
-                res[997] = "安装正在进行中。";
-                res[13] = "无法验证下载的 Office 部署工具 (ODT) 的签名。";
-                res[1460] = "下载 ODT 超时。";
-                res[1602] = "用户已取消运行。";
-                res[1603] = "未通过任何预检检查。安装 2016 MSI 时尝试安装 SxS。" +
-                    "当前安装的 Office 与尝试安装的 Office 之间的位不匹配 (例如，在当前安装 64 位版本时尝试安装 32 位版本时。)";
-                res[17000] = "未能启动 C2RClient。";
-                res[17001] = "未能在 C2RClient 中排队安装方案。";
-                res[17002] = "未能完成该过程。可能的原因：" +
+                Dictionary<uint, string> res = new Dictionary<uint, string>
+                {
+                    [0] = "安装成功。",
+                    [997] = "安装正在进行中。",
+                    [13] = "无法验证下载的 Office 部署工具 (ODT) 的签名。",
+                    [1460] = "下载 ODT 超时。",
+                    [1602] = "用户已取消运行。",
+                    [1603] = "未通过任何预检检查。安装 2016 MSI 时尝试安装 SxS。" +
+                    "当前安装的 Office 与尝试安装的 Office 之间的位不匹配 (例如，在当前安装 64 位版本时尝试安装 32 位版本时。)",
+                    [17000] = "未能启动 C2RClient。",
+                    [17001] = "未能在 C2RClient 中排队安装方案。",
+                    [17002] = "未能完成该过程。可能的原因：" +
                     "（1）用户已取消安装" +
                     "（2）安装已由另一个安装取消" +
                     "（3）安装期间磁盘空间不足" +
-                    "（4）未知语言 ID";
-                res[17003] = "另一个方案正在运行。";
-                res[17004] = "无法完成需要的清理。可能的原因：" +
+                    "（4）未知语言 ID",
+                    [17003] = "另一个方案正在运行。",
+                    [17004] = "无法完成需要的清理。可能的原因：" +
                     "（1）未知 SKU" +
                     "（2）CDN 上不存在内容。例如，尝试安装不受支持的 LAP，例如 zh-sg" +
                     "（3）内容不可用的 CDN 问题" +
                     "（4）签名检查问题，例如 Office 内容的签名检查失败" +
-                    "（5）用户已取消";
-                res[17005] = "ERROR！SCENARIO CANCELLED AS PLANNED。";
-                res[17006] = "通过运行应用阻止更新。";
-                res[17007] = "客户端在“删除安装”方案中请求客户端清理。";
-                res[17100] = "C2RClient 命令行错误。";
-                res[0x80004005] = "ODT 不能用于安装批量许可证。";
-                res[0x8000ffff] = "尝试在计算机上没有 C2R Office 时卸载。";
+                    "（5）用户已取消",
+                    [17005] = "ERROR！SCENARIO CANCELLED AS PLANNED。",
+                    [17006] = "通过运行应用阻止更新。",
+                    [17007] = "客户端在“删除安装”方案中请求客户端清理。",
+                    [17100] = "C2RClient 命令行错误。",
+                    [0x80004005] = "ODT 不能用于安装批量许可证。",
+                    [0x8000ffff] = "尝试在计算机上没有 C2R Office 时卸载。"
+                };
                 return res;
             }
         }

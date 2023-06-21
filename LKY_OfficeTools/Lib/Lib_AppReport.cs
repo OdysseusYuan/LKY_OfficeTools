@@ -33,14 +33,14 @@ namespace LKY_OfficeTools.Lib
         /// <returns></returns>
         internal static bool Pointing(ProcessStage point_type, bool show_info = false)
         {
+            //Passive不打点
+            if (Current_RunMode == RunMode.Passive)
+            {
+                return true;
+            }
+
             try
             {
-                //Passive不打点
-                if (Current_RunMode == RunMode.Passive)
-                {
-                    return true;
-                }
-
                 if (show_info && point_type != ProcessStage.Starting)
                 {
                     new Log($"\n------> 正在清理 冗余数据，请勿关闭或重启电脑 ...", ConsoleColor.DarkCyan);

@@ -12,7 +12,6 @@ using System.Threading;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -22,60 +21,29 @@ namespace LKY_OfficeTools.Lib
     internal class Lib_OfficeDownload
     {
         /// <summary>
-        /// 下载文件列表
-        /// </summary>
-        static List<string> down_list = null;
-
-        /// <summary>
-        /// 重载实现下载
-        /// </summary>
-        internal Lib_OfficeDownload()
-        {
-            //FilesDownload();
-        }
-
-        /// <summary>
         /// 下载所有文件（Aria2c）
-        /// 返回值：-1【用户终止】，0【下载失败】，1【下载成功】，2【无需下载】
+        /// 返回值：-1【用户终止】，0【下载失败】，1【下载成功】
         /// </summary>
-        internal static int FilesDownload()
+        internal static int StartDownload()
         {
             try
             {
-                //获取下载列表
-                down_list = OfficeNetVersion.GetOfficeFileList();
-                if (down_list == null)
-                {
-                    //因列表获取异常，停止下载
-                    return 0;
-                }
-
-                //判断是否已经安装了当前版本
-                InstallState install_state = GetOfficeState();
-                if (install_state==InstallState.Correct)                //已安装最新版，无需下载
-                {
-                    new Log($"\n      * 当前系统安装了最新 Office 版本，已跳过下载、安装流程。", ConsoleColor.DarkMagenta);
-                    return 2;
-                }
-                ///当不存在 VersionToReport or 其版本与最新版不一致 or 产品ID不一致 or 安装位数与系统不一致时，需要下载新文件。
-
-                //定义下载目标地
-                string save_to = AppPath.ExecuteDir + @"\Office\Data\";       //文件必须位于 \Office\Data\ 下，
-                                                                           //ODT安装必须在 Office 上一级目录上执行。
+                //定义下载目标地。文件必须位于 \Office\Data\下。ODT安装必须在 Office 上一级目录上执行。
+                string save_to = AppPath.ExecuteDir + @"\Office\Data\";
 
                 //计划保存的地址
                 List<string> save_files = new List<string>();
 
                 //下载开始
-                new Log($"\n------> 开始下载 Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 开始下载 Office v{OfficeNetInfo.OfficeLatestVersion} 文件 ...", ConsoleColor.DarkCyan);
                 //延迟，让用户看到开始下载
                 Thread.Sleep(1000);
 
                 //轮询下载所有文件
-                foreach (var a in down_list)
+                foreach (var a in OfficeNetInfo.OfficeFileList)
                 {
                     //根据官方目录，来调整下载保存位置
-                    string save_path = save_to + a.Substring(OfficeNetVersion.office_file_root_url.Length).Replace("/", "\\");
+                    string save_path = save_to + a.Substring(OfficeNetInfo.OfficeUrlRoot.Length).Replace("/", "\\");
 
                     //保存到List里面，用于后续检查
                     save_files.Add(save_path);
@@ -99,7 +67,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"     √ 已下载 {new FileInfo(save_path).Name} 文件。", ConsoleColor.DarkGreen);
                 }
 
-                new Log($"\n------> 正在检查 Office v{OfficeNetVersion.latest_version} 文件 ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 正在检查 Office v{OfficeNetInfo.OfficeLatestVersion} 文件 ...", ConsoleColor.DarkCyan);
 
                 foreach (var b in save_files)
                 {
@@ -113,11 +81,11 @@ namespace LKY_OfficeTools.Lib
                     else
                     {
                         new Log($"     >> 文件 {new FileInfo(b).Name} 存在异常，重试中 ...", ConsoleColor.DarkRed);
-                        return FilesDownload();
+                        return StartDownload();
                     }
                 }
 
-                new Log($"     √ 已完成 Office v{OfficeNetVersion.latest_version} 下载。", ConsoleColor.DarkGreen);
+                new Log($"     √ 已完成 Office v{OfficeNetInfo.OfficeLatestVersion} 下载。", ConsoleColor.DarkGreen);
 
                 return 1;
             }

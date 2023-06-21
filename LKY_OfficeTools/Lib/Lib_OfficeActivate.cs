@@ -15,7 +15,7 @@ using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInfo;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -24,14 +24,6 @@ namespace LKY_OfficeTools.Lib
     /// </summary>
     internal class Lib_OfficeActivate
     {
-        /// <summary>
-        /// 重载实现激活
-        /// </summary>
-        internal Lib_OfficeActivate()
-        {
-            Activating();
-        }
-
         /// <summary>
         /// KMS 服务器列表
         /// </summary>
@@ -97,7 +89,7 @@ namespace LKY_OfficeTools.Lib
                 string cmd_kms_url = $"cscript ospp.vbs /sethst:{kms_server}";                          //设置激活KMS地址
                 string cmd_activate = "cscript ospp.vbs /act";                                              //开始激活
 
-                new Log($"\n------> 正在激活 Office v{OfficeNetVersion.latest_version} ...", ConsoleColor.DarkCyan);
+                new Log($"\n------> 正在激活 Office v{OfficeNetInfo.OfficeLatestVersion} ...", ConsoleColor.DarkCyan);
 
                 //执行：设置激活KMS地址
                 string kms_flag = kms_server.Replace("kms.", "");
@@ -225,7 +217,7 @@ namespace LKY_OfficeTools.Lib
                     return -1;
                 }
 
-                new Log($"     √ 已完成 Office v{OfficeNetVersion.latest_version} 正版激活。", ConsoleColor.DarkGreen);
+                new Log($"     √ 已完成 Office v{OfficeNetInfo.OfficeLatestVersion} 正版激活。", ConsoleColor.DarkGreen);
                 Lib_AppState.Current_StageType = Lib_AppState.ProcessStage.Finish_Success;   //设置整体运行状态为成功
 
                 return 1;

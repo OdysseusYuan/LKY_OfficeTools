@@ -42,7 +42,8 @@ namespace LKY_OfficeTools.Lib
                 string filename = new FileInfo(save_to).Name;               //保存的文件名
 
                 //设置命令行
-                string aria2c_params = $"{uri} --dir=\"{file_path}\" --out=\"{filename}\" --continue=true --max-connection-per-server=5 --check-integrity=true --file-allocation=none";
+                string aria2c_params = $"{uri} --dir=\"{file_path}\" --out=\"{filename}\"" +
+                    $" --continue=true --max-connection-per-server=5 --check-integrity=true --file-allocation=none --console-log-level=error";
                 //new Log(aria2c_params);
 
                 var down_result = Com_ExeOS.Run.Exe(aria2c_path, aria2c_params);

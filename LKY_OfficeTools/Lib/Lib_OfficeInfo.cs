@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using static LKY_OfficeTools.Common.Com_SystemOS;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
@@ -75,171 +74,245 @@ namespace LKY_OfficeTools.Lib
         /// <summary>
         /// 查看 Office 网络的版本类库
         /// </summary>
-        internal class OfficeNetVersion
+        internal class OfficeNetInfo
         {
+            private static string _office_channel_info;
             /// <summary>
-            /// 最新版 Office 版本信息
+            /// Office频道的信息
             /// </summary>
-            internal static Version latest_version = null;
-
-            /// <summary>
-            /// 要下载的 Office 文件的根网址
-            /// </summary>
-            internal static string office_file_root_url;
-
-            /// <summary>
-            /// 获取最新版本的 Office 函数
-            /// </summary>
-            /// <returns></returns>
-            internal static Version GetOfficeVersion()
+            internal static string OfficeChannelInfo
             {
-                try
+                get
                 {
-                    new Log("\n------> 正在获取 最新可用 Office 版本 ...", ConsoleColor.DarkCyan);
-
-                    //获取频道信息，得到可用 Url 列表
-                    string channel_info = Com_TextOS.GetCenterText(AppJson.Info, "\"OfficeChannels_Url\": \"", "\"");
-                    if (string.IsNullOrEmpty(channel_info))
+                    try
                     {
-                        throw new Exception("OfficeChannels_Url 信息获取失败！");
-                    }
-                    List<string> channel_list = channel_info.Split(';').ToList();
-
-                    //遍历获取有效地址，并下载channel信息
-                    string office_info = null;
-                    int try_times = 1;                                                          //尝试获取次数，初始值为1
-                    foreach (var now_url in channel_list)
-                    {
-                        office_info = Com_WebOS.Visit_WebClient(now_url.Replace(" ", ""));      //替换网址空格，并获得当前网址的访问信息
-                        if (!string.IsNullOrEmpty(office_info))
+                        //私有值非空判断
+                        if (!string.IsNullOrWhiteSpace(_office_channel_info))
                         {
-                            //info有值，开始截取字段
+                            return _office_channel_info;
+                        }
 
-                            //获取版本信息
-                            string latest_info = Com_TextOS.GetCenterText(office_info, "\"PerpetualVL2021\",", "name");                     //获取 2021 LTSC
-                            if (!string.IsNullOrEmpty(latest_info))
+                        new Log("\n------> 正在获取 最新可用 Office 信息 ...", ConsoleColor.DarkCyan);
+
+                        //获取频道信息，得到可用 Url 列表
+                        string channel_info = Com_TextOS.GetCenterText(AppJson.Info, "\"OfficeChannels_Url\": \"", "\"");
+                        if (string.IsNullOrEmpty(channel_info))
+                        {
+                            throw new Exception("OfficeChannels_Url 信息获取失败！");
+                        }
+                        List<string> channel_list = channel_info.Split(';').ToList();
+
+                        //遍历获取有效地址，并下载channel信息
+                        string office_info = null;
+                        int try_times = 1;                                                          //尝试获取次数，初始值为1
+                        foreach (var now_url in channel_list)
+                        {
+                            office_info = Com_WebOS.Visit_WebClient(now_url.Replace(" ", ""));      //替换网址空格，并获得当前网址的访问信息
+                            if (!string.IsNullOrEmpty(office_info))
                             {
-                                //获取版本号
-                                latest_version = new Version(Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\""));      //官方Json取值，格式和自己的不一样，千万注意
+                                new Log($"     √ 已获得 Office 最新正版信息。", ConsoleColor.DarkGreen);
 
-                                //获取office下载地址
-                                office_file_root_url = Com_TextOS.GetCenterText(latest_info, "baseUrl\":\"", "\"");                         //官方Json取值，格式和自己的不一样，千万注意
+                                //info有值，返回该值。
+                                return _office_channel_info = office_info;
+                            }
 
-                                //版本信息不为空，下载地址不为空时，返回
-                                if ((latest_version != null) && (!string.IsNullOrEmpty(office_file_root_url)))
-                                {
-                                    return latest_version;
-                                }
+                            //访问当前网址返回数据为空，或者无法截取获得有效字段时，遍历。
+                            if (try_times < channel_list.Count)
+                            {
+                                new Log($"     >> 尝试使用 {++try_times} 号服务器获取中 ...", ConsoleColor.DarkYellow);
+                                continue;
                             }
                         }
 
-                        //访问当前网址返回数据为空，或者无法截取获得有效字段时，遍历。
-                        if (try_times < channel_list.Count)
-                        {
-                            new Log($"     >> 尝试使用 {++try_times} 号服务器获取中 ...", ConsoleColor.DarkYellow);
-                            continue;
-                        }
+                        //全部遍历完，依旧没返回，就说明全部失败
+                        throw new Exception("Office 信息获取失败！");
                     }
-
-                    //全部遍历完，依旧没返回，就说明全部失败，返回null。
-                    return null;
-                }
-                catch (Exception Ex)
-                {
-                    new Log(Ex.ToString());
-                    return null;
-                }
-
-            }
-
-            /// <summary>
-            /// 获取文件下载列表
-            /// </summary>
-            /// <returns></returns>
-            internal static List<string> GetOfficeFileList()
-            {
-                try
-                {
-                    Version version_info = GetOfficeVersion();      //获取版本
-
-                    if (version_info == null || string.IsNullOrEmpty(office_file_root_url))     //下载根地址为空时，视为失败
+                    catch (Exception Ex)
                     {
-                        new Log("     × 最新版本获取失败，请稍后重试！", ConsoleColor.DarkRed);
+                        new Log("     × 最新 Office 信息获取失败，请稍后重试！", ConsoleColor.DarkRed);
+                        new Log(Ex.ToString());
                         return null;
                     }
-
-                    string ver = version_info.ToString();
-
-                    new Log($"     √ 已获得 Office v{ver} 正版信息。", ConsoleColor.DarkGreen);
-
-                    //延迟，让用户看清版本号
-                    Thread.Sleep(500);
-
-
-                    //获取文件列表
-                    List<string> file_list = new List<string>();
-                    office_file_root_url += "/office/data";
-                    ///获取当前系统位数
-                    int sys_bit;
-                    if (Environment.Is64BitOperatingSystem)
-                    {
-                        sys_bit = 64;
-                    }
-                    else
-                    {
-                        sys_bit = 32;
-                    }
-
-                    //x32系统也需要下载 64 的 i64****.cab文件，但必须放在 {ver} 目录下。
-                    file_list.Add($"{office_file_root_url}/{ver}/i640.cab");
-                    file_list.Add($"{office_file_root_url}/{ver}/i642052.cab");
-
-                    switch (sys_bit)
-                    {
-                        case 64:
-                            file_list.Add($"{office_file_root_url}/{ver}/stream.x{sys_bit}.x-none.dat");
-                            file_list.Add($"{office_file_root_url}/{ver}/stream.x{sys_bit}.zh-cn.dat");
-                            break;
-                        case 32:
-                            file_list.Add($"{office_file_root_url}/{ver}/stream.x86.x-none.dat");
-                            file_list.Add($"{office_file_root_url}/{ver}/stream.x86.zh-cn.dat");
-                            file_list.Add($"{office_file_root_url}/{ver}/i{sys_bit}0.cab");
-                            file_list.Add($"{office_file_root_url}/{ver}/i{sys_bit}2052.cab");
-                            break;
-                    }
-
-                    //按版本下载其余文件
-                    file_list.Add($"{office_file_root_url}/v{sys_bit}.cab");
-                    file_list.Add($"{office_file_root_url}/v{sys_bit}_{ver}.cab");
-                    file_list.Add($"{office_file_root_url}/{ver}/s{sys_bit}0.cab");
-                    file_list.Add($"{office_file_root_url}/{ver}/s{sys_bit}2052.cab");
-
-                    /*
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    new Log($"\n------> 预计下载文件：");
-                    foreach (var a in file_list)
-                    {
-                        new Log($"      > {a}");
-                    }
-                    Console.Read();
-                    */
-
-                    return file_list;
                 }
+            }
 
-                catch (Exception Ex)
+            private static Version _office_latest_version;
+            /// <summary>
+            /// 最新版 Office 版本信息
+            /// </summary>
+            internal static Version OfficeLatestVersion
+            {
+                get
                 {
-                    new Log(Ex.ToString());
-                    return null;
-                }
+                    try
+                    {
+                        //非空返回
+                        if (_office_latest_version != null)
+                        {
+                            return _office_latest_version;
+                        }
 
+                        //非空判断
+                        if (string.IsNullOrWhiteSpace(OfficeChannelInfo))
+                        {
+                            return null;
+                        }
+
+                        new Log("\n------> 正在解析 最新可用 Office 版本 ...", ConsoleColor.DarkCyan);
+
+                        //获取版本信息
+                        string latest_info = Com_TextOS.GetCenterText(OfficeChannelInfo, "\"PerpetualVL2021\",", "name");                     //获取 2021 LTSC
+                        if (!string.IsNullOrEmpty(latest_info))
+                        {
+                            //获取版本号
+                            var ver = new Version(Com_TextOS.GetCenterText(latest_info, "latestUpdateVersion\":\"", "\""));      //官方Json取值，格式和自己的不一样，千万注意
+
+                            new Log($"     √ 已获得 Office 最新版本为：v{ver}", ConsoleColor.DarkGreen);
+
+                            return _office_latest_version = ver;
+                        }
+
+                        throw new Exception("无法获取 PerpetualVL2021 对应的版本号！");
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log("     × 无法获取 最新可用 Office 版本，请稍后重试！", ConsoleColor.DarkRed);
+                        new Log(Ex.ToString());
+                        return null;
+                    }
+                }
+            }
+
+            private static string _office_url_root;
+            /// <summary>
+            /// 要下载的 Office 文件的根网址
+            /// </summary>
+            internal static string OfficeUrlRoot
+            {
+                get
+                {
+                    try
+                    {
+                        //非空返回
+                        if (!string.IsNullOrWhiteSpace(_office_url_root))
+                        {
+                            return _office_url_root;
+                        }
+
+                        //非空判断
+                        if (string.IsNullOrWhiteSpace(OfficeChannelInfo))
+                        {
+                            return null;
+                        }
+
+                        new Log("\n------> 正在解析 最新可用 Office 下载服务器 ...", ConsoleColor.DarkCyan);
+
+                        //获取版本信息
+                        string latest_info = Com_TextOS.GetCenterText(OfficeChannelInfo, "\"PerpetualVL2021\",", "name");                     //获取 2021 LTSC
+                        if (!string.IsNullOrEmpty(latest_info))
+                        {
+                            //获取office下载地址
+                            var url = Com_TextOS.GetCenterText(latest_info, "baseUrl\":\"", "\"");                         //官方Json取值，格式和自己的不一样，千万注意
+
+                            new Log($"     √ 已获得 Office 最新下载服务器信息", ConsoleColor.DarkGreen);
+
+                            return _office_url_root = url + "/office/data";
+                        }
+
+                        throw new Exception("无法获取 PerpetualVL2021 对应的下载地址！");
+                    }
+                    catch (Exception Ex)
+                    {
+                        new Log("     × 无法获取 最新可用 Office 下载服务器", ConsoleColor.DarkRed);
+                        new Log(Ex.ToString());
+                        return null;
+                    }
+                }
+            }
+
+            private static List<string> _office_file_list;
+            /// <summary>
+            /// Office 最新版的文件下载地址列表
+            /// </summary>
+            internal static List<string> OfficeFileList
+            {
+                get
+                {
+                    try
+                    {
+                        //非空返回
+                        if (_office_file_list != null && _office_file_list.Count > 0)
+                        {
+                            return _office_file_list;
+                        }
+
+                        //下载根地址为空时，视为失败
+                        if (OfficeLatestVersion == null || string.IsNullOrEmpty(OfficeUrlRoot))
+                        {
+                            return null;
+                        }
+
+                        new Log("\n------> 正在解析 Office 下载列表 ...", ConsoleColor.DarkCyan);
+
+                        //获取文件列表
+                        List<string> result = new List<string>();
+
+                        //获取当前系统位数
+                        int sys_bit;
+                        if (Environment.Is64BitOperatingSystem)
+                        {
+                            sys_bit = 64;
+                        }
+                        else
+                        {
+                            sys_bit = 32;
+                        }
+
+                        //获得版本号的字符串
+                        string ver = OfficeLatestVersion.ToString();
+
+                        //x32系统也需要下载 64 的 i64****.cab文件，但必须放在 {ver} 目录下。
+                        result.Add($"{OfficeUrlRoot}/{ver}/i640.cab");
+                        result.Add($"{OfficeUrlRoot}/{ver}/i642052.cab");
+
+                        switch (sys_bit)
+                        {
+                            case 64:
+                                result.Add($"{OfficeUrlRoot}/{ver}/stream.x{sys_bit}.x-none.dat");
+                                result.Add($"{OfficeUrlRoot}/{ver}/stream.x{sys_bit}.zh-cn.dat");
+                                break;
+                            case 32:
+                                result.Add($"{OfficeUrlRoot}/{ver}/stream.x86.x-none.dat");
+                                result.Add($"{OfficeUrlRoot}/{ver}/stream.x86.zh-cn.dat");
+                                result.Add($"{OfficeUrlRoot}/{ver}/i{sys_bit}0.cab");
+                                result.Add($"{OfficeUrlRoot}/{ver}/i{sys_bit}2052.cab");
+                                break;
+                        }
+
+                        //按版本下载其余文件
+                        result.Add($"{OfficeUrlRoot}/v{sys_bit}.cab");
+                        result.Add($"{OfficeUrlRoot}/v{sys_bit}_{ver}.cab");
+                        result.Add($"{OfficeUrlRoot}/{ver}/s{sys_bit}0.cab");
+                        result.Add($"{OfficeUrlRoot}/{ver}/s{sys_bit}2052.cab");
+
+                        new Log($"     √ 已解析 Office 下载列表。", ConsoleColor.DarkGreen);
+
+                        return _office_file_list = result;
+                    }
+
+                    catch (Exception Ex)
+                    {
+                        new Log(Ex.ToString());
+                        return null;
+                    }
+                }
             }
         }
 
         /// <summary>
         /// 查看本地 Office 安装情况 类库
         /// </summary>
-        internal class OfficeLocalInstall
+        internal class OfficeLocalInfo
         {
             /// <summary>
             /// Office 本地安装情况（标记）
@@ -297,58 +370,66 @@ namespace LKY_OfficeTools.Lib
                             if (office_reg_ver_list.Count == 1)
                             {
                                 //只安装了1个ODT版本
-                                foreach (var now_ver in office_reg_ver_list)
+                                //获取其版本号
+                                Version installed_ver = null;
+
+                                //解析版本号
+                                try
                                 {
-                                    //获取目标ID
-                                    string Pop_Office_ID = "2021Volume";
+                                    installed_ver = new Version(office_reg_ver_list[0]);
+                                }
+                                catch
+                                {
+                                    //ODT 只安装了1个版本，但 now_ver 为空，或版本号解析失败，视为版本不同
+                                    return InstallState.Diff;
+                                }
 
-                                    //获取本机已经安装的ID（如果x64系统，安装了x32的 Office 在 WOW6432Node 目录，该值将为null）
-                                    string Current_Office_ID = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+                                //获取目标ID
+                                string Pop_Office_ID = "2021Volume";
 
-                                    //ODT 只安装了1个版本，但 now_ver 为空，视为版本不同
-                                    if (string.IsNullOrEmpty(Current_Office_ID))
+                                //获取本机已经安装的ID（如果x64系统，安装了x32的 Office 在 WOW6432Node 目录，该值将为null）
+                                string Current_Office_ID = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
+
+                                //替换支持的版本ID。如果用户还安装了其它架构，进行替换后，该值不是空
+                                var diff_products = Current_Office_ID
+                                    .Replace($"ProjectPro{Pop_Office_ID}", "")
+                                    .Replace($"ProPlus{Pop_Office_ID}", "")
+                                    .Replace($"VisioPro{Pop_Office_ID}", "")
+                                    .Replace(",", "");
+
+                                if (
+                                    //本地版本号非空 & 本地版本号 >= 官方最新版本号，就视为安装了最新版（因为可能会有安全更新补丁）
+                                    (installed_ver != null && installed_ver >= OfficeNetInfo.OfficeLatestVersion)
+                                    &&
+                                    string.IsNullOrWhiteSpace(diff_products)    //是否还安装了其它ID
+                                    )
+                                {
+                                    //x64系统还得校验下 Office 注册表的 平台信息 是否一致
+                                    if (Environment.Is64BitOperatingSystem)
                                     {
-                                        return InstallState.Diff;
-                                    }
-
-                                    //替换支持的版本ID。如果用户还安装了其它架构，进行替换后，该值不是空
-                                    var diff_products = Current_Office_ID
-                                        .Replace($"ProjectPro{Pop_Office_ID}", "")
-                                        .Replace($"ProPlus{Pop_Office_ID}", "")
-                                        .Replace($"VisioPro{Pop_Office_ID}", "")
-                                        .Replace(",", "");
-
-                                    if (
-                                        (now_ver != null && now_ver == OfficeNetVersion.latest_version.ToString())          //版本号一致
-                                        &&
-                                        string.IsNullOrWhiteSpace(diff_products)    //是否还安装了其它ID
-                                        )
-                                    {
-                                        //x64系统还得校验下 Office 注册表的 平台信息 是否一致
-                                        if (Environment.Is64BitOperatingSystem)
+                                        string platform = Register.Read.Value(RegistryHive.LocalMachine, RegistryView.Registry64, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "Platform");
+                                        if (string.IsNullOrWhiteSpace(platform) || platform == "x86")
                                         {
-                                            string platform = Register.Read.Value(RegistryHive.LocalMachine, RegistryView.Registry64, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "Platform");
-                                            if (string.IsNullOrWhiteSpace(platform) || platform == "x86")
-                                            {
-                                                return InstallState.Diff;       //虽然出现在了与x64系统注册表匹配的路径，但是Office平台版本并非x64
-                                            }
-                                            else
-                                            {
-                                                //版本号一致、产品ID一致、注册表显示的位数一致
-                                                return InstallState.Correct;    //已经正确安装最新版
-                                            }
+                                            return InstallState.Diff;       //虽然出现在了与x64系统注册表匹配的路径，但是Office平台版本并非x64
                                         }
                                         else
                                         {
-                                            //x32系统，直接满足了
+                                            //版本号不小于官方最新版、产品ID一致、注册表显示的位数一致
                                             return InstallState.Correct;    //已经正确安装最新版
                                         }
                                     }
+                                    else
+                                    {
+                                        //x32系统，直接满足了
+                                        return InstallState.Correct;    //已经正确安装最新版
+                                    }
                                 }
-
-                                //ODT 只安装了1个版本，但版本号和预期版本号不一致，或者还安装了其它版本，
-                                //如：ProPlus2016Volume，视为版本不同
-                                return InstallState.Diff;
+                                else
+                                {
+                                    //ODT 只安装了1个版本，但版本号小于预期版本号，或者还安装了其它版本，
+                                    //如：ProPlus2016Volume，视为版本不同
+                                    return InstallState.Diff;
+                                }
                             }
                             else
                             {

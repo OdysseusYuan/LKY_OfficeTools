@@ -53,8 +53,8 @@ namespace LKY_OfficeTools.Lib
                 Uninstall.BySaRA();
 
                 //无论哪种方式清理，都要再检查一遍是否卸载干净。如果 当前系统 Office 版本数量 > 0，启动强制模式
-                var installed_office = OfficeLocalInstall.GetArchiDir();
-                var license_list = OfficeLocalInstall.LicenseInfo();
+                var installed_office = OfficeLocalInfo.GetArchiDir();
+                var license_list = OfficeLocalInfo.LicenseInfo();
                 if (
                     (installed_office != null && installed_office.Count > 0) ||     //存在残留的Office注册表/文件目录
                     license_list != null && license_list.Count > 0                  //存在残留的许可证信息
@@ -86,7 +86,7 @@ namespace LKY_OfficeTools.Lib
                 try
                 {
                     //获取激活信息
-                    var office_installed_key = OfficeLocalInstall.LicenseInfo();
+                    var office_installed_key = OfficeLocalInfo.LicenseInfo();
 
                     if (office_installed_key != null && office_installed_key.Count > 0)
                     {
@@ -108,7 +108,7 @@ namespace LKY_OfficeTools.Lib
                         }
 
                         //逐一卸载后，若都为 success，则再执行一次检查
-                        office_installed_key = OfficeLocalInstall.LicenseInfo();   //再度获取list
+                        office_installed_key = OfficeLocalInfo.LicenseInfo();   //再度获取list
                         if (office_installed_key.Count == 0)   //为0，视为成功
                         {
                             return true;
@@ -151,7 +151,7 @@ namespace LKY_OfficeTools.Lib
                     try
                     {
                         //有些文件可能无法彻底删除，但如果后面复查时，不影响安装，则不会返回 false
-                        var office_installed_dir = OfficeLocalInstall.GetArchiDir();
+                        var office_installed_dir = OfficeLocalInfo.GetArchiDir();
                         if (office_installed_dir != null && office_installed_dir.Count > 0)
                         {
                             foreach (var now_dir in office_installed_dir)     //遍历查询所有目录，将其删除
@@ -213,7 +213,7 @@ namespace LKY_OfficeTools.Lib
                     }
 
                     //复查是否干净了
-                    var installed_info = OfficeLocalInstall.GetArchiDir();
+                    var installed_info = OfficeLocalInfo.GetArchiDir();
                     if (installed_info != null && installed_info.Count > 0)
                     {
                         throw new Exception();
@@ -372,7 +372,7 @@ namespace LKY_OfficeTools.Lib
                     new Log($"\n------> 正在卸载 Office 冗余版本 ...", ConsoleColor.DarkCyan);
 
                     //获取目前存留的版本
-                    var install_list = OfficeLocalInstall.GetArchiDir();
+                    var install_list = OfficeLocalInfo.GetArchiDir();
                     if (install_list == null || install_list.Count == 0)
                     {
                         //已经不存在残留版本时，直接返回卸载成功

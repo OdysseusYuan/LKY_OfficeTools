@@ -9,7 +9,7 @@ using LKY_OfficeTools.Common;
 using System;
 using System.IO;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
-using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInstall;
+using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInfo;
 
 namespace LKY_OfficeTools.Lib
 {
@@ -78,6 +78,9 @@ namespace LKY_OfficeTools.Lib
                     {
                         Console.ForegroundColor = str_color;
                         Console.WriteLine(str);
+
+                        //输出后恢复颜色
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
 
                     //需要输出日志文件时，进行判断

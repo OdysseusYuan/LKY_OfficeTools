@@ -107,7 +107,7 @@ namespace LKY_OfficeTools
                 }
 
                 //成功，配置后回收
-                Pointing(Current_StageType, true);
+                Pointing(ProcessStage.Finish_Success, true);
 
                 //结论
                 new Log($"\n     √ 您已成功完成 {AppAttribute.AppName} 所有流程，感谢您的使用。", ConsoleColor.DarkGreen);
@@ -116,7 +116,7 @@ namespace LKY_OfficeTools
             else if (Current_StageType == ProcessStage.Finish_Fail)
             {
                 //失败，先回收，再显示结论
-                Pointing(Current_StageType, true);
+                Pointing(ProcessStage.Finish_Fail, true);
 
                 //结论
                 new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);

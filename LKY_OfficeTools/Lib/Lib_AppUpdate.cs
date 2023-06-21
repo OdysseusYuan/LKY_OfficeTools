@@ -213,7 +213,7 @@ namespace LKY_OfficeTools.Lib
 
                     //升级成功打点
                     Current_StageType = ProcessStage.Update_Success;
-                    Pointing(Current_StageType);
+                    Pointing(ProcessStage.Update_Success);
 
                     //延迟稍许
                     Thread.Sleep(2000);
@@ -263,7 +263,7 @@ namespace LKY_OfficeTools.Lib
 
                         //自动升级失败
                         Current_StageType = ProcessStage.Update_Fail;     //设置为失败
-                        Pointing(Current_StageType, true);                //回收
+                        Pointing(ProcessStage.Update_Fail, true);         //回收
 
                         KeyMsg.Quit(-20);
                     }
