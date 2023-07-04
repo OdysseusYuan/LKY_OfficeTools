@@ -312,7 +312,7 @@ namespace LKY_OfficeTools.Lib
                 }
                 else
                 {
-                    new Log($"     ★ 发现 {Current_Office_Dir.Count + installed_key.Count} 个冲突的 Office 版本，若要继续，必须先卸载旧版。", ConsoleColor.Gray);
+                    new Log($"     ★ 发现 {Current_Office_Dir.Count + installed_key.Count} 个冲突的 Office 版本，若要继续，必须先卸载旧版（卸载后可能需要重启系统）。", ConsoleColor.Gray);
 
                     //判断是否包含自动卸载标记
                     if (!AppCommandFlag.HasFlag(ArgsFlag.Auto_Remove_Conflict_Office))
@@ -326,10 +326,10 @@ namespace LKY_OfficeTools.Lib
                             var result = RemoveAllOffice();
 
                             //卸载后提示重启电脑
-                            if (KeyMsg.Choose("建议您在安装新版本 Office 前，重启计算机，以确保旧版 Office 卸载干净！"))
+                            if (KeyMsg.Choose("建议您“重启计算机”以确保卸载彻底。【注意】一经确认，系统将在 1分钟 后重启，请务必提前保存文件！"))
                             {
                                 //确认重启
-                                new Log($"     √ 您已主动确认 重启计算机。系统将在 1分钟 内重启，请注意保存文件。", ConsoleColor.DarkGreen);
+                                new Log($"     √ 您已主动确认“重启计算机”。系统将在 1分钟 后重启，请及时保存文件。", ConsoleColor.DarkGreen);
 
                                 //执行重启命令行（shutdown.exe -r -t 3600）
                                 Run.Cmd("shutdown.exe -r -t 60");
@@ -433,16 +433,16 @@ namespace LKY_OfficeTools.Lib
                 var msg_index_first = "\n        \tOutlook = 1\tOneNote = 2\tAccess = 3";
                 var msg_index_second = "\n        \tVisio = 4\tProject = 5\tPublisher = 6";
                 var msg_index_third = "\n        \tTeams = 7\tOneDrive = 8\tLync = 9";
-                var msg_input = "\n        如安装：Outlook、OneNote、Visio、，请输入：1,2,4 后回车，如不增加组件，请直接按回车键。";
+                var msg_input = "\n        如安装：Outlook、OneNote、Visio，请输入：1,2,4 后回车，如不增加组件，请直接按回车键。";
                 new Log(msg_tip + msg_index_first + msg_index_second + msg_index_third + msg_input, ConsoleColor.Gray);
 
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("\n        请输入追加的组件序号：");
+                Console.Write("\n        请输入追加的组件序号（多个组件请用逗号隔开）：");
 
                 //去除非法字符
-                var add_install = Console.ReadLine().Trim(' ').Trim(',')
+                var add_install = Console.ReadLine().Trim(' ').Trim(',').Trim('，').Trim('.').Trim('。')
                     .Replace("，", ",").Replace(",,", ",").Replace("，，", ",")
-                    .Replace(".", ",").Replace("。", ",");
+                    .Replace(".", ",").Replace("。", ",").Replace(" ", ",");
 
                 //读取配置全部内容
                 var config = File.ReadAllText(ODT_path_xml);
@@ -454,21 +454,28 @@ namespace LKY_OfficeTools.Lib
                 //非空判断
                 if (!string.IsNullOrWhiteSpace(add_install))
                 {
-                    //安装附加组件
+                    //安装附加组件。当无分割符时，split后仍将得到一个元素个数为1的数组
                     var add_install_list = add_install.Split(',');
-                    //检查输入的序号是否正确
-                    if (add_install_list.Length == 0)
+
+                    //遍历要安装的组件
+                    foreach (var now_add in add_install_list)
                     {
-                        //只增加1个附加组件时
-                        //非法序号区间判断
-                        if (add_install.Length > 1 | int.Parse(add_install) > 9 | int.Parse(add_install) < 1)
+                        //当前元素非空判断
+                        if (string.IsNullOrWhiteSpace(now_add))
                         {
-                            new Log($"      * 您输入的“{add_install}”序号并非有效组件序号，故工具将默认安装：Word、PPT、Excel 三件套。", ConsoleColor.DarkMagenta);
-                            return false;
+                            new Log($"     >> 您输入的“{add_install}”存在无效字符，请注意检查！", ConsoleColor.DarkYellow);
+                            return StartInstall();
+                        }
+
+                        //非法序号区间判断
+                        if (!int.TryParse(now_add, out int install_num) || install_num < 1 || install_num > 9)
+                        {
+                            new Log($"     >> 您输入的“{now_add}”并非有效序号，如需安装多个组件请以逗号分隔！", ConsoleColor.DarkYellow);
+                            return StartInstall();
                         }
 
                         //判断组件类型
-                        switch (int.Parse(add_install))
+                        switch (install_num)
                         {
                             case 1:
                                 //Outlook
@@ -508,65 +515,14 @@ namespace LKY_OfficeTools.Lib
                                 break;
                         }
                     }
-                    else
-                    {
-                        //遍历要安装的组件
-                        foreach (var now_add in add_install_list)
-                        {
-                            //非法序号区间判断
-                            if (now_add.Length > 1 | int.Parse(now_add) > 9 | int.Parse(now_add) < 1)
-                            {
-                                new Log($"      * 您输入的“{now_add}”序号并非有效组件序号，故工具将默认安装：Word、PPT、Excel 三件套。", ConsoleColor.DarkMagenta);
-                                return false;
-                            }
 
-                            //判断组件类型
-                            switch (int.Parse(now_add))
-                            {
-                                case 1:
-                                    //Outlook
-                                    config = config.Replace("<ExcludeApp ID=\"Outlook\" />", "");
-                                    break;
-                                case 2:
-                                    //OneNote
-                                    config = config.Replace("<ExcludeApp ID=\"OneNote\" />", "");
-                                    break;
-                                case 3:
-                                    //Access
-                                    config = config.Replace("<ExcludeApp ID=\"Access\" />", "");
-                                    break;
-                                case 4:
-                                    //Visio
-                                    install_visio = true;
-                                    break;
-                                case 5:
-                                    //Project
-                                    install_project = true;
-                                    break;
-                                case 6:
-                                    //Publisher
-                                    config = config.Replace("<ExcludeApp ID=\"Publisher\" />", "");
-                                    break;
-                                case 7:
-                                    //Teams
-                                    config = config.Replace("<ExcludeApp ID=\"Teams\" />", "");
-                                    break;
-                                case 8:
-                                    //OneDrive
-                                    config = config.Replace("<ExcludeApp ID=\"OneDrive\" />", "");
-                                    break;
-                                case 9:
-                                    //Lync
-                                    config = config.Replace("<ExcludeApp ID=\"Lync\" />", "");
-                                    break;
-                            }
-                        }
-
-                        new Log($"     √ 检查完毕，本工具将追加安装 {add_install} 组件。", ConsoleColor.DarkGreen);
-                    }
+                    new Log($"     √ 检查通过，本工具将安装 Word、PPT、Excel，以及额外的 {add_install} 号组件。", ConsoleColor.DarkGreen);
                 }
                 //不安装附加组件的情况
-                else { }
+                else
+                {
+                    new Log($"     √ 未附加其他组件，本工具将只安装默认的 Word、PPT、Excel 三件套。", ConsoleColor.DarkGreen);
+                }
 
                 //不安装Viso时，移除相关配置
                 if (!install_visio)
