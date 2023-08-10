@@ -11,7 +11,7 @@
 - 当系统中存在多个冗余 Office 版本时，本工具在用户同意的情况下，可实现自动升级。
 
 ## 使用方法
-- 下载形如：LKY_OfficeTools_v*.zip 的压缩包，最新版地址：https://gitee.com/OdysseusYuan/LKY_OfficeTools/releases/latest
+- 下载形如：LKY_OfficeTools_v*.zip 的压缩包，最新版地址：https://github.com/OdysseusYuan/LKY_OfficeTools/releases/latest
 - 解压下载好的 zip 压缩包，运行解压后目录下的 LKY_OfficeTools.exe 文件即可完成部署。
 
 ## 运行环境
@@ -19,10 +19,6 @@
 - 目前已经在 Windows 10(1703) 及以上版本进行了测试，均可在其 x86、x64 完美安装正版 Office 并激活。
 - 应 Office 官方要求，系统中只能部署唯一架构类型，故本工具部署时，会征求用户同意，由其自行决定是否卸载其它架构。
 - 2016年7月及其之前发布的 Windows 系统（即：Windows 10(1703) 之前的系统），因其架构过于陈旧，其已经不再支持安装最新的正版 Office。
-
-## Q&A相关
-- 中国大陆用户：https://gitee.com/OdysseusYuan/LKY_OfficeTools/wikis
-- 中国其它区域或海外用户：https://github.com/OdysseusYuan/LKY_OfficeTools/wiki
  
 ## 开源说明
 - 欢迎广大开发者、爱好者们 Fork、PR 本仓库。参考、引用、转发、二次开发本开源库时，请注明来源。
@@ -31,7 +27,7 @@
 - 当前工具将持续进行迭代更新和维护，迭代过程中不排除在各种因素综合下，可能产生计算机运行的各种情况。
 
 ## 版权保护
-- 软件已获多项著作权（含修改保护）：软著登字第10549507号、软著登字第10895737号、软著登字第10850084号等。
+- 软件已获多项著作权（含修改保护）：软著登字第10549507号、软著登字第10895737号、软著登字第10850084号、软著登字第11497426号等。
 
 ## 关于
 - 如有建议、疑惑等，大家可以发邮件至 [liukaiyuan@sjtu.edu.cn](mailto:liukaiyuan@sjtu.edu.cn) 交流探讨。
