@@ -6,7 +6,7 @@
 目前包含的功能：
 - 一键快速下载、安装、激活最新版 Microsoft Office 软件。
 - 用户可在安装 Word、PPT、Excel 的同时，根据软件提示，自助安装其它组件，包括：
-Outlook、OneNote、Access、Visio、Project、Publisher、Teams、OneDrive、Lync/Skype
+Outlook、OneNote、Access、Visio、Project、Publisher、Teams、OneDrive、Lync/Skype。
 - 工具可自动识别不同的操作系统架构，自动下载适配版本的 Office。
 - 本工具激活 Office 的方式为正版激活模式，不会篡改任何系统文件。
 - 当系统中存在多个冗余 Office 版本时，本工具在用户同意的情况下，可实现自动升级。
@@ -28,7 +28,7 @@ Outlook、OneNote、Access、Visio、Project、Publisher、Teams、OneDrive、Ly
 - 当前工具将持续进行迭代更新和维护，迭代过程中不排除在各种因素综合下，可能产生计算机运行的各种情况。
 
 ## 版权保护
-- 软件已获多项著作权（含修改保护）：软著登字第10549507号、软著登字第10895737号、软著登字第10850084号、软著登字第11497426号等。
+- 软件已获多项著作权（含修改保护）：软著登字第10549507号、软著登字第10895737号、软著登字第10850084号、软著登字第11497426号、软著登字第11573194号等。
 
 ## 关于
 - 如有建议、疑惑等，大家可以发邮件至 [liukaiyuan@sjtu.edu.cn](mailto:liukaiyuan@sjtu.edu.cn) 交流探讨。
