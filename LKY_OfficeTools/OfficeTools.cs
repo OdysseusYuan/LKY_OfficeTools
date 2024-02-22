@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
+ *      [LKY Office Tools] Copyright (C) 2022 - 2024 LiuKaiyuan Inc.
  *      
  *      FileName : OfficeTools.cs
  *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)

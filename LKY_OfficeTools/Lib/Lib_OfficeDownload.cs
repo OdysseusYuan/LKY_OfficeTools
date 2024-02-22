@@ -1,5 +1,5 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
+ *      [LKY Office Tools] Copyright (C) 2022 - 2024 LiuKaiyuan Inc.
  *      
  *      FileName : Lib_OfficeDownload.cs
  *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
