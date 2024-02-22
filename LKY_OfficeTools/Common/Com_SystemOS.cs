@@ -9,11 +9,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Windows.Forms;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
@@ -307,122 +303,6 @@ namespace LKY_OfficeTools.Common
                     {
                         return false;
                     }
-                }
-                catch (Exception Ex)
-                {
-                    new Log(Ex.ToString());
-                    return false;
-                }
-            }
-        }
-
-        internal class SoftWare
-        {
-            public static List<string> InstalledList()
-            {
-                try
-                {
-                    //从注册表中获取控制面板“卸载程序”中的程序和功能列表
-                    RegistryKey HK_Root_x32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);    //打开x32系统键
-                    RegistryKey HK_Root_x64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);    //打开x64系统键
-
-                    string soft_path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
-                    RegistryKey software_x32_list = HK_Root_x32.OpenSubKey(soft_path);              //x32软件列表
-                    RegistryKey software_x64_list = null;                                           //x64软件列表。x32系统该值将始终为null
-
-                    //获取x64软件列表（仅在用户系统是x64的情况下获取）
-                    if (Environment.Is64BitOperatingSystem)
-                    {
-                        software_x64_list = HK_Root_x64.OpenSubKey(soft_path);
-                    }
-
-                    //整合键位
-                    List<RegistryKey> software_key = new List<RegistryKey>();
-                    if (software_x32_list != null && software_x32_list.SubKeyCount > 0)
-                    {
-                        software_key.Add(software_x32_list);
-                    }
-                    if (software_x64_list != null && software_x64_list.SubKeyCount > 0)
-                    {
-                        software_key.Add(software_x64_list);
-                    }
-
-                    //开始获取
-                    if (software_key != null && software_key.Count > 0)
-                    {
-                        List<string> software_info = new List<string>();
-
-                        foreach (var now_bit in software_key)                               //遍历2个系统位数的注册表
-                        {
-                            foreach (string now_subkeyname in now_bit.GetSubKeyNames())     //遍历每个位数下面，对应的软件列表
-                            {
-                                //打开对应的软件名称
-                                RegistryKey SubKey = now_bit.OpenSubKey(now_subkeyname);
-                                if (SubKey != null)
-                                {
-                                    string DisplayName = SubKey.GetValue("DisplayName", "NONE").ToString();
-
-                                    //过滤条件
-                                    if (DisplayName != "NONE" && !DisplayName.Contains("vs") && !DisplayName.Contains("Visual C++") &&
-                                        !DisplayName.Contains(".NET"))
-                                    {
-                                        software_info.Add(DisplayName);
-                                    }
-                                }
-                            }
-                        }
-
-                        //元素去重
-                        if (software_info != null && software_info.Count > 0)
-                        {
-                            return software_info.Distinct().ToList();
-                        }
-                    }
-
-                    return null;
-                }
-                catch (Exception Ex)
-                {
-                    new Log(Ex.ToString());
-                    return null;
-                }
-            }
-        }
-
-        internal class Screen
-        {
-            internal static bool CaptureToSave(string save_to, ImageFormat file_type = null)
-            {
-                try
-                {
-                    //初始化屏幕尺寸
-                    int screenLeft = SystemInformation.VirtualScreen.Left;
-                    int screenTop = SystemInformation.VirtualScreen.Top;
-                    int screenWidth = SystemInformation.VirtualScreen.Width;
-                    int screenHeight = SystemInformation.VirtualScreen.Height;
-
-                    //接收截图
-                    using (Bitmap bmp = new Bitmap(screenWidth, screenHeight))
-                    {
-                        //抓取
-                        using (Graphics g = Graphics.FromImage(bmp))
-                        {
-                            g.CopyFromScreen(screenLeft, screenTop, 0, 0, bmp.Size);
-                        }
-
-                        //判断保存格式
-                        if (file_type == null)
-                        {
-                            file_type = ImageFormat.Jpeg;
-                        }
-
-                        //创建日志目录
-                        Directory.CreateDirectory(new FileInfo(save_to).DirectoryName);
-
-                        bmp.Save(save_to, file_type);
-                    }
-
-                    return true;
                 }
                 catch (Exception Ex)
                 {
