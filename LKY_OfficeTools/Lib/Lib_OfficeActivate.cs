@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_OfficeActivate.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -19,19 +19,10 @@ using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInfo;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// 实现激活的类库
-    /// </summary>
     internal class Lib_OfficeActivate
     {
-        /// <summary>
-        /// KMS 服务器列表
-        /// </summary>
         internal static List<string> KMS_List = new List<string>();
 
-        /// <summary>
-        /// 获取 KMS 服务器列表
-        /// </summary>
         internal static void Activating()
         {
             string KMS_info = Com_TextOS.GetCenterText(AppJson.Info, "\"KMS_List\": \"", "\"");
@@ -67,10 +58,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 激活 Office
-        /// 没安装 Office 最新版 返回 -10，激活成功 = 1，其余小于1的值均为失败
-        /// </summary>
         internal static int StartActivate(string kms_server = "kms.chinancce.com")
         {
             //检查安装情况

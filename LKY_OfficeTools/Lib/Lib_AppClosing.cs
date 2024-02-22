@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_AppClosing.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -13,14 +13,8 @@ using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// APP 关闭时的类库
-    /// </summary>
     internal class Lib_AppClosing
     {
-        /// <summary>
-        /// 关闭窗口的类库
-        /// </summary>
         internal class CloseWindow
         {
             internal delegate bool ControlCtrlDelegate(int CtrlType);
@@ -30,11 +24,6 @@ namespace LKY_OfficeTools.Lib
 
             internal static ControlCtrlDelegate newDelegate = new ControlCtrlDelegate(HandlerRoutine);
 
-            /// <summary>
-            /// 用户关闭窗口事件
-            /// </summary>
-            /// <param name="CtrlType"></param>
-            /// <returns></returns>
             internal static bool HandlerRoutine(int CtrlType)
             {
                 //只要程序不是已完成（无论成功与否），手动关闭，就会显示文字并打点

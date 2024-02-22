@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Com_FileOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -14,22 +14,10 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 对文件操作的类库
-    /// </summary>
     internal class Com_FileOS
     {
-        /// <summary>
-        /// 对xml文件操作的类库
-        /// </summary>
         internal class XML
         {
-            /// <summary>
-            /// 通过键修改对应的值
-            /// </summary>
-            /// <param name="xml_path"></param>
-            /// <param name="Key_str"></param>
-            /// <returns></returns>
             internal static bool SetValue(string xml_path, string Key_str, string new_Value)
             {
                 try
@@ -63,21 +51,10 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 搜索文件的类库
-        /// </summary>
         internal class ScanFiles
         {
-            /// <summary>
-            /// 检索最终的文件路径列表
-            /// </summary>
             internal List<string> FilesList = new List<string>();
 
-            /// <summary>
-            /// 通过文件后缀扩展类型，递归查找满足条件的文件路径
-            /// </summary>
-            /// <param name="dirPath"></param>
-            /// <param name="isRoot"></param>
             internal void GetFilesByExtension(string dirPath, string fileType = "*", bool isRoot = false)
             {
                 if (Directory.Exists(dirPath))     //目录存在
@@ -130,17 +107,11 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 转换文件不同格式，如：流、文件流等
-        /// </summary>
         internal class Covert
         {
             /* - - - - - - - - - - - - - - - - - - - - - - - - 
              * Stream 和 byte[] 之间的转换
              * - - - - - - - - - - - - - - - - - - - - - - - */
-            /// <summary>
-            /// 将 Stream 转成 byte[]
-            /// </summary>
             internal static byte[] StreamToBytes(Stream stream)
             {
                 byte[] bytes = new byte[stream.Length];
@@ -151,9 +122,6 @@ namespace LKY_OfficeTools.Common
                 return bytes;
             }
 
-            /// <summary>
-            /// 将 byte[] 转成 Stream
-            /// </summary>
             internal static Stream BytesToStream(byte[] bytes)
             {
                 Stream stream = new MemoryStream(bytes);
@@ -164,9 +132,6 @@ namespace LKY_OfficeTools.Common
             /* - - - - - - - - - - - - - - - - - - - - - - - - 
              * Stream 和 文件之间的转换
              * - - - - - - - - - - - - - - - - - - - - - - - */
-            /// <summary>
-            /// 将 Stream 写入文件
-            /// </summary>
             internal static void StreamToFile(Stream stream, string fileName)
             {
                 // 把 Stream 转换成 byte[]
@@ -183,9 +148,6 @@ namespace LKY_OfficeTools.Common
                 fs.Close();
             }
 
-            /// <summary>
-            /// 从文件读取 Stream
-            /// </summary>
             internal static Stream FileToStream(string fileName)
             {
                 // 打开文件
@@ -200,19 +162,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 文件写出类
-        /// </summary>
         internal class Write
         {
-            /// <summary>
-            /// 将文本以流的方式写出到文件。
-            /// 默认为追加模式
-            /// </summary>
-            /// <param name="file_path"></param>
-            /// <param name="content"></param>
-            /// <param name="is_append">设置为 false 时，将删除原有文件！</param>
-            /// <returns></returns>
             internal static bool TextToFile(string file_path, string content, bool is_append = true)
             {
                 try
@@ -244,10 +195,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 将Stream数据写出到本地文件
-            /// </summary>
-            /// <returns></returns>
             internal static bool FromStream(Stream stream, string to_path)
             {
                 try
@@ -271,16 +218,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 获取文件相关信息的类库
-        /// </summary>
         internal class Info
         {
-            /// <summary>
-            /// 获取文件哈希值
-            /// </summary>
-            /// <param name="file_path"></param>
-            /// <returns></returns>
             internal static string GetHash(string file_path)
             {
                 try

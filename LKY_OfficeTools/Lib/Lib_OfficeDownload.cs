@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_OfficeDownload.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -15,15 +15,8 @@ using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// Office 下载类库
-    /// </summary>
     internal class Lib_OfficeDownload
     {
-        /// <summary>
-        /// 下载所有文件（Aria2c）
-        /// 返回值：-1【用户终止】，0【下载失败】，1【下载成功】
-        /// </summary>
         internal static int StartDownload()
         {
             try

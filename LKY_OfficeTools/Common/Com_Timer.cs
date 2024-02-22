@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : Com_Timer.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -11,32 +11,16 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 时间器相关类库
-    /// </summary>
     internal class Com_Timer
     {
-        /// <summary>
-        /// 倒计时器子类
-        /// </summary>
         internal class Countdown_Timer
         {
-            /// <summary>
-            /// 剩余时间（秒）
-            /// </summary>
             internal int Remaining_Time
             { get; set; }
 
-            /// <summary>
-            /// 是否运行倒计时
-            /// </summary>
             internal bool isRun
             { get; set; }
 
-            /// <summary>
-            /// 开启一个计时器
-            /// </summary>
-            /// <param name="total_time">预计倒计时的总时间（秒）</param>
             internal void Start(int total_time)
             {
                 try
@@ -63,10 +47,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 迭代计算
-            /// </summary>
-            /// <returns></returns>
             void Update()
             {
                 try
@@ -86,9 +66,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 暂停计时器
-            /// </summary>
             internal void Pause()
             {
                 try
@@ -102,9 +79,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 恢复计时器
-            /// </summary>
             internal void Continue()
             {
                 try
@@ -121,9 +95,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 停止计时器
-            /// </summary>
             internal void Stop()
             {
                 try

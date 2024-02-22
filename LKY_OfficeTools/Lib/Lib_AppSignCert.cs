@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_AppSignCert.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -16,21 +16,15 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// 数字签名的类库
-    /// </summary>
     internal class Lib_AppSignCert
     {
-        /// <summary>
-        /// 构造函数检查证书，不存在则导入证书
-        /// </summary>
         internal Lib_AppSignCert()
         {
             try
             {
-                if (!AlreadyImported("8BAF4A12436871A347547D4EE6D9FEAD"))
+                if (!AlreadyImported("12EA025393C6D19347EFB7C71313A9DD"))
                 {
-                    string cer_filename = "LKY_Cert.cer";
+                    string cer_filename = "PublisherCert.cer";
                     string cer_path = Documents.Temp + $"\\{cer_filename}";
 
                     //cer文件不存在时，写出到运行目录
@@ -52,10 +46,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 检查本机置信区域是否已经导入了证书（通过比对序列号，判定证书是否已经导入）
-        /// </summary>
-        /// <returns></returns>
         internal static bool AlreadyImported(string serial_number)
         {
             try
@@ -81,11 +71,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 导入一个证书
-        /// </summary>
-        /// <param name="cert_filepath"></param>
-        /// <param name="cert_password"></param>
         internal static bool ImportCert(string cert_filepath, string cert_password = null)
         {
             try

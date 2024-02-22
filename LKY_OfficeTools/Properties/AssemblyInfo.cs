@@ -1,5 +1,11 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿/*
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
+ *      
+ *      FileName : AssemblyInfo.cs
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
+ */
+
+using System.Reflection;
 using System.Runtime.InteropServices;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 
@@ -11,7 +17,7 @@ using static LKY_OfficeTools.Lib.Lib_AppInfo;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany(AppAttribute.Developer)]
 [assembly: AssemblyProduct(AppAttribute.AppName)]
-[assembly: AssemblyCopyright("Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.")]
+[assembly: AssemblyCopyright("Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

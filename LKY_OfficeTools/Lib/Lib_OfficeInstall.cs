@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : Lib_OfficeInstall.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -17,7 +17,6 @@ using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
-using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_AppState;
 using static LKY_OfficeTools.Lib.Lib_OfficeClean;
 using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
@@ -25,14 +24,8 @@ using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInfo;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// Office 安装类库
-    /// </summary>
     internal class Lib_OfficeInstall
     {
-        /// <summary>
-        /// 重载实现安装
-        /// </summary>
         internal Lib_OfficeInstall()
         {
 
@@ -128,10 +121,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 冲突版本检查，卸载和主发行版本不一样的的 Office。
-        /// 无冲突 或 冲突已经解决返回 true，有冲突且无法解决返回 false。
-        /// </summary>
         internal static bool ConflictCheck()
         {
             try
@@ -172,10 +161,8 @@ namespace LKY_OfficeTools.Lib
                             }
 
                             //odt位数与系统匹配，开始校验产品ID
-                            ///获取其ID是否和当前的ID一致，不一致，则false。根据系统位数来取，如果用户是x64系统，则取的是x64的software注册表。x32同理
                             string Current_Office_ID = Register.Read.ValueBySystem(RegistryHive.LocalMachine, @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration", "ProductReleaseIds");
 
-                            ///目标ID
                             string Pop_Office_ID = "2021Volume";
 
                             //ODT 只安装了1个版本，但 Current_Office_ID 为空，视为冲突
@@ -335,7 +322,6 @@ namespace LKY_OfficeTools.Lib
                                 Run.Cmd("shutdown.exe -r -t 60");
 
                                 //重启打点&退出
-                                Pointing(ProcessStage.RestartPC, true);
                                 KeyMsg.Quit(128);
                             }
                             else
@@ -368,9 +354,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 开始安装 Office
-        /// </summary>
         internal static bool StartInstall()
         {
             try
@@ -388,7 +371,6 @@ namespace LKY_OfficeTools.Lib
                 }
 
                 //修改新的xml信息
-                ///修改安装目录，安装目录为运行根目录
                 bool isNewInstallPath = Com_FileOS.XML.SetValue(ODT_path_xml, "SourcePath", AppPath.ExecuteDir);
 
                 //检查是否修改成功（安装目录）
@@ -398,7 +380,6 @@ namespace LKY_OfficeTools.Lib
                     return false;
                 }
 
-                ///修改为新版本号
                 bool isNewVersion = Com_FileOS.XML.SetValue(ODT_path_xml, "Version", OfficeNetInfo.OfficeLatestVersion.ToString());
 
                 //检查是否修改成功（版本号）
@@ -408,7 +389,6 @@ namespace LKY_OfficeTools.Lib
                     return false;
                 }
 
-                ///修改安装的位数
                 //获取系统位数
                 int sys_bit;
                 if (Environment.Is64BitOperatingSystem)
@@ -428,7 +408,6 @@ namespace LKY_OfficeTools.Lib
                     return false;
                 }
 
-                ///提示用户要安装的Office组件
                 var msg_tip = "\n     ★ 本工具默认安装 Word、PPT、Excel，并可选配更多组件：";
                 var msg_index_first = "\n        \tOutlook = 1\tOneNote = 2\tAccess = 3";
                 var msg_index_second = "\n        \tVisio = 4\tProject = 5\tPublisher = 6";
@@ -546,10 +525,8 @@ namespace LKY_OfficeTools.Lib
                 //开始安装
                 new Log($"\n------> 正在安装 Office v{OfficeNetInfo.OfficeLatestVersion} ...", ConsoleColor.DarkCyan);
 
-                ///先结束掉可能还在安装的 Office 进程（强制结束，不等待）
                 Lib_AppSdk.KillAllSdkProcess(KillExe.KillMode.Only_Force);
 
-                ///命令安装
                 string install_args = $"/configure \"{ODT_path_xml}\"";     //配置命令行
                 var install_code = Run.Exe(ODT_path_exe, install_args);
 
@@ -626,10 +603,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// ODT工具常见错误码。
-        /// https://learn.microsoft.com/zh-cn/windows/client-management/mdm/office-csp
-        /// </summary>
         internal static Dictionary<uint, string> ODT_Error
         {
             get

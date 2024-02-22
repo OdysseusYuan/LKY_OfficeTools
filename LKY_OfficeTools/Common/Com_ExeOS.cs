@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Com_ExeOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -12,22 +12,10 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 外部 exe 文件调用类库
-    /// </summary>
     internal class Com_ExeOS
     {
-        /// <summary>
-        /// 运行 exe 类库
-        /// </summary>
         internal class Run
         {
-            /// <summary>
-            /// 启动一个外部exe，等待完成后，返回Code。
-            /// </summary>
-            /// <param name="file_path"></param>
-            /// <param name="args"></param>
-            /// <returns>执行失败时，返回：-920921</returns>
             internal static int Exe(string file_path, string args)
             {
                 try
@@ -50,14 +38,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 启动一个进程（带有线程信息）
-            /// </summary>
-            /// <param name="file_path"></param>
-            /// <param name="args"></param>
-            /// <param name="ProcessInfo"></param>
-            /// <param name="WaitForExit"></param>
-            /// <returns></returns>
             internal static bool Process(string file_path, string args, out Process ProcessInfo, bool WaitForExit)
             {
                 try
@@ -96,11 +76,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 运行CMD命令，并返回执行结果
-            /// </summary>
-            /// <param name="args"></param>
-            /// <returns></returns>
             internal static string Cmd(string args)
             {
                 try
@@ -151,39 +126,17 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 结束运行 exe 类库
-        /// </summary>
         internal class KillExe
         {
-            /// <summary>
-            /// 结束进程的模式
-            /// </summary>
             internal enum KillMode
             {
-                /// <summary>
-                /// 尝试使用优雅的方式结束，如果失败，使用强制结束
-                /// </summary>
                 Try_Friendly = 1,
 
-                /// <summary>
-                /// 只使用优雅的方式结束，若失败，将不再尝试其他方式结束
-                /// </summary>
                 Only_Friendly = 2,
 
-                /// <summary>
-                /// 只使用强制模式结束进程。
-                /// </summary>
                 Only_Force = 4,
             }
 
-            /// <summary>
-            /// 通过 进程的名称 结束指定的进程
-            /// </summary>
-            /// <param name="exe_name">不要扩展名，例如：abc.exe，此处应填写abc</param>
-            /// <param name="kill_mode"></param>
-            /// <param name="isWait">是否等待进程结束？</param>
-            /// <returns></returns>
             internal static bool ByExeName(string exe_name, KillMode kill_mode, bool isWait)
             {
                 try
@@ -211,13 +164,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 通过 进程ID 结束指定的进程
-            /// </summary>
-            /// <param name="exe_id"></param>
-            /// <param name="kill_mode"></param>
-            /// <param name="isWait">是否等待进程结束？</param>
-            /// <returns></returns>
             internal static bool ByProcessID(int exe_id, KillMode kill_mode, bool isWait)
             {
                 try
@@ -277,16 +223,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 获取 exe 进程信息
-        /// </summary>
         internal class Info
         {
-            /// <summary>
-            /// 判断进程是否在运行（通过进程名称）
-            /// </summary>
-            /// <param name="exe_name">不要扩展名，例如：abc.exe，此处应填写abc</param>
-            /// <returns></returns>
             internal static bool IsRun(string exe_name)
             {
                 try
@@ -308,11 +246,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 判断进程是否在运行（通过进程ID号）
-            /// </summary>
-            /// <param name="exe_id">进程ID号</param>
-            /// <returns></returns>
             internal static bool IsRun(int exe_id)
             {
                 try
@@ -334,12 +267,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 通过进程窗口标题，获取符合条件的进程对象列表
-            /// </summary>
-            /// <param name="window_title"></param>
-            /// <param name="need_equal">如果为true，则需要标题严格与预期值相等。反之，窗口标题只需包含预期值即可。默认为 false。</param>
-            /// <returns></returns>
             internal static List<Process> GetProcessByTitle(string window_title, bool need_equal = false)
             {
                 try

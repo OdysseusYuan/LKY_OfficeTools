@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Com_ServiceOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -12,21 +12,10 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 服务操作的类库
-    /// </summary>
     internal class Com_ServiceOS
     {
-        /// <summary>
-        /// 对服务进行查询
-        /// </summary>
         internal class Query
         {
-            /// <summary>
-            /// 查询一个服务的运行状态
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns>1:已停止 2:正在启动 3:正在停止 4:已运行 5:即将继续 6:即将暂停 7:已暂停 0:未知状态</returns>
             internal static int RunState(string serv_name)
             {
                 try
@@ -43,10 +32,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 查询一个服务是否被创建（通过服务名称查询）
-            /// </summary>
-            /// <returns></returns>
             internal static bool IsCreated(string serv_name)
             {
                 try
@@ -69,11 +54,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 获得一个服务对象（通过服务名称）
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns></returns>
             internal static ServiceController GetService(string serv_name)
             {
                 try
@@ -98,12 +78,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 判断一个服务的可执行文件路径（含命令行）与给定值是否相等
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <param name="compare_path"></param>
-            /// <returns></returns>
             internal static bool CompareBinPath(string serv_name, string compare_path)
             {
                 try
@@ -141,13 +115,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 判断一个服务的描述信息与给定值是否相等。
-            /// 注意：这里只看目标描述是否在现有描述中包含来判断，如果二者存在子集关系，仍将返回 true。
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <param name="compare_description"></param>
-            /// <returns></returns>
             internal static bool CompareDescription(string serv_name, string compare_description)
             {
                 try
@@ -186,17 +153,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 对服务进行相应行为的类库。
-        /// 主要用于启动、暂停、停止、重启服务。
-        /// </summary>
         internal class Action
         {
-            /// <summary>
-            /// 启动一个服务
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns></returns>
             internal static bool Start(string serv_name)
             {
                 try
@@ -246,11 +204,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 停止一个服务
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns></returns>
             internal static bool Stop(string serv_name)
             {
                 try
@@ -300,12 +253,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 重启一个服务（禁止用于重启自身服务）。
-            /// 重启自身服务时，存在无法再次启动的问题。因为关闭自身服务时，进程会被结束
-            /// </summary>
-            /// <param name="serv_name"></param>
-            /// <returns></returns>
             internal static bool Restart(string serv_name)
             {
                 try
@@ -335,20 +282,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 配置服务的类库。
-        /// 主要用于增、删、改、查服务
-        /// </summary>
         internal class Config
         {
-            /// <summary>
-            /// 创建一个服务
-            /// </summary>
-            /// <param name="serv_name">服务名称。在服务详情中会展示</param>
-            /// <param name="serv_runpath">运行文件。服务启动时运行哪个文件</param>
-            /// <param name="serv_displayname">展示名称。在服务列表中和详情信息中，均会看到这一属性</param>
-            /// <param name="serv_description">描述信息。可选。</param>
-            /// <returns></returns>
             internal static bool Create(string serv_name, string serv_runpath, string serv_displayname, string serv_description = null)
             {
                 try
@@ -395,10 +330,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 删除一个服务
-            /// </summary>
-            /// <returns></returns>
             internal static bool Delete(string serv_name)
             {
                 if (Query.IsCreated(serv_name))
@@ -436,17 +367,8 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 修改服务的相关信息 类库
-            /// </summary>
             internal class Modify
             {
-                /// <summary>
-                /// 修改一个服务的 BinPath 信息
-                /// </summary>
-                /// <param name="serv_name">服务名称。在服务详情中会展示</param>
-                /// <param name="serv_binpath">binpath 路径（含命令行）</param>
-                /// <returns></returns>
                 internal static bool BinPath(string serv_name, string serv_binpath)
                 {
                     try
@@ -485,12 +407,6 @@ namespace LKY_OfficeTools.Common
                     }
                 }
 
-                /// <summary>
-                /// 修改一个服务的 DisplayName 信息
-                /// </summary>
-                /// <param name="serv_name">服务名称。在服务详情中会展示</param>
-                /// <param name="serv_displayname">新的 DisplayName 信息</param>
-                /// <returns></returns>
                 internal static bool DisplayName(string serv_name, string serv_displayname)
                 {
                     try
@@ -529,12 +445,6 @@ namespace LKY_OfficeTools.Common
                     }
                 }
 
-                /// <summary>
-                /// 修改一个服务的描述信息
-                /// </summary>
-                /// <param name="serv_name">服务名称。在服务详情中会展示</param>
-                /// <param name="serv_description">描述信息，将在服务列表页、详情页展示</param>
-                /// <returns></returns>
                 internal static bool Description(string serv_name, string serv_description)
                 {
                     try

@@ -1,15 +1,14 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : Lib_OfficeClean.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Data.Odbc;
 using System.IO;
 using System.Threading;
 using static LKY_OfficeTools.Common.Com_InstallerOS;
@@ -20,15 +19,8 @@ using static LKY_OfficeTools.Lib.Lib_OfficeInfo;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// 清理 Office 的类库
-    /// </summary>
     internal class Lib_OfficeClean
     {
-        /// <summary>
-        /// 卸载所有的 Office 版本，并移除许可证信息
-        /// </summary>
-        /// <returns></returns>
         internal static bool RemoveAllOffice()
         {
             try
@@ -72,15 +64,8 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 解除激活信息
-        /// </summary>
         internal class Activate
         {
-            /// <summary>
-            /// 移除所有激活信息
-            /// </summary>
-            /// <returns></returns>
             internal static bool Delete()
             {
                 try
@@ -129,15 +114,8 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 使用常规工具卸载安装
-        /// </summary>
         internal class Uninstall
         {
-            /// <summary>
-            /// 强制删除 Office
-            /// </summary>
-            /// <returns></returns>
             internal static bool ForceDelete()
             {
                 try
@@ -185,7 +163,6 @@ namespace LKY_OfficeTools.Lib
                     //清除开始菜单
                     try
                     {
-                        ///先删除 公共目录 下面所有以 Microsoft Office 开头的文件夹路径
                         string root = $@"{Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu)}\Programs";
                         var root_dir = Directory.GetDirectories(root, "Microsoft Office*", SearchOption.TopDirectoryOnly);
                         foreach (var now_dir in root_dir)
@@ -196,7 +173,6 @@ namespace LKY_OfficeTools.Lib
                             }
                         }
 
-                        ///删除 账户 开始菜单下面所有以 Microsoft Office 开头的文件夹路径
                         root = $@"{Environment.GetFolderPath(Environment.SpecialFolder.StartMenu)}\Programs";
                         root_dir = Directory.GetDirectories(root, "Microsoft Office*", SearchOption.TopDirectoryOnly);
                         foreach (var now_dir in root_dir)
@@ -232,11 +208,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 卸载早期 Office 版本。
-            /// 目前包含：Office 2007 和 2003 版本的卸载
-            /// </summary>
-            /// <returns></returns>
             internal static bool RemovePreviousVersion()
             {
                 try
@@ -361,10 +332,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 使用 SaRA 工具，卸载所有 非ODT 安装的 Office 版本
-            /// </summary>
-            /// <returns></returns>
             internal static bool BySaRA()
             {
                 try
@@ -433,10 +400,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 使用 ODT 工具卸载所有使用 ODT 安装的 Office 版本
-            /// </summary>
-            /// <returns></returns>
             internal static bool ByODT()
             {
                 try

@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Com_TextOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -12,18 +12,8 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 对文本操作的类
-    /// </summary>
     internal class Com_TextOS
     {
-        /// <summary>
-        /// 获取中间文本
-        /// </summary>
-        /// <param name="from_text"></param>
-        /// <param name="str_left"></param>
-        /// <param name="str_right"></param>
-        /// <returns></returns>
         internal static string GetCenterText(string str, string strLeft, string strRight)
         {
             try
@@ -57,16 +47,6 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        ///<summary>
-        ///生成随机字符串 
-        ///</summary>
-        ///<param name="length">目标字符串的长度</param>
-        ///<param name="useNum">是否包含数字，1=包含，默认为包含</param>
-        ///<param name="useLow">是否包含小写字母，1=包含，默认为包含</param>
-        ///<param name="useUpp">是否包含大写字母，1=包含，默认为包含</param>
-        ///<param name="useSpe">是否包含特殊字符，1=包含，默认为不包含</param>
-        ///<param name="custom">要包含的自定义字符，直接输入要包含的字符列表</param>
-        ///<returns>指定长度的随机字符串</returns>
         internal static string GetRandomString(int length, bool useNum, bool useLow, bool useUpp, bool useSpe, string custom)
         {
             byte[] b = new byte[4];
@@ -84,11 +64,6 @@ namespace LKY_OfficeTools.Common
             return s;
         }
 
-        /// <summary>
-        /// 将MD5转换为大写
-        /// </summary>
-        /// <param name="strPwd"></param>
-        /// <returns></returns>
         internal static string Encrypt16(string strPwd)
         {
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
@@ -97,12 +72,6 @@ namespace LKY_OfficeTools.Common
             return t2.ToLower();
         }
 
-        /// <summary>
-        /// 搜索一串字符中，某个字符出现的次数
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="scan_str"></param>
-        /// <returns></returns>
         internal static int GetStringTimes(string str, string scan_str)
         {
             try

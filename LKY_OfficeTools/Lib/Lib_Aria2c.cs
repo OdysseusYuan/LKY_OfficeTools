@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_Aria2c.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -13,18 +13,8 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// Aria2c 类库
-    /// </summary>
     internal class Lib_Aria2c
     {
-        /// <summary>
-        /// 使用 Aria2c 下载单个文件。
-        /// 返回值：1~下载完成；0~因lot_aria2c.exe丢失导致无法下载；-1~因为非已知的原因下载失败。
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="save_to"></param>
-        /// <returns></returns>
         internal static int DownFile(string uri, string save_to)
         {
             try

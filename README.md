@@ -31,5 +31,5 @@ Outlook、OneNote、Access、Visio、Project、Publisher、Teams、OneDrive、Ly
 - 软件已获多项著作权（含修改保护）：软著登字第10549507号、软著登字第10895737号、软著登字第10850084号、软著登字第11497426号、软著登字第11573194号等。
 
 ## 关于
-- 如有建议、疑惑等，大家可以发邮件至 [liukaiyuan@sjtu.edu.cn](mailto:liukaiyuan@sjtu.edu.cn) 交流探讨。
-- © 2022 - 2023 LiuKaiyuan (Odysseus.Yuan). All Rights Reserved.
+- 如有建议、疑惑等，大家可以发邮件至 [OdysseusYuan@foxmail.com](mailto:OdysseusYuan@foxmail.com) 交流探讨。
+- © 2022 - 2024 LiuKaiyuan (Odysseus.Yuan). All Rights Reserved.

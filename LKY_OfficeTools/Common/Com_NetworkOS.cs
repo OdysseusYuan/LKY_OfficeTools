@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Com_NetworkOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -14,14 +14,8 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 网络处理类库
-    /// </summary>
     internal class Com_NetworkOS
     {
-        /// <summary>
-        /// 网络环境检查
-        /// </summary>
         internal class Check
         {
             //导入判断网络是否连接的 .dll
@@ -29,9 +23,6 @@ namespace LKY_OfficeTools.Common
             //判断网络状况的方法,返回值true为连接，false为未连接
             private extern static bool InternetGetConnectedState(out int conState, int reder);
 
-            /// <summary>
-            /// 网络联网检查
-            /// </summary>
             internal static bool IsConnected
             {
                 get
@@ -41,15 +32,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// IP 相关类库
-        /// </summary>
         internal class IP
         {
-            /// <summary>
-            /// 获得自身IP地址以及网络信息
-            /// </summary>
-            /// <returns>返回IP和查询地址</returns>
             internal static string GetMyIP_Info()
             {
                 try
@@ -78,10 +62,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 获得自身IP地址
-            /// </summary>
-            /// <returns></returns>
             internal static string GetMyIP()
             {
                 try
@@ -126,10 +106,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 将 IP 映射到归属地
-            /// </summary>
-            /// <returns></returns>
             internal static string IP2Location()
             {
                 try
@@ -164,11 +140,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 从html中通过正则找到ip信息(只支持ipv4地址)
-            /// </summary>
-            /// <param name="pageHtml"></param>
-            /// <returns></returns>
             private static string GetIPFromHtml(string pageHtml)
             {
                 try

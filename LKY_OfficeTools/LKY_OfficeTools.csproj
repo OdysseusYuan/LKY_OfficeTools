@@ -75,7 +75,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Com_EmailOS.cs" />
     <Compile Include="Common\Com_ExeOS.cs" />
     <Compile Include="Common\Com_FileOS.cs" />
     <Compile Include="Common\Com_InstallerOS.cs" />
@@ -104,7 +103,6 @@
     <Compile Include="Lib\Lib_OfficeDownload.cs" />
     <Compile Include="Lib\Lib_OfficeInfo.cs" />
     <Compile Include="Lib\Lib_OfficeInstall.cs" />
-    <Compile Include="Lib\Lib_AppReport.cs" />
     <Compile Include="Lib\Lib_AppLog.cs" />
     <Compile Include="Lib\Lib_AppUpdate.cs" />
     <Compile Include="Lib\Lib_OfficeClean.cs" />
@@ -118,12 +116,12 @@
     <None Include="Resource\Json\LKY_OfficeTools_AppInfo.json" />
     <None Include="Resource\Json\OfficeChannels.txt" />
     <None Include="Properties\app.manifest" />
-    <EmbeddedResource Include="Resource\LKY_Cert.cer" />
     <EmbeddedResource Include="Resource\Office_Processes.list" />
     <EmbeddedResource Include="Resource\SDK\Activate.lotp" />
     <EmbeddedResource Include="Resource\SDK\Aria2c.lotp" />
     <EmbeddedResource Include="Resource\SDK\ODT.lotp" />
     <EmbeddedResource Include="Resource\SDK\SaRA.lotp" />
+    <EmbeddedResource Include="Resource\PublisherCert.cer" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />

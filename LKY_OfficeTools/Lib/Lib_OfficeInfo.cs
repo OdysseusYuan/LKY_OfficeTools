@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_OfficeInfo.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -20,66 +20,30 @@ namespace LKY_OfficeTools.Lib
 {
     internal class Lib_OfficeInfo
     {
-        /// <summary>
-        /// Office 每一代发行的架构
-        /// </summary>
         internal enum OfficeArchi
         {
-            /// <summary>
-            /// Office 2003
-            /// </summary>
             Office_2003 = 2003,
 
-            /// <summary>
-            /// Office 12.0 x32
-            /// </summary>
             Office_2007_x32 = 2007 * 32,
 
-            /// <summary>
-            /// Office 12.0 x64
-            /// </summary>
             Office_2007_x64 = 2007 * 64,
 
-            /// <summary>
-            /// Office 14.0 x32
-            /// </summary>
             Office_2010_x32 = 2010 * 32,
 
-            /// <summary>
-            /// Office 14.0 x64
-            /// </summary>
             Office_2010_x64 = 2010 * 64,
 
-            /// <summary>
-            /// Office 15.0 x32
-            /// </summary>
             Office_2013_x32 = 2013 * 32,
 
-            /// <summary>
-            /// Office 15.0 x64
-            /// </summary>
             Office_2013_x64 = 2013 * 64,
 
-            /// <summary>
-            /// Office 16.0及其以上版本  x32
-            /// </summary>
             Office_ODT_x32 = 2016 * 32,
 
-            /// <summary>
-            /// Office 16.0及其以上版本 x64
-            /// </summary>
             Office_ODT_x64 = 2016 * 64,
         }
 
-        /// <summary>
-        /// 查看 Office 网络的版本类库
-        /// </summary>
         internal class OfficeNetInfo
         {
             private static string _office_channel_info;
-            /// <summary>
-            /// Office频道的信息
-            /// </summary>
             internal static string OfficeChannelInfo
             {
                 get
@@ -137,9 +101,6 @@ namespace LKY_OfficeTools.Lib
             }
 
             private static Version _office_latest_version;
-            /// <summary>
-            /// 最新版 Office 版本信息
-            /// </summary>
             internal static Version OfficeLatestVersion
             {
                 get
@@ -184,9 +145,6 @@ namespace LKY_OfficeTools.Lib
             }
 
             private static string _office_url_root;
-            /// <summary>
-            /// 要下载的 Office 文件的根网址
-            /// </summary>
             internal static string OfficeUrlRoot
             {
                 get
@@ -231,9 +189,6 @@ namespace LKY_OfficeTools.Lib
             }
 
             private static List<string> _office_file_list;
-            /// <summary>
-            /// Office 最新版的文件下载地址列表
-            /// </summary>
             internal static List<string> OfficeFileList
             {
                 get
@@ -309,43 +264,20 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 查看本地 Office 安装情况 类库
-        /// </summary>
         internal class OfficeLocalInfo
         {
-            /// <summary>
-            /// Office 本地安装情况（标记）
-            /// </summary>
             [Flags]
             internal enum InstallState
             {
-                /// <summary>
-                /// 已安装了最新版 Office
-                /// </summary>
                 Correct = 1,
 
-                /// <summary>
-                /// 安装了 Office，但版本与预期版本不同
-                /// </summary>
                 Diff = 2,
 
-                /// <summary>
-                /// 系统中存在多个版本的 Office
-                /// </summary>
                 Multi = 4,
 
-                /// <summary>
-                /// 本机未安装任何 Office
-                /// </summary>
                 None = 8,
             }
 
-            /// <summary>
-            /// 判断当前电脑 Office 版本的安装情况。
-            /// （只检查注册表，不包含激活许可证信息）
-            /// </summary>
-            /// <returns></returns>
             internal static InstallState GetOfficeState()
             {
                 var version_info = GetArchiDir();
@@ -451,10 +383,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 获取本机已经安装的所有Office版本和对应的安装目录（字典）
-            /// </summary>
-            /// <returns></returns>
             internal static Dictionary<OfficeArchi, string> GetArchiDirFull()
             {
                 try
@@ -512,10 +440,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 获取本机已经安装的所有Office版本的安装目录（仅包含有效目录）
-            /// </summary>
-            /// <returns></returns>
             internal static List<string> GetArchiDir()
             {
                 try
@@ -552,10 +476,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 获取目前所有激活、未激活的信息
-            /// </summary>
-            /// <returns></returns>
             internal static List<string> LicenseInfo()
             {
                 try

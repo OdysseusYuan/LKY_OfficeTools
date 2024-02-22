@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Com_SystemOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using Microsoft.Win32;
@@ -18,19 +18,10 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 获取用户电脑信息类库
-    /// </summary>
     internal class Com_SystemOS
     {
-        /// <summary>
-        /// 系统级别类库
-        /// </summary>
         internal class OSVersion
         {
-            /// <summary>
-            /// 操作系统类别枚举
-            /// </summary>
             internal enum OSType
             {
                 LowVersion,
@@ -43,10 +34,6 @@ namespace LKY_OfficeTools.Common
                 UnKnow
             }
 
-            /// <summary>
-            /// Windows10~11版本号与发行号对应字典
-            /// 官方字典：https://docs.microsoft.com/zh-cn/windows/release-health/release-information
-            /// </summary>
             internal static readonly IDictionary<string, string> WinPublishType = new Dictionary<string, string>
                 {
                     //win10版本号
@@ -74,9 +61,6 @@ namespace LKY_OfficeTools.Common
                     //{ "1111111111111111", "ARM" },
                 };
 
-            /// <summary>
-            /// 判断用户电脑Windows操作系统版本，如：Win7、Win10等
-            /// </summary>
             internal static OSType GetPublishType()
             {
                 try
@@ -129,10 +113,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 获取当前Win BuildNumber，isCoreVersion默认为真，返回内部版本号，如：19043，
-            /// 若为假，则返回发行版本，如：21H1版本。
-            /// </summary>
             internal static string GetBuildNumber(bool isCoreVersion = true)
             {
                 try
@@ -164,28 +144,10 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 注册表操作类库
-        /// </summary>
         internal class Register
         {
-            /// <summary>
-            /// 读取注册表值
-            /// </summary>
             internal class Read
             {
-                /// <summary>
-                /// 获取指定路径下的注册表键值。
-                /// </summary>
-                /// <param name="reg_root">根节点</param>
-                /// <param name="reg_view">
-                /// 使用该函数访问 Software 目录时：
-                /// <para>x32 系统：无论选择 reg32 还是 reg64，都将只读取 Software 目录，不会读取 WOW6432Node 目录。</para>
-                /// <para>x64 系统：reg32 将读取 WOW6432Node 目录，reg64 将读取 Software 目录。</para>
-                /// </param>
-                /// <param name="path"></param>
-                /// <param name="key"></param>
-                /// <returns></returns>
                 internal static string Value(RegistryHive reg_root, RegistryView reg_view, string path, string key)
                 {
                     try
@@ -221,13 +183,6 @@ namespace LKY_OfficeTools.Common
                     }
                 }
 
-                /// <summary>
-                /// 获取指定路径下的注册表键值（若访问 Software 目录，函数将根据系统位数自动选择 Software 对应的的节点）。
-                /// </summary>
-                /// <param name="reg_root">根节点</param>
-                /// <param name="path"></param>
-                /// <param name="key"></param>
-                /// <returns></returns>
                 internal static string ValueBySystem(RegistryHive reg_root, string path, string key)
                 {
                     try
@@ -250,14 +205,6 @@ namespace LKY_OfficeTools.Common
                     }
                 }
 
-                /// <summary>
-                /// 获取注册表指定目录下的所有注册表键值。若为 Software 目录，将会获取x32、x64节点下对应的值。
-                /// <para>注意：如果计算机为 x32 系统，本函数将只返回 1 条 x32 节点的信息，因为 x32 不可能存在 x64 注册表节点。</para>
-                /// </summary>
-                /// <param name="reg_root">根节点</param>
-                /// <param name="path"></param>
-                /// <param name="key"></param>
-                /// <returns></returns>
                 internal static List<string> AllValues(RegistryHive reg_root, string path, string key)
                 {
                     try
@@ -291,13 +238,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 判断一个项是否存在
-            /// </summary>
-            /// <param name="reg_root"></param>
-            /// <param name="reg_view"></param>
-            /// <param name="item_path"></param>
-            /// <returns></returns>
             internal static bool ExistItem(RegistryHive reg_root, RegistryView reg_view, string item_path)
             {
                 try
@@ -321,13 +261,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 删除注册表 项下面一切东西
-            /// </summary>
-            /// <param name="registry">根项</param>
-            /// <param name="path">路径</param>
-            /// <param name="item">最终从哪一项开始删除</param>
-            /// <returns></returns>
             internal static bool DeleteItem(RegistryHive reg_root, RegistryView reg_view, string path, string item)
             {
                 try
@@ -352,12 +285,6 @@ namespace LKY_OfficeTools.Common
                 }
             }
 
-            /// <summary>
-            /// 从注册表导出到文件。
-            /// </summary>
-            /// <param name="save_to">导出的文件的扩展名应当是.REG的</param>
-            /// <param name="reg_path">指定注册表的某一键被导出，如果指定null值，将导出整个注册表</param>
-            /// <returns></returns>
             internal static bool ExportReg(string reg_path, string save_to)
             {
                 try
@@ -389,15 +316,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 软件操作类库
-        /// </summary>
         internal class SoftWare
         {
-            /// <summary>
-            /// 获取已安装软件列表
-            /// </summary>
-            /// <returns></returns>
             public static List<string> InstalledList()
             {
                 try
@@ -469,17 +389,8 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 屏幕相关类库
-        /// </summary>
         internal class Screen
         {
-            /// <summary>
-            /// 抓取屏幕并保存至文件
-            /// </summary>
-            /// <param name="save_to"></param>
-            /// <param name="file_type"></param>
-            /// <returns></returns>
             internal static bool CaptureToSave(string save_to, ImageFormat file_type = null)
             {
                 try

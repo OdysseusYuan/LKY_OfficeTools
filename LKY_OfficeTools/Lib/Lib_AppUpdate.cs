@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : Lib_SelfUpdate.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -16,32 +16,18 @@ using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
-using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// 用于检查更新的类库
-    /// </summary>
     internal class Lib_AppUpdate
     {
-        /// <summary>
-        /// 最新的版本
-        /// </summary>
         internal static string Latest_Version
         { get; set; }
 
-        /// <summary>
-        /// 最新版本对应的下载地址
-        /// </summary>
         internal static string Latest_Url
         { get; set; }
 
-        /// <summary>
-        /// 检查自身最新版本
-        /// </summary>
-        /// <returns></returns>
         internal static bool Check()
         {
             try
@@ -51,7 +37,6 @@ namespace LKY_OfficeTools.Lib
                 //当更新完成自重启时，自动删除 Update Trash 目录中的 .old 文件
                 ScanFiles oldFiles = new ScanFiles();
                 oldFiles.GetFilesByExtension(AppPath.Documents.Update.UpdateTrash, ".old");
-                ///无 old 文件时，自动跳过
                 if (oldFiles.FilesList != null && oldFiles.FilesList.Count > 0)
                 {
                     foreach (var now_file in oldFiles.FilesList)
@@ -95,9 +80,6 @@ namespace LKY_OfficeTools.Lib
                 Latest_Url = Com_TextOS.GetCenterText(AppJson.Info, "\"Latest_Version_Update_Url\": \"", "\"");
 
                 new Log($"     >> 初始化完成 {new Random().Next(11, 30)}% ...", ConsoleColor.DarkYellow);
-
-                //启动打点
-                Pointing(ProcessStage.Starting, true);
 
                 new Log($"     >> 初始化完成 {new Random().Next(91, 100)}% ...", ConsoleColor.DarkYellow);
 
@@ -149,19 +131,16 @@ namespace LKY_OfficeTools.Lib
 
                     //解压文件
                     string extra_to = Path.GetDirectoryName(save_to) + "\\" + $"v{Latest_Version}";
-                    ///如果目录存在，先清空下目标文件夹，删除子目录、子文件等
                     if (Directory.Exists(extra_to))
                     {
                         Directory.Delete(extra_to, true);
                     }
                     ZipFile.ExtractToDirectory(save_to, extra_to);
-                    ///删除下载的zip
                     File.Delete(save_to);
 
                     //扫描文件
                     ScanFiles new_files = new ScanFiles();
                     new_files.GetFilesByExtension(extra_to);
-                    ///可更新文件为空，跳过更新
                     if (new_files.FilesList == null)
                     {
                         throw new Exception();
@@ -213,7 +192,6 @@ namespace LKY_OfficeTools.Lib
 
                     //升级成功打点
                     Current_StageType = ProcessStage.Update_Success;
-                    Pointing(ProcessStage.Update_Success);
 
                     //延迟稍许
                     Thread.Sleep(2000);
@@ -240,9 +218,6 @@ namespace LKY_OfficeTools.Lib
 
         }
 
-        /// <summary>
-        /// 手动下载升级
-        /// </summary>
         static void ManualUpdate()
         {
             try
@@ -263,7 +238,6 @@ namespace LKY_OfficeTools.Lib
 
                         //自动升级失败
                         Current_StageType = ProcessStage.Update_Fail;     //设置为失败
-                        Pointing(ProcessStage.Update_Fail, true);         //回收
 
                         KeyMsg.Quit(-20);
                     }
@@ -282,10 +256,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 更新完成，重启进程或服务，完成新的部署
-        /// </summary>
-        /// <returns></returns>
         static bool RestartProcess()
         {
             try

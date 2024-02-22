@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_OfficeProcess.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -18,9 +18,6 @@ namespace LKY_OfficeTools.Lib
 {
     internal class Lib_OfficeProcess
     {
-        /// <summary>
-        /// Office 所有版本常用进程列表
-        /// </summary>
         internal static List<string> Process_List
         {
             get
@@ -56,10 +53,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 从 Office List 文件中找到目前计算机正在运行的进程名
-        /// </summary>
-        /// <returns></returns>
         internal static List<string> GetRuningProcess()
         {
             try
@@ -82,15 +75,8 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 结束 Office 进程类库
-        /// </summary>
         internal class KillOffice
         {
-            /// <summary>
-            /// 结束所有 Office 常用进程。
-            /// </summary>
-            /// <returns></returns>
             internal static bool All()
             {
                 try

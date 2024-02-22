@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_AppServiceConfig.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -17,15 +17,8 @@ using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// 配置服务的类库
-    /// </summary>
     internal class Lib_AppServiceConfig
     {
-        /// <summary>
-        /// 配置服务（建议在主体安装、激活成功时使用）
-        /// </summary>
-        /// <returns></returns>
         internal static void Setup()
         {
             try
@@ -67,52 +60,23 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 添加服务的结果类型
-        /// </summary>
         enum Add_Result
         {
-            /// <summary>
-            /// 添加成功
-            /// </summary>
             Add_Success,
 
-            /// <summary>
-            /// 添加失败
-            /// </summary>
             Add_Fail,
 
-            /// <summary>
-            /// 添加，出现错误
-            /// </summary>
             Add_Error,
 
-            /// <summary>
-            /// 更新成功
-            /// </summary>
             Update_Success,
 
-            /// <summary>
-            /// 更新失败
-            /// </summary>
             Update_Fail,
 
-            /// <summary>
-            /// 更新，出现错误
-            /// </summary>
             Update_Error,
 
-            /// <summary>
-            /// 出现未知的错误
-            /// </summary>
             Unknow,
         }
 
-        /// <summary>
-        /// 为 APP 添加/更新服务。
-        /// 如果服务名称已经被安装，则校验该服务其他属性，若不一致，则修改相关属性。
-        /// </summary>
-        /// <returns>1 安装成功；0 安装失败；-1 安装异常</returns>
         static Add_Result AddOrUpdate()
         {
             try
@@ -220,10 +184,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 让 APP 以服务方式启动
-        /// </summary>
-        /// <returns></returns>
         internal static bool Start()
         {
             try
@@ -251,10 +211,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 停止 APP 对应的服务
-        /// </summary>
-        /// <returns></returns>
         internal static bool Stop()
         {
             try
@@ -289,12 +245,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 重启自身服务（cmd方式）。
-        /// 此方式不会因重启服务，而导致自身进程被结束。
-        /// </summary>
-        /// <param name="serv_name"></param>
-        /// <returns></returns>
         internal static void RestartSelf()
         {
             try

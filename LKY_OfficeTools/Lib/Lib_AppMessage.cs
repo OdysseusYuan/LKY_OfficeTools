@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : Lib_AppMessage.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -13,19 +13,10 @@ using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// 用户消息提示类库
-    /// </summary>
     internal class Lib_AppMessage
     {
-        /// <summary>
-        /// 生成一条与按键相关的信息的类库
-        /// </summary>
         internal class KeyMsg
         {
-            /// <summary>
-            /// 按键退出 & 完成善后
-            /// </summary>
             internal static void Quit(int exit_code)
             {
                 //清理SDK缓存
@@ -43,9 +34,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 需要用户确认的信息（按 回车键 继续）
-            /// </summary>
             internal static bool Confirm(string msg_str = null)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -77,12 +65,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 完成一件事情，并给一个倒计时
-            /// </summary>
-            /// <param name="msg_str"></param>
-            /// <param name="countdown_time">倒计时时间（秒）</param>
-            /// <returns></returns>
             internal static void DoByTime(string msg_str, int countdown_time)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -111,10 +93,6 @@ namespace LKY_OfficeTools.Lib
                 return;
             }
 
-            /// <summary>
-            /// 让用户选择的消息
-            /// 默认 按回车键 执行，按 其他键 跳过。
-            /// </summary>
             internal static bool Choose(string todo_thing)
             {
                 new Log($"\n     ★ {todo_thing}", ConsoleColor.Gray);

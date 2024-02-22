@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : Lib_AppSdk.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -18,46 +18,23 @@ using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppInfo.AppPath;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
-using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// App SDK 类库
-    /// </summary>
     internal class Lib_AppSdk
     {
-        /// <summary>
-        /// SDK包类型
-        /// （更改枚举值时，请务必确保对应的资源文件名字得到了同名修改）
-        /// </summary>
         enum SdkPackage
         {
-            /// <summary>
-            /// 存放 激活 工具
-            /// </summary>
             Activate,
 
-            /// <summary>
-            /// 存放 Aria2c 工具
-            /// </summary>
             Aria2c,
 
-            /// <summary>
-            /// 存放 ODT 工具
-            /// </summary>
             ODT,
 
-            /// <summary>
-            /// 存放 SaRA 维护工具
-            /// </summary>
             SaRA,
         }
 
-        /// <summary>
-        /// 资源在内存中的位置（字典）
-        /// </summary>
         private static Dictionary<SdkPackage, Stream> SdkPackageDic
         {
             get
@@ -87,9 +64,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// SDK 从资源中读取后，保存到硬盘的位置（字典）
-        /// </summary>
         private static Dictionary<SdkPackage, string> SdkPkgPath
         {
             get
@@ -114,10 +88,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 初始化释放 SDK 包
-        /// </summary>
-        /// <returns></returns>
         internal static bool Initial()
         {
             try
@@ -130,12 +100,10 @@ namespace LKY_OfficeTools.Lib
                 Clean();
 
                 //释放文件
-                ///资源读取判断
                 if (SdkPackageDic == null)
                 {
                     throw new Exception("读取 SDK 内存资源失败！");
                 }
-                ///轮询解压sdk
                 foreach (var now_pkg in SdkPackageDic)
                 {
                     string pkg_path = SdkPkgPath[now_pkg.Key];
@@ -165,7 +133,6 @@ namespace LKY_OfficeTools.Lib
                 Clean();
 
                 Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
-                Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
                 KeyMsg.Quit(-2);
@@ -183,7 +150,6 @@ namespace LKY_OfficeTools.Lib
                 Clean();
 
                 Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
-                Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
                 KeyMsg.Quit(-2);
@@ -201,7 +167,6 @@ namespace LKY_OfficeTools.Lib
                 Clean();
 
                 Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
-                Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
                 KeyMsg.Quit(-10);
@@ -230,10 +195,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 清理 SDK 包
-        /// </summary>
-        /// <returns></returns>
         internal static bool Clean()
         {
             try
@@ -256,9 +217,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// SDK 涉及到的所有进程名
-        /// </summary>
         internal static List<string> Process_List
         {
             get
@@ -294,10 +252,6 @@ namespace LKY_OfficeTools.Lib
             }
         }
 
-        /// <summary>
-        /// 结束 SDK 掉残存的进程
-        /// </summary>
-        /// <returns></returns>
         internal static bool KillAllSdkProcess(KillExe.KillMode mode)
         {
             try

@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : OfficeTools.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -14,7 +14,6 @@ using static LKY_OfficeTools.Lib.Lib_AppCommand;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
-using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools
@@ -36,18 +35,13 @@ namespace LKY_OfficeTools
             Entry();
         }
 
-        /// <summary>
-        /// 函数入口
-        /// </summary>
         private static void Entry()
         {
             //欢迎话术
-            ///设置标题
             Console.Title = $"{AppAttribute.AppName} v{AppAttribute.AppVersion}";
-            ///Header
             new Log($"{AppAttribute.AppName} [版本 {AppAttribute.AppVersion}]\n" +
-                $"版权所有（C）LiuKaiyuan (Odysseus.Yuan)。保留所有权利。\n\n" +
-                $"探讨 {AppAttribute.AppName} 相关内容，可发送邮件至：liukaiyuan@sjtu.edu.cn", ConsoleColor.Gray);
+    $"版权所有（C）LiuKaiyuan (Odysseus.Yuan)。保留所有权利。\n\n" +
+    $"探讨 {AppAttribute.AppName} 相关内容，可发送邮件至：OdysseusYuan@foxmail.com", ConsoleColor.Gray);
 
             //清理冗余信息
             Log.Clean();
@@ -106,18 +100,12 @@ namespace LKY_OfficeTools
                     Lib_AppServiceConfig.Setup();
                 }
 
-                //成功，配置后回收
-                Pointing(ProcessStage.Finish_Success, true);
-
                 //结论
                 new Log($"\n     √ 您已成功完成 {AppAttribute.AppName} 所有流程，感谢您的使用。", ConsoleColor.DarkGreen);
             }
             //部署失败，提示错误信息
             else if (Current_StageType == ProcessStage.Finish_Fail)
             {
-                //失败，先回收，再显示结论
-                Pointing(ProcessStage.Finish_Fail, true);
-
                 //结论
                 new Log($"\n     × 当前部署存在失败环节，您可在稍后重试运行！", ConsoleColor.DarkRed);
             }
@@ -126,7 +114,5 @@ namespace LKY_OfficeTools
             KeyMsg.Quit(0);
 
         }
-
-
     }
 }

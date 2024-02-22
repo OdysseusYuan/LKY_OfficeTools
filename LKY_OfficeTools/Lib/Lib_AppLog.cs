@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Lib_AppLog.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using LKY_OfficeTools.Common;
@@ -13,62 +13,29 @@ using static LKY_OfficeTools.Lib.Lib_OfficeInfo.OfficeLocalInfo;
 
 namespace LKY_OfficeTools.Lib
 {
-    /// <summary>
-    /// 日志类库
-    /// </summary>
     internal class Lib_AppLog
     {
-        /// <summary>
-        /// 产生记录类库
-        /// </summary>
         internal class Log
         {
-            /// <summary>
-            /// 日志文件保存的位置
-            /// </summary>
             internal static string log_filepath = null;
 
-            /// <summary>
-            /// 安装失败时注册表 导出后的文件路径
-            /// </summary>
             internal static string reg_install_error { get; set; }
 
-            /// <summary>
-            /// 所有日志的文字记录
-            /// </summary>
             internal static string log_info { get; set; }
 
             /*
-            /// <summary>
-            /// 运行错误的截屏文件列表
-            /// </summary>
-            internal static List<string> error_screen_path = new List<string>();
+                                                internal static List<string> error_screen_path = new List<string>();
             */
 
-            /// <summary>
-            /// 日志输出的类型
-            /// </summary>
             internal enum Output_Type
             {
-                /// <summary>
-                /// 仅展示文本，不写入log
-                /// </summary>
                 Display,
 
-                /// <summary>
-                /// 仅写入log文件，不展现文字
-                /// </summary>
                 Write,
 
-                /// <summary>
-                /// 既展示文字，又写入log
-                /// </summary>
                 Display_Write
             }
 
-            /// <summary>
-            /// 重载：输出实现日志
-            /// </summary>
             internal Log(string str, ConsoleColor str_color, Output_Type output_type = Output_Type.Display_Write)
             {
                 try
@@ -140,11 +107,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 将日志信息保存到文件，不在UI中显示日志内容。
-            /// 一般用于记录Bug或者记录错误。
-            /// </summary>
-            /// <param name="err_str"></param>
             internal Log(string err_str)
             {
                 try
@@ -167,9 +129,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 因为安装 Office 错误产生的注册表日志
-            /// </summary>
             internal Log(InstallState install_error)
             {
                 try
@@ -220,10 +179,6 @@ namespace LKY_OfficeTools.Lib
                 }
             }
 
-            /// <summary>
-            /// 清理所有日志及错误文件
-            /// </summary>
-            /// <returns></returns>
             internal static bool Clean()
             {
                 try

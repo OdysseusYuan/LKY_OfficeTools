@@ -1,29 +1,19 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 LiuKaiyuan. All rights reserved.
  *      
  *      FileName : Com_WebOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
-using System.IO;
 using System.Net;
 using System.Text;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 访问网页类库
-    /// </summary>
     internal class Com_WebOS
     {
-        /// <summary>
-        /// 读取网页链接的内容，并非以浏览器的方式加载。
-        /// 一般适用于读取网页的纯文本文件
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
         internal static string Visit_WebClient(string url, Encoding encoding = null)
         {
             try

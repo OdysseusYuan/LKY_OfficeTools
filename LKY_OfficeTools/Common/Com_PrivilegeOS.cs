@@ -1,8 +1,8 @@
 ﻿/*
- *      [LKY Common Tools] Copyright (C) 2022 - 2023 liukaiyuan@sjtu.edu.cn Inc.
+ *      [LKY Common Tools] Copyright (C) 2022 - 2024 - 2023 OdysseusYuan@foxmail.com Inc.
  *      
  *      FileName : Com_PrivilegeOS.cs
- *      Developer: liukaiyuan@sjtu.edu.cn (Odysseus.Yuan)
+ *      Developer: OdysseusYuan@foxmail.com (Odysseus.Yuan)
  */
 
 using System;
@@ -11,20 +11,12 @@ using System.Security.Principal;
 using static LKY_OfficeTools.Lib.Lib_AppInfo;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 using static LKY_OfficeTools.Lib.Lib_AppMessage;
-using static LKY_OfficeTools.Lib.Lib_AppReport;
 using static LKY_OfficeTools.Lib.Lib_AppState;
 
 namespace LKY_OfficeTools.Common
 {
-    /// <summary>
-    /// 权限相关类库
-    /// </summary>
     internal class Com_PrivilegeOS
     {
-        /// <summary>
-        /// 判断自身程序是否以管理员身份运行
-        /// </summary>
-        /// <returns></returns>
         internal static bool IsRunByAdmin()
         {
             WindowsIdentity identity = WindowsIdentity.GetCurrent();
@@ -32,10 +24,6 @@ namespace LKY_OfficeTools.Common
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
-        /// <summary>
-        /// 判断是否对 ProgramData 目录具有写入权限。
-        /// </summary>
-        /// <returns></returns>
         internal static bool CanWriteProgramDataDir()
         {
             try
@@ -60,9 +48,6 @@ namespace LKY_OfficeTools.Common
             }
         }
 
-        /// <summary>
-        /// 权限处理结果
-        /// </summary>
         internal static void PrivilegeAttention()
         {
             new Log($"\n------> 正在进行 {AppAttribute.AppName} 权限检查 ...", ConsoleColor.DarkCyan);
@@ -73,7 +58,6 @@ namespace LKY_OfficeTools.Common
                 new Log($"     × 权限错误，请以管理员身份运行此文件！", ConsoleColor.DarkRed);
 
                 Current_StageType = ProcessStage.Finish_Fail;     //设置为失败模式
-                Pointing(ProcessStage.Finish_Fail);  //回收
 
                 //退出提示
                 KeyMsg.Quit(-1);
