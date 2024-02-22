@@ -6,8 +6,6 @@
  */
 
 using System;
-using System.Security.Cryptography;
-using System.Text;
 using static LKY_OfficeTools.Lib.Lib_AppLog;
 
 namespace LKY_OfficeTools.Common
@@ -45,31 +43,6 @@ namespace LKY_OfficeTools.Common
                 new Log(Ex.ToString());
                 return null;
             }
-        }
-
-        internal static string GetRandomString(int length, bool useNum, bool useLow, bool useUpp, bool useSpe, string custom)
-        {
-            byte[] b = new byte[4];
-            new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(b);
-            Random r = new Random(BitConverter.ToInt32(b, 0));
-            string s = null, str = custom;
-            if (useNum == true) { str += "0123456789"; }
-            if (useLow == true) { str += "abcdefghijklmnopqrstuvwxyz"; }
-            if (useUpp == true) { str += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
-            if (useSpe == true) { str += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; }
-            for (int i = 0; i < length; i++)
-            {
-                s += str.Substring(r.Next(0, str.Length - 1), 1);
-            }
-            return s;
-        }
-
-        internal static string Encrypt16(string strPwd)
-        {
-            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            string t2 = BitConverter.ToString(md5.ComputeHash(UTF8Encoding.Default.GetBytes(strPwd)), 4, 8);
-            t2 = t2.Replace("-", "");
-            return t2.ToLower();
         }
 
         internal static int GetStringTimes(string str, string scan_str)
